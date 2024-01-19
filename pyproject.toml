@@ -1,0 +1,17 @@
+[tool.poetry]
+name = "y-lab-menu"
+version = "0.1.0"
+description = ""
+authors = ["eddy.di <eddy.di.fint@gmail.com>"]
+readme = "README.md"
+packages = [{include = "y_lab_menu"}]
+
+[tool.poetry.dependencies]
+python = "^3.11"
+fastapi = {extras = ["all"], version = "^0.109.0"}
+uvicorn = {extras = ["standard"], version = "^0.26.0"}
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
