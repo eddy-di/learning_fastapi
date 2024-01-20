@@ -1,5 +1,4 @@
 from pydantic import BaseModel
-from typing import List
 
 class MenuBase(BaseModel):
     title: str
@@ -19,9 +18,10 @@ class SubMenuBase(BaseModel):
     description: str
 
 class SubMenuCreate(SubMenuBase):
-    menu_id: str
+    # menu_id: str
+    ...
 
-class SubMenu(SubMenuBase):
+class SubMenu(SubMenuCreate):
     id: str
     menu: Menu
 
