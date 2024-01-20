@@ -10,6 +10,8 @@ packages = [{include = "y_lab_menu"}]
 python = "^3.11"
 fastapi = {extras = ["all"], version = "^0.109.0"}
 uvicorn = {extras = ["standard"], version = "^0.26.0"}
+sqlalchemy = "^2.0.25"
+psycopg2-binary = "^2.9.9"
 
 
 [build-system]
