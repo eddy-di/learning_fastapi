@@ -12,7 +12,7 @@ class Menu(MenuBase):
     id: str
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 class SubMenuBase(BaseModel):
     title: str
@@ -26,7 +26,7 @@ class SubMenu(SubMenuBase):
     menu: Menu
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 class DishBase(BaseModel):
     title: str
@@ -41,4 +41,11 @@ class Dish(DishBase):
     submenu: SubMenu
 
     class Config:
-        orm_mode = True
+        from_attributes = True
+
+class SubMenuWithCounts(SubMenu):
+    dish_count: int
+
+class MenuWithCounts(Menu):
+    submenu_count: int
+    dish_count: int
