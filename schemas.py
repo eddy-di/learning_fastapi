@@ -1,33 +1,7 @@
 from decimal import Decimal
 from pydantic import BaseModel
 
-class MenuBase(BaseModel):
-    title: str
-    description: str
-
-class MenuCreate(MenuBase):
-    pass
-
-class Menu(MenuBase):
-    id: str
-
-    class Config:
-        from_attributes = True
-
-class SubMenuBase(BaseModel):
-    title: str
-    description: str
-
-class SubMenuCreate(SubMenuBase):
-    pass
-
-class SubMenu(SubMenuCreate):
-    id: str
-    menu: Menu
-
-    class Config:
-        from_attributes = True
-
+# dishes schemas
 class DishBase(BaseModel):
     title: str
     description: str
@@ -38,11 +12,41 @@ class DishCreate(DishBase):
 
 class Dish(DishBase):
     id: str
-    submenu: SubMenu
 
     class Config:
         from_attributes = True
 
+# Submenu schemas
+class SubMenuBase(BaseModel):
+    title: str
+    description: str
+
+class SubMenuCreate(SubMenuBase):
+    pass
+
+class SubMenu(SubMenuBase):
+    id: str
+    dishes: list[Dish] = []
+
+    class Config:
+        from_attributes = True
+
+# Menu schemas
+class MenuBase(BaseModel):
+    title: str
+    description: str
+
+class MenuCreate(MenuBase):
+    pass
+
+class Menu(MenuBase):
+    id: str
+    submenus: list[SubMenu] = []
+
+    class Config:
+        from_attributes = True
+
+# for counts
 class SubMenuWithCounts(SubMenu):
     dish_count: int
 
