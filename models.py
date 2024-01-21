@@ -1,12 +1,15 @@
 from database import Base, engine
 from sqlalchemy import Column, ForeignKey, String, Float
 from sqlalchemy.orm import relationship
-from uuid import uuid4
+import uuid
+
+def generate_uuid():
+    return str(uuid.uuid4())
 
 class Menu(Base):
     __tablename__ = 'menus'
 
-    id = Column(String, primary_key=True, default=str(uuid4()))
+    id = Column(String, primary_key=True, default=generate_uuid)
     title = Column(String)
     description = Column(String)
 
@@ -16,7 +19,7 @@ class Menu(Base):
 class SubMenu(Base):
     __tablename__ = 'submenus'
 
-    id = Column(String, primary_key=True, default=str(uuid4()))
+    id = Column(String, primary_key=True, default=generate_uuid)
     title = Column(String)
     description = Column(String)
 
@@ -30,7 +33,7 @@ class SubMenu(Base):
 class Dish(Base):
     __tablename__ = 'dishes'
 
-    id = Column(String, primary_key=True, default=str(uuid4()))
+    id = Column(String, primary_key=True, default=generate_uuid)
     title = Column(String)
     description = Column(String)
     price = Column(Float)
