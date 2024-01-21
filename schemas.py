@@ -27,6 +27,7 @@ class SubMenuCreate(SubMenuBase):
 class SubMenu(SubMenuBase):
     id: str
     dishes: list[Dish] = []
+    dishes_count: int | None = None
 
     class Config:
         from_attributes = True
@@ -42,14 +43,16 @@ class MenuCreate(MenuBase):
 class Menu(MenuBase):
     id: str
     submenus: list[SubMenu] = []
+    submenus_count: int | None = None
+    dishes_count: int | None = None
 
     class Config:
         from_attributes = True
 
 # for counts
-class SubMenuWithCounts(SubMenu):
-    dish_count: int
+# class SubMenuWithCounts(SubMenu):
+    # dishes_count: int
 
-class MenuWithCounts(Menu):
-    submenu_count: int
-    dish_count: int
+# class MenuWithCounts(Menu):
+    # submenus_count: int
+    # dishes_count: int

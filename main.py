@@ -20,19 +20,20 @@ def get_db():
     # return db.query(models.Menu).filter(models.Menu.id == menu_id).options(joinedload(models.Menu.submenus)).first()
 
 # GET endpoint for list of menus, and a count of related items in it
-@app.get("/api/v1/menus", response_model=List[schemas.MenuWithCounts])
+@app.get("/api/v1/menus", response_model=List[schemas.Menu])
 def read_menus(db: Session = Depends(get_db)):
     menus = db.query(models.Menu).all()
+    
 
     # Fetch submenu count for each menu
     for menu in menus:
-        menu.submenu_count = (
+        menu.submenus_count = (
             db.query(func.count(models.SubMenu.id))
             .filter(models.SubMenu.menu_id == menu.id)
             .scalar()
         )
 
-        menu.dish_count = (
+        menu.dishes_count = (
             db.query(func.count(models.Dish.id))
             .join(models.SubMenu)
             .filter(models.SubMenu.menu_id == menu.id)
@@ -62,6 +63,18 @@ def read_menu(target_menu_id: str, db: Session = Depends(get_db)):
                 .options(joinedload(models.Menu.submenus))\
                 .first()
     
+    db_menu.submenus_count = (
+            db.query(func.count(models.SubMenu.id))
+            .filter(models.SubMenu.menu_id == db_menu.id)
+            .scalar()
+        )
+
+    db_menu.dishes_count = (
+            db.query(func.count(models.Dish.id))
+            .join(models.SubMenu)
+            .filter(models.SubMenu.menu_id == db_menu.id)
+            .scalar()
+        )
     # Check if the menu exists
     if db_menu is None:
         raise HTTPException(status_code=404, detail="menu not found")
@@ -111,6 +124,14 @@ def get_submenus(target_menu_id: str, db: Session = Depends(get_db)):
 
     # Fetch the associated submenus
     submenus = db.query(models.SubMenu).filter(models.SubMenu.menu_id == target_menu_id).all()
+
+    for submenu in submenus:
+        submenu.dishes_count = (
+            db.query(func.count(models.Dish.id))
+            .join(models.SubMenu)
+            .filter(models.SubMenu.menu_id == target_menu_id)
+            .scalar()
+        )
     
     return submenus
 
@@ -143,6 +164,13 @@ def get_submenu(target_menu_id: str, submenu_id: str, db: Session = Depends(get_
 
     # Fetch the specific submenu
     db_submenu = db.query(models.SubMenu).filter(models.SubMenu.id == submenu_id, models.SubMenu.menu_id == target_menu_id).first()
+
+    db_submenu.dishes_count = (
+        db.query(func.count(models.Dish.id))
+        .join(models.SubMenu)
+        .filter(models.SubMenu.id == db_submenu.id)
+        .scalar()
+    )
 
     if db_submenu is None:
         raise HTTPException(status_code=404, detail="submenu not found")
@@ -197,17 +225,6 @@ def delete_submenu(target_menu_id: str, submenu_id: str, db: Session = Depends(g
 # GET operation for retrieving dishes related to a specific submenu
 @app.get('/api/v1/menus/{target_menu_id}/submenus/{target_submenu_id}/dishes', response_model=list[schemas.Dish])
 def get_dishes(target_menu_id: str, target_submenu_id: str, db: Session = Depends(get_db)):
-    # Fetch the menu first to check if it exists
-    db_menu = db.query(models.Menu).filter(models.Menu.id == target_menu_id).first()
-
-    if db_menu is None:
-        raise HTTPException(status_code=404, detail="menu not found")
-
-    # Fetch the submenu to check if it exists
-    db_submenu = db.query(models.SubMenu).filter(models.SubMenu.id == target_submenu_id, models.SubMenu.menu_id == target_menu_id).first()
-
-    if db_submenu is None:
-        raise HTTPException(status_code=404, detail="submenu not found")
 
     # Fetch the associated dishes
     dishes = db.query(models.Dish).filter(models.Dish.submenu_id == target_submenu_id).all()
