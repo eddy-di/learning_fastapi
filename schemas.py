@@ -19,8 +19,7 @@ class SubMenuBase(BaseModel):
     description: str
 
 class SubMenuCreate(SubMenuBase):
-    # menu_id: str
-    ...
+    pass
 
 class SubMenu(SubMenuCreate):
     id: str
@@ -35,11 +34,7 @@ class DishBase(BaseModel):
     price: Decimal
 
 class DishCreate(DishBase):
-    # submenu_id: str
-    title: str
-    description: str
-    price: Decimal
-    submenu: SubMenu
+    pass
 
 class Dish(DishBase):
     id: str
