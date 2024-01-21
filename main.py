@@ -1,5 +1,5 @@
 from fastapi import FastAPI, HTTPException, Depends
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 from sqlalchemy import func
 from typing import List
 import database, models, schemas
@@ -16,7 +16,8 @@ def get_db():
     finally:
         db.close()
 
-
+# def get_menu_with_submenus(db: Session, menu_id: str):
+    # return db.query(models.Menu).filter(models.Menu.id == menu_id).options(joinedload(models.Menu.submenus)).first()
 
 # GET endpoint for list of menus, and a count of related items in it
 @app.get("/api/v1/menus", response_model=List[schemas.MenuWithCounts])
@@ -55,7 +56,11 @@ def create_menu(menu: schemas.MenuCreate, db: Session = Depends(get_db)):
 @app.get("/api/v1/menus/{target_menu_id}", response_model=schemas.Menu)
 def read_menu(target_menu_id: str, db: Session = Depends(get_db)):
     # Fetch the menu from the database
-    db_menu = db.query(models.Menu).filter(models.Menu.id == target_menu_id).first()
+    # db_menu = db.query(models.Menu).filter(models.Menu.id == target_menu_id).first()
+    db_menu = db.query(models.Menu)\
+                .filter(models.Menu.id == target_menu_id)\
+                .options(joinedload(models.Menu.submenus))\
+                .first()
     
     # Check if the menu exists
     if db_menu is None:
@@ -115,7 +120,6 @@ def get_submenus(target_menu_id: str, db: Session = Depends(get_db)):
 def create_submenu(target_menu_id: str, submenu: schemas.SubMenuCreate, db: Session = Depends(get_db)):
     # Fetch the menu first to check if it exists
     db_menu = db.query(models.Menu).filter(models.Menu.id == target_menu_id).first()
-    print(db_menu)
     if db_menu is None:
         raise HTTPException(status_code=404, detail="menu not found")
 
@@ -187,3 +191,129 @@ def delete_submenu(target_menu_id: str, submenu_id: str, db: Session = Depends(g
     db.delete(db_submenu)
     db.commit()
     return db_submenu
+
+# CRUD for Dishes
+
+# GET operation for retrieving dishes related to a specific submenu
+@app.get('/api/v1/menus/{target_menu_id}/submenus/{target_submenu_id}/dishes', response_model=list[schemas.Dish])
+def get_dishes(target_menu_id: str, target_submenu_id: str, db: Session = Depends(get_db)):
+    # Fetch the menu first to check if it exists
+    db_menu = db.query(models.Menu).filter(models.Menu.id == target_menu_id).first()
+
+    if db_menu is None:
+        raise HTTPException(status_code=404, detail="menu not found")
+
+    # Fetch the submenu to check if it exists
+    db_submenu = db.query(models.SubMenu).filter(models.SubMenu.id == target_submenu_id, models.SubMenu.menu_id == target_menu_id).first()
+
+    if db_submenu is None:
+        raise HTTPException(status_code=404, detail="submenu not found")
+
+    # Fetch the associated dishes
+    dishes = db.query(models.Dish).filter(models.Dish.submenu_id == target_submenu_id).all()
+    
+    return dishes
+
+# POST operation for creating a new dish under a specific submenu
+@app.post('/api/v1/menus/{target_menu_id}/submenus/{target_submenu_id}/dishes', response_model=schemas.Dish, status_code=201)
+def create_dish(target_menu_id: str, target_submenu_id: str, dish: schemas.DishCreate, db: Session = Depends(get_db)):
+    # Fetch the menu first to check if it exists
+    db_menu = db.query(models.Menu).filter(models.Menu.id == target_menu_id).first()
+
+    if db_menu is None:
+        raise HTTPException(status_code=404, detail="menu not found")
+
+    # Fetch the submenu to check if it exists
+    db_submenu = db.query(models.SubMenu).filter(models.SubMenu.id == target_submenu_id, models.SubMenu.menu_id == target_menu_id).first()
+
+    if db_submenu is None:
+        raise HTTPException(status_code=404, detail="submenu not found")
+
+    # Create the new dish
+    db_dish = models.Dish(**dish.model_dump(), submenu=db_submenu)
+    db.add(db_dish)
+    db.commit()
+    db.refresh(db_dish)
+
+    return db_dish
+
+
+# GET operation for retrieving a specific dish of a specific submenu
+@app.get('/api/v1/menus/{target_menu_id}/submenus/{target_submenu_id}/dishes/{target_dish_id}', response_model=schemas.Dish)
+def get_dish(target_menu_id: str, target_submenu_id: str, target_dish_id: str, db: Session = Depends(get_db)):
+    # Fetch the menu first to check if it exists
+    db_menu = db.query(models.Menu).filter(models.Menu.id == target_menu_id).first()
+
+    if db_menu is None:
+        raise HTTPException(status_code=404, detail="menu not found")
+
+    # Fetch the submenu to check if it exists
+    db_submenu = db.query(models.SubMenu).filter(models.SubMenu.id == target_submenu_id, models.SubMenu.menu_id == target_menu_id).first()
+
+    if db_submenu is None:
+        raise HTTPException(status_code=404, detail="submenu not found")
+
+    # Fetch the specific dish
+    db_dish = db.query(models.Dish).filter(models.Dish.id == target_dish_id, models.Dish.submenu_id == target_submenu_id).first()
+
+    if db_dish is None:
+        raise HTTPException(status_code=404, detail="dish not found")
+
+    return db_dish
+
+
+# PATCH operation for updating a specific dish of a specific submenu
+@app.patch('/api/v1/menus/{target_menu_id}/submenus/{target_submenu_id}/dishes/{target_dish_id}', response_model=schemas.Dish)
+def update_dish(target_menu_id: str, target_submenu_id: str, target_dish_id: str, dish_update: schemas.DishCreate, db: Session = Depends(get_db)):
+    # Fetch the menu first to check if it exists
+    db_menu = db.query(models.Menu).filter(models.Menu.id == target_menu_id).first()
+
+    if db_menu is None:
+        raise HTTPException(status_code=404, detail="menu not found")
+
+    # Fetch the submenu to check if it exists
+    db_submenu = db.query(models.SubMenu).filter(models.SubMenu.id == target_submenu_id, models.SubMenu.menu_id == target_menu_id).first()
+
+    if db_submenu is None:
+        raise HTTPException(status_code=404, detail="submenu not found")
+
+    # Fetch the specific dish
+    db_dish = db.query(models.Dish).filter(models.Dish.id == target_dish_id, models.Dish.submenu_id == target_submenu_id).first()
+
+    if db_dish is None:
+        raise HTTPException(status_code=404, detail="dish not found")
+
+    # Update dish attributes
+    for key, value in dish_update.dict().items():
+        setattr(db_dish, key, value)
+
+    db.commit()
+    db.refresh(db_dish)
+    return db_dish
+
+# DELETE operation for deleting a specific dish of a specific submenu
+@app.delete('/api/v1/menus/{target_menu_id}/submenus/{target_submenu_id}/dishes/{target_dish_id}', response_model=schemas.Dish)
+def delete_dish(target_menu_id: str, target_submenu_id: str, target_dish_id: str, db: Session = Depends(get_db)):
+    # Fetch the menu first to check if it exists
+    db_menu = db.query(models.Menu).filter(models.Menu.id == target_menu_id).first()
+
+    if db_menu is None:
+        raise HTTPException(status_code=404, detail="menu not found")
+
+    # Fetch the submenu to check if it exists
+    db_submenu = db.query(models.SubMenu).filter(models.SubMenu.id == target_submenu_id, models.SubMenu.menu_id == target_menu_id).first()
+
+    if db_submenu is None:
+        raise HTTPException(status_code=404, detail="submenu not found")
+
+    # Fetch the specific dish
+    db_dish = db.query(models.Dish).filter(models.Dish.id == target_dish_id, models.Dish.submenu_id == target_submenu_id).first()
+
+    if db_dish is None:
+        raise HTTPException(status_code=404, detail="dish not found")
+
+    # Delete the dish
+    db.delete(db_dish)
+    db.commit()
+
+    return db_dish

@@ -1,3 +1,4 @@
+from decimal import Decimal
 from pydantic import BaseModel
 
 class MenuBase(BaseModel):
@@ -31,10 +32,14 @@ class SubMenu(SubMenuCreate):
 class DishBase(BaseModel):
     title: str
     description: str
-    price: float
+    price: Decimal
 
 class DishCreate(DishBase):
-    submenu_id: str
+    # submenu_id: str
+    title: str
+    description: str
+    price: Decimal
+    submenu: SubMenu
 
 class Dish(DishBase):
     id: str
