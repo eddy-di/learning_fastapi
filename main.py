@@ -1,9 +1,8 @@
 from fastapi import FastAPI, HTTPException, Depends
-from sqlalchemy.orm import Session, joinedload
+from sqlalchemy.orm import Session
 from sqlalchemy import func
 from typing import List
 import database, models, schemas
-from fastapi.responses import JSONResponse
 
 
 app = FastAPI()
@@ -58,7 +57,6 @@ def create_menu(menu: schemas.MenuCreate, db: Session = Depends(get_db)):
 def read_menu(target_menu_id: str, db: Session = Depends(get_db)):
     # Fetch the menu from the database
     db_menu = db.query(models.Menu).filter(models.Menu.id == target_menu_id).first()
-    # db_menu = db.query(models.Menu).filter(models.Menu.id == target_menu_id).options(joinedload(models.Menu.submenus)).first()
     
     # Check if the menu exists
     if db_menu is None:

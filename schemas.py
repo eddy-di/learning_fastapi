@@ -48,11 +48,3 @@ class Menu(MenuBase):
 
     class Config:
         from_attributes = True
-
-# for counts
-# class SubMenuWithCounts(SubMenu):
-    # dishes_count: int
-
-# class MenuWithCounts(Menu):
-    # submenus_count: int
-    # dishes_count: int
