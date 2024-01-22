@@ -15,8 +15,6 @@ def get_db():
     finally:
         db.close()
 
-# def get_menu_with_submenus(db: Session, menu_id: str):
-    # return db.query(models.Menu).filter(models.Menu.id == menu_id).options(joinedload(models.Menu.submenus)).first()
 
 # GET endpoint for list of menus, and a count of related items in it
 @app.get("/api/v1/menus", response_model=List[schemas.Menu])

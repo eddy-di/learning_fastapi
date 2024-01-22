@@ -1,5 +1,5 @@
 from database import Base, engine
-from sqlalchemy import Column, ForeignKey, String, Float
+from sqlalchemy import Column, ForeignKey, String, DECIMAL
 from sqlalchemy.orm import relationship
 import uuid
 
@@ -36,7 +36,7 @@ class Dish(Base):
     id = Column(String, primary_key=True, default=generate_uuid)
     title = Column(String)
     description = Column(String)
-    price = Column(Float)
+    price = Column(DECIMAL(precision=10, scale=2))
 
     submenu_id = Column(String, ForeignKey("submenus.id", ondelete='CASCADE'))
     submenu = relationship('SubMenu', back_populates='dishes')
