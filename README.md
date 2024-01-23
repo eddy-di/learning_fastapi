@@ -20,17 +20,8 @@ git clone https://github.com/eddy-di/learning_fastapi.git
 ```
 docker-compose -f local.yaml up -d
 ```  
-2. Чтобы этот проект работал правильно, убедитесь, что строка кода `6` в файле `database.py` относится к пути, заданному для вашей переменной среды.
-
-```python
-SQLALCHEMY_DATABASE_URL = os.environ.get('SQLALCHEMY_DATABASE_URL')
-```
-
-4. Часть, которая находится в круглых скобках после `os.environ.get`, должна быть заменена на значение, хранящееся в вашей среде.
-5. Чтобы создать переменную окружения в вашем виртуальном окружении, запустите команду:
-```
-poetry run python -c 'import os; print(os.environ.get("SQLALCHEMY_DATABASE_URL"))'
-```
+2. Чтобы этот проект работал правильно, убедитесь, что существует переменная окружения `SQLALCHEMY_DATABASE_URL` со значением `postgresql://menu_db_admin:menu_db_admin@localhost:5432/menu_db` для локальных тестов. Для этого надо убедиться есть ли файл `.env` со значением `SQLALCHEMY_DATABASE_URL = "postgresql://menu_db_admin:menu_db_admin@localhost:5432/menu_db"`
+3. В данном проекте уже существует `.env` и `example.env` файлы.
 
 ## 3. Загрузка пакета Poetry
 
@@ -40,7 +31,7 @@ poetry run python -c 'import os; print(os.environ.get("SQLALCHEMY_DATABASE_URL")
 poetry --version
 ```
 
-2. Если вы видите такой вывод: `Poetry (version 1.X.X)`, то все готово. В большинстве случаев пакет должен быть доступен по умолчанию. 
+2. Если вы видите такой вывод: `Poetry (version 1.X.X)`, то все готово переходите к 4 шагу "Установка пакетов". В большинстве случаев Poetry должен быть доступен по умолчанию. 
 3. Если вам не удалось получить какие-либо выходные данные, как указано на предыдущем шаге, перейдите по следующей ссылке: https://python-poetry.org/docs/#installing-with-pipx. 
 4. Или используйте следующие команды для установки Poetry в Windows или Linux/MacOS:
 
@@ -128,14 +119,14 @@ git clone https://github.com/eddy-di/learning_fastapi.git
 4. Paste the command above into the terminal and press enter.
 ## 2. Setting up database
 
-1. Please ensure you have an environment variable and a path to the PostgreSQL database.
-2. To correctly set up the path for this homework project, you may want to consider naming the value for the path. For this project to work correctly, please ensure that the code line `6` in file `database.py` refers to the path being set to your environment variable. 
+1. Raise the database via Docker with the command
 
-```python
-SQLALCHEMY_DATABASE_URL = os.environ.get('SQLALCHEMY_DATABASE_URL')
+```
+docker-compose -f local.yaml up -d
 ```
 
-3. The part which is in parentheses after the `os.environ.get`, that part has to be changed to the value that is stored in your environment
+2. For this project to work correctly, ensure that the environment variable `SQLALCHEMY_DATABASE_URL` exists with the value `postgresql://menu_db_admin:menu_db_admin@localhost:5432/menu_db` for local tests. To do this, you need to make sure there is a `.env` file with the value `SQLALCHEMY_DATABASE_URL = "postgresql://menu_db_admin:menu_db_admin@localhost:5432/menu_db"`.
+3. This project already has `.env` and `example.env` files.
 
 ## 3. Downloading Poetry package
 
@@ -145,7 +136,7 @@ SQLALCHEMY_DATABASE_URL = os.environ.get('SQLALCHEMY_DATABASE_URL')
 poetry --version
 ```
 
-2. If you see an output like this: `Poetry (version 1.X.X)` then you are good to go. In most of the cases, it has to be available by default.
+2. If you see an output like this: `Poetry (version 1.X.X)` then you are good to go follow the instructions in 4th part "Installing packages". In most of the cases, Poetry has to be available by default.
 3. If you were unable to get any output as mentioned in the previous step, then please follow the following link: https://python-poetry.org/docs/#installing-with-pipx 
 4. Or use the following commands to install poetry to Windows or Linux/MacOS:
 
