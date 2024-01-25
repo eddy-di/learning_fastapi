@@ -1,4 +1,5 @@
 from decimal import Decimal
+from typing import Optional
 from pydantic import BaseModel
 
 # dishes schemas
@@ -39,6 +40,10 @@ class MenuBase(BaseModel):
 
 class MenuCreate(MenuBase):
     pass
+
+class MenuUpdate(MenuBase):
+    title: Optional[str] = None
+    description: Optional[str] = None
 
 class Menu(MenuBase):
     id: str

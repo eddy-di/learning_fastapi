@@ -41,5 +41,3 @@ class Dish(Base):
     submenu_id = Column(String, ForeignKey("submenus.id", ondelete='CASCADE'))
     submenu = relationship('SubMenu', back_populates='dishes')
 
-
-Base.metadata.create_all(bind=engine)

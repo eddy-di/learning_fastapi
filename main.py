@@ -3,6 +3,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy import func
 from typing import List
 import database, models, schemas
+from database import Base, engine
 
 
 app = FastAPI()
@@ -15,6 +16,9 @@ def get_db():
     finally:
         db.close()
 
+@app.on_event('startup')
+def startup():
+    Base.metadata.create_all(bind=engine)
 
 # GET endpoint for list of menus, and a count of related items in it
 @app.get("/api/v1/menus", response_model=List[schemas.Menu])
@@ -78,7 +82,7 @@ def read_menu(target_menu_id: str, db: Session = Depends(get_db)):
 
 
 @app.patch("/api/v1/menus/{target_menu_id}", response_model=schemas.Menu)
-def update_menu(target_menu_id: str, menu_update: schemas.MenuCreate, db: Session = Depends(get_db)):
+def update_menu(target_menu_id: str, menu_update: schemas.MenuUpdate, db: Session = Depends(get_db)):
     db_menu = db.query(models.Menu).filter(models.Menu.id == target_menu_id).first()
     if db_menu is None:
         raise HTTPException(status_code=404, detail="menu not found")
