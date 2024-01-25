@@ -1,4 +1,4 @@
-from fastapi import FastAPI, HTTPException, Depends
+from fastapi import FastAPI, HTTPException, Depends, status
 from sqlalchemy.orm import Session
 from sqlalchemy import func
 from typing import List
@@ -88,7 +88,7 @@ def update_menu(target_menu_id: str, menu_update: schemas.MenuUpdate, db: Sessio
         raise HTTPException(status_code=404, detail="menu not found")
 
     # Update menu attributes
-    for key, value in menu_update.dict().items():
+    for key, value in menu_update.model_dump(exclude_unset=True).items():
         setattr(db_menu, key, value)
 
     db.commit()
@@ -107,7 +107,8 @@ def delete_menu(target_menu_id: str, db: Session = Depends(get_db)):
     # Delete the menu and its associated submenus and dishes
     db.delete(db_menu)
     db.commit()
-    return db_menu
+    # Return None and set status_code to 204
+    raise HTTPException(status_code=status.HTTP_204_NO_CONTENT)
 
 # Part for Submenus
 
@@ -177,7 +178,7 @@ def get_submenu(target_menu_id: str, submenu_id: str, db: Session = Depends(get_
 
 # PATCH operation for updating a specific submenu of a specific menu
 @app.patch('/api/v1/menus/{target_menu_id}/submenus/{submenu_id}', response_model=schemas.SubMenu)
-def update_submenu(target_menu_id: str, submenu_id: str, submenu_update: schemas.SubMenuCreate, db: Session = Depends(get_db)):
+def update_submenu(target_menu_id: str, submenu_id: str, submenu_update: schemas.SubMenuUpdate, db: Session = Depends(get_db)):
     # Fetch the menu first to check if it exists
     db_menu = db.query(models.Menu).filter(models.Menu.id == target_menu_id).first()
 
@@ -191,7 +192,7 @@ def update_submenu(target_menu_id: str, submenu_id: str, submenu_update: schemas
         raise HTTPException(status_code=404, detail="submenu not found")
 
     # Update submenu attributes
-    for key, value in submenu_update.model_dump().items():
+    for key, value in submenu_update.model_dump(exclude_unset=True).items():
         setattr(db_submenu, key, value)
 
     db.commit()
@@ -216,7 +217,8 @@ def delete_submenu(target_menu_id: str, submenu_id: str, db: Session = Depends(g
     # Delete the submenu
     db.delete(db_submenu)
     db.commit()
-    return db_submenu
+    # Return None and set status_code to 204
+    raise HTTPException(status_code=status.HTTP_204_NO_CONTENT)
 
 # CRUD for Dishes
 
@@ -279,7 +281,7 @@ def get_dish(target_menu_id: str, target_submenu_id: str, target_dish_id: str, d
 
 # PATCH operation for updating a specific dish of a specific submenu
 @app.patch('/api/v1/menus/{target_menu_id}/submenus/{target_submenu_id}/dishes/{target_dish_id}', response_model=schemas.Dish)
-def update_dish(target_menu_id: str, target_submenu_id: str, target_dish_id: str, dish_update: schemas.DishCreate, db: Session = Depends(get_db)):
+def update_dish(target_menu_id: str, target_submenu_id: str, target_dish_id: str, dish_update: schemas.DishUpdate, db: Session = Depends(get_db)):
     # Fetch the menu first to check if it exists
     db_menu = db.query(models.Menu).filter(models.Menu.id == target_menu_id).first()
 
@@ -299,7 +301,7 @@ def update_dish(target_menu_id: str, target_submenu_id: str, target_dish_id: str
         raise HTTPException(status_code=404, detail="dish not found")
 
     # Update dish attributes
-    for key, value in dish_update.dict().items():
+    for key, value in dish_update.model_dump(exclude_unset=True).items():
         setattr(db_dish, key, value)
 
     db.commit()
@@ -330,5 +332,5 @@ def delete_dish(target_menu_id: str, target_submenu_id: str, target_dish_id: str
     # Delete the dish
     db.delete(db_dish)
     db.commit()
-
-    return db_dish
+    # Return None and set status_code to 204
+    raise HTTPException(status_code=status.HTTP_204_NO_CONTENT)

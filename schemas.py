@@ -11,6 +11,11 @@ class DishBase(BaseModel):
 class DishCreate(DishBase):
     pass
 
+class DishUpdate(DishBase):
+    title: Optional[str] = None
+    description: Optional[str] = None
+    price: Optional[Decimal] = None
+
 class Dish(DishBase):
     id: str
 
@@ -24,6 +29,10 @@ class SubMenuBase(BaseModel):
 
 class SubMenuCreate(SubMenuBase):
     pass
+
+class SubMenuUpdate(SubMenuBase):
+    title: Optional[str] = None
+    description: Optional[str] = None
 
 class SubMenu(SubMenuBase):
     id: str
