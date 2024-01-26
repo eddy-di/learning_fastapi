@@ -1,15 +1,11 @@
 from fastapi.testclient import TestClient
-import uuid
 from database import TestingRUDSessionLocal
-from models import Menu, SubMenu, Dish
 
+from models import Menu, SubMenu, Dish, generate_uuid
 from main import app
 
 client = TestClient(app)
 
-
-def generate_uuid():
-    return str(uuid.uuid4())
 
 def create_submenu(menu_id, submenu_id):
     session = TestingRUDSessionLocal()

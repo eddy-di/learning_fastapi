@@ -1,4 +1,5 @@
 from database import TestingSessionLocal, engine, Base, TestingRUDSessionLocal
+from sqlalchemy import MetaData, Table, text
 import pytest
 import uuid
 from main import app, get_db
@@ -13,6 +14,7 @@ def override_get_db():
 
 app.dependency_overrides[get_db] = override_get_db
 
+
 def override_get_db_for_rud():
     try:
         db = TestingRUDSessionLocal()
@@ -22,17 +24,23 @@ def override_get_db_for_rud():
 
 app.dependency_overrides[get_db] = override_get_db_for_rud
 
+
 @pytest.fixture
 def test_db():
     Base.metadata.create_all(bind=engine)
     yield
     Base.metadata.drop_all(bind=engine)
 
-def setup():
+
+@pytest.fixture
+def setup_db():
     Base.metadata.create_all(bind=engine)
 
-def teardown():
+
+@pytest.fixture
+def teardown_and_setup_db():
     Base.metadata.drop_all(bind=engine)
+    Base.metadata.create_all(bind=engine)
 
 
 # @pytest.fixture()

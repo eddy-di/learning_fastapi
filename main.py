@@ -16,9 +16,7 @@ def get_db():
     finally:
         db.close()
 
-@app.on_event('startup')
-def startup():
-    Base.metadata.create_all(bind=engine)
+Base.metadata.create_all(bind=engine)
 
 # GET endpoint for list of menus, and a count of related items in it
 @app.get("/api/v1/menus", response_model=List[schemas.Menu])
@@ -107,8 +105,7 @@ def delete_menu(target_menu_id: str, db: Session = Depends(get_db)):
     # Delete the menu and its associated submenus and dishes
     db.delete(db_menu)
     db.commit()
-    # Return None and set status_code to 204
-    raise HTTPException(status_code=status.HTTP_204_NO_CONTENT)
+    return db_menu
 
 # Part for Submenus
 
@@ -217,8 +214,7 @@ def delete_submenu(target_menu_id: str, submenu_id: str, db: Session = Depends(g
     # Delete the submenu
     db.delete(db_submenu)
     db.commit()
-    # Return None and set status_code to 204
-    raise HTTPException(status_code=status.HTTP_204_NO_CONTENT)
+    return db_submenu
 
 # CRUD for Dishes
 
@@ -332,5 +328,4 @@ def delete_dish(target_menu_id: str, target_submenu_id: str, target_dish_id: str
     # Delete the dish
     db.delete(db_dish)
     db.commit()
-    # Return None and set status_code to 204
-    raise HTTPException(status_code=status.HTTP_204_NO_CONTENT)
+    return db_dish
