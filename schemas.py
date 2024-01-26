@@ -56,7 +56,7 @@ class MenuUpdate(MenuBase):
 
 class Menu(MenuBase):
     id: str
-    submenus: list[SubMenu] = []
+    # submenus: list[SubMenu] = []
     submenus_count: int | None = None
     dishes_count: int | None = None
 

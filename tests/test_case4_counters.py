@@ -1,73 +1,45 @@
 import uuid
+import pytest
 from fastapi.testclient import TestClient
-from database import TestingRUDSessionLocal, Base, engine
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
+from database import Base, engine
+from models import Menu, SubMenu, Dish
 
-from models import Menu, SubMenu, Dish, generate_uuid
-from main import app
+from main import app, get_db
+
+@pytest.fixture
+def init_db():
+    Base.metadata.create_all(bind=engine)
+
+@pytest.fixture
+def drop_db():
+    Base.metadata.drop_all(bind=engine)
+
+
+TEST_DB_URL = 'sqlite:///./test_sqlite_db.sqlite3'
+SQLALCHEMY_DATABASE_URL = TEST_DB_URL
+
+engine = create_engine(
+    SQLALCHEMY_DATABASE_URL,
+    connect_args={"check_same_thread": False}
+)
+
+TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+
+# Override the database dependency for testing
+def override_get_db():
+    db = TestingSessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
+
+app.dependency_overrides[get_db] = override_get_db
+
 
 client = TestClient(app)
 
-
-# custom fixtures
-def create_menu(id: str):
-    session = TestingRUDSessionLocal()
-    db_menu_item = Menu(
-        id=id, 
-        title='testMenu1', 
-        description='testMenu1Description'
-    )
-    session.add(db_menu_item)
-    session.commit()
-    session.close()
-
-
-def create_submenu(menu_id, submenu_id):
-    session = TestingRUDSessionLocal()
-    db_menu_item = Menu(
-        id=menu_id, 
-        title='testMenu1', 
-        description='testMenu1Description'
-    )
-    session.add(db_menu_item)
-    session.commit()
-    db_submenu_item = SubMenu(
-        id=submenu_id,
-        title='testSubMenu1',
-        description='testSubMenu1Description',
-        menu_id=db_menu_item.id
-    )
-    session.add(db_submenu_item)
-    session.commit()
-    session.close()
-
-
-def create_dish(menu_id, submenu_id, dish_id):
-    session = TestingRUDSessionLocal()
-    db_menu_item = Menu(
-        id=menu_id, 
-        title='testMenu1', 
-        description='testMenu1Description'
-    )
-    session.add(db_menu_item)
-    session.commit()
-    db_submenu_item = SubMenu(
-        id=submenu_id,
-        title='testSubMenu1',
-        description='testSubMenu1Description',
-        menu_id=db_menu_item.id
-    )
-    session.add(db_submenu_item)
-    session.commit()
-    db_dish_item = Dish(
-        id=dish_id,
-        title='testDishTitle1',
-        description='testDishDescription1',
-        price='11.10',
-        submenu_id=db_submenu_item.id
-    )
-    session.add(db_dish_item)
-    session.commit()
-    session.close()
 
 menu_url = f"/api/v1/menus"
 
@@ -76,7 +48,8 @@ submenu_id = None
 dish1_id = None
 dish2_id = None
 
-def test_create_menu(setup_db):
+def test_create_menu(init_db):
+    init_db
     # given: empty db and endpoint url
     global menu_id
     url = menu_url
@@ -254,6 +227,5 @@ def test_get_menus_list():
     assert response.status_code == 200
     assert response.json() == []
 
-
-def test_end(teardown_and_setup_db):
-    teardown_and_setup_db
+def test_end(drop_db):
+    drop_db

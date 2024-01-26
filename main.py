@@ -1,9 +1,10 @@
 from fastapi import FastAPI, HTTPException, Depends, status
 from sqlalchemy.orm import Session
-from sqlalchemy import func
+from sqlalchemy import func, select, and_
 from typing import List
 import database, models, schemas
 from database import Base, engine
+from fastapi.responses import JSONResponse
 
 
 app = FastAPI()
@@ -19,10 +20,33 @@ def get_db():
 Base.metadata.create_all(bind=engine)
 
 # GET endpoint for list of menus, and a count of related items in it
+
+# @app.get("/api/v1/menus", response_model=List[schemas.Menu])
+# def read_menus(db: Session = Depends(get_db)):
+    # menus = db.query(models.Menu).all()
+    # result_menus = []
+    # menus_with_counts = \
+        # select([
+            # models.Menu.id,
+            # func.count(func.distinct(models.SubMenu.id)).label('submenus_count'),
+            # func.count(func.distinct(models.Dish.id)).label('dishes_count')
+        # ]).select_from(models.Menu)\
+        # .leftjoin(models.SubMenu, and_(models.SubMenu.menu_id == models.Menu.id))\
+        # .leftjoin(models.Dish, and_(models.Dish.submenu_id == models.SubMenu.id))\
+        # .group_by(models.Menu.id)\
+        # .all()
+    # 
+    # for menu_with_counts in menus_with_counts:
+        # menu_obj, submenus_count, dishes_count = menu_with_counts
+        # menu_dict = menu_obj.__dict__
+        # menu_dict['submenus_count'] = submenus_count
+        # menu_dict['dishes_count'] = dishes_count
+        # result_menus.append(menu_dict)
+    # return result_menus
+
 @app.get("/api/v1/menus", response_model=List[schemas.Menu])
 def read_menus(db: Session = Depends(get_db)):
     menus = db.query(models.Menu).all()
-    
 
     # Fetch submenu count for each menu
     for menu in menus:
