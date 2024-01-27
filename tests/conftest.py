@@ -3,9 +3,9 @@ import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from database import Base, engine
+from database import Base, engine, generate_uuid
 from models import Menu, SubMenu, Dish
-from fastapi.responses import JSONResponse
+
 
 from main import app, get_db
 

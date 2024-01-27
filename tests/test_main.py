@@ -93,7 +93,6 @@ def test_menu_delete_target_id(setup_test_db):
 
 
 # testing CRUD for submenus endpoints
-
 def test_submenu_get_list(setup_test_db):
     # given: menu instance
     client = setup_test_db
@@ -175,6 +174,7 @@ def test_submenu_delete_taget_id(setup_test_db):
     # then: expecting status code 404 and not found details
     assert response.status_code == 404
     assert response.json() == {"detail":"submenu not found"}
+
 
 # unit testing CRUD for dishes endpoints
 def test_dish_get_list(setup_test_db):
