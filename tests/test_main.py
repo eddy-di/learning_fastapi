@@ -35,7 +35,6 @@ def test_menu_post(setup_test_db):
     expected_data = {
         'title': 'Menu 1',
         'description': 'Menu 1 description',
-        # 'submenus': [],
         'submenus_count': None,
         'dishes_count': None
     }
@@ -90,7 +89,6 @@ def test_menu_update_target_id(setup_test_db):
     # then: expecting to to get status code 200 and response description changed
     assert response.status_code == 200
     assert response.json()['description'] == 'patchedMenuDescription'
-    # assert response.json()['submenus'] == []
     assert response.json()['submenus_count'] == None or 0
     assert response.json()['dishes_count'] == None or 0
 

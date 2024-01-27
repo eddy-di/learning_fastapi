@@ -1,13 +1,13 @@
-import uuid
+import uuid # used in tests
 import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from database import Base, engine
-from models import Menu, SubMenu, Dish, generate_uuid
+from app.database import Base, engine
+from app.models import Menu, SubMenu, Dish, generate_uuid # used in tests
 
 
-from main import app, get_db
+from app.main import app, get_db
 
 @pytest.fixture
 def init_db():

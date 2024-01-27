@@ -1,10 +1,9 @@
-from fastapi import FastAPI, HTTPException, Depends, status
+from fastapi import FastAPI, HTTPException, Depends
 from sqlalchemy.orm import Session
-from sqlalchemy import func, select, and_, distinct
+from sqlalchemy import func, distinct
 from typing import List
-import database, models, schemas
-from database import Base, engine
-from fastapi.responses import JSONResponse
+from . import database, models, schemas
+from .database import Base, engine
 
 
 app = FastAPI()

@@ -1,4 +1,4 @@
-from database import Base, engine
+from .database import Base
 from sqlalchemy import Column, ForeignKey, String, DECIMAL
 from sqlalchemy.orm import relationship
 import uuid
