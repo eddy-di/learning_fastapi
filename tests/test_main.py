@@ -41,6 +41,26 @@ def test_menu_post(setup_test_db):
     }
     assert {k: data[k] for k in expected_data.keys()} == expected_data
 
+
+def test_menu_get_list_with_data_in_db(setup_test_db):
+    # given: an instance of menu, submenu and dish objs
+    client = setup_test_db
+    menu_id = generate_uuid()
+    submenu_id = generate_uuid()
+    dish_id = generate_uuid()
+    create_dish(menu_id, submenu_id, dish_id)
+    # when: executing CRUD operation get on menus list
+    url = '/api/v1/menus'
+    response = client.get(url)
+    # then: expecting to get status code 200 and data on available instances of each objects
+    assert response.status_code == 200
+    assert response.json()[0]['id'] == menu_id
+    assert response.json()[0]['title'] == 'testMenu1'
+    assert response.json()[0]['description'] == 'testMenu1Description'
+    assert response.json()[0]['submenus_count'] == 1
+    assert response.json()[0]['dishes_count'] == 1
+
+
 def test_menu_get_target_menu(setup_test_db):
     # given: an instance of menu obj
     client = setup_test_db
@@ -122,6 +142,24 @@ def test_submenu_post(setup_test_db):
     assert response.status_code == 201
     assert response.json()['title'] == 'subMenuTitle1'
     assert response.json()['description'] == 'subMenuDescription1'
+
+
+def test_submenu_get_list_with_data_in_db(setup_test_db):
+    # given: an instance of menu, submenu and dish objs
+    client = setup_test_db
+    menu_id = generate_uuid()
+    submenu_id = generate_uuid()
+    dish_id = generate_uuid()
+    create_dish(menu_id, submenu_id, dish_id)
+    # when: executing CRUD operation get on menus list
+    url = f'/api/v1/menus/{menu_id}/submenus'
+    response = client.get(url)
+    # then: expecting to get status code 200 and data on available instances of each objects
+    assert response.status_code == 200
+    assert response.json()[0]['id'] == submenu_id
+    assert response.json()[0]['title'] == 'testSubMenu1'
+    assert response.json()[0]['description'] == 'testSubMenu1Description'
+    assert response.json()[0]['dishes_count'] == 1
 
 
 def test_submenu_get_target_id(setup_test_db):
