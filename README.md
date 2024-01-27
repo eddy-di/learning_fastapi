@@ -35,14 +35,7 @@ poetry --version
 3. Если вам не удалось получить какие-либо выходные данные, как указано на предыдущем шаге, перейдите по следующей ссылке: https://python-poetry.org/docs/#installing-with-pipx. 
 4. Или используйте следующие команды для установки Poetry в Windows или Linux/MacOS:
 
-Для Windows: 
-Запустите следующую команду в Терминале:
-
-```
-(Invoke-WebRequest -Uri https://install.python-poetry.org -UseBasicParsing).Content | py -
-```
-
-Для Linux/MacOS: 
+Для Linux/MacOS/Windows: 
 Запустите следующую команду в Терминале:
 
 ```
