@@ -1,44 +1,4 @@
-import uuid
-import pytest
-from fastapi.testclient import TestClient
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
-from database import Base, engine
-from models import Menu, SubMenu, Dish
-
-from main import app, get_db
-
-@pytest.fixture
-def init_db():
-    Base.metadata.create_all(bind=engine)
-
-@pytest.fixture
-def drop_db():
-    Base.metadata.drop_all(bind=engine)
-
-
-TEST_DB_URL = 'sqlite:///./test_sqlite_db.sqlite3'
-SQLALCHEMY_DATABASE_URL = TEST_DB_URL
-
-engine = create_engine(
-    SQLALCHEMY_DATABASE_URL,
-    connect_args={"check_same_thread": False}
-)
-
-TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
-
-# Override the database dependency for testing
-def override_get_db():
-    db = TestingSessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
-
-app.dependency_overrides[get_db] = override_get_db
-
-
-client = TestClient(app)
+from .conftest import *
 
 
 menu_url = f"/api/v1/menus"
