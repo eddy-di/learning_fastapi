@@ -21,7 +21,7 @@ git clone https://github.com/eddy-di/learning_fastapi.git
 2. Введите в командную строку находясь в корневой директории проекта.
 
 ```
-docker compose -f docker-compose.yaml up -d
+docker compose -f docker-compose.yaml up -d --build
 ```
 
 3. Это позволит в виртуальной среде установить все пакеты и запустить проект в docker'e.
@@ -31,7 +31,7 @@ docker compose -f docker-compose.yaml up -d
 http://localhost:8008/docs
 ```
 
-5. Для того чтобы далее для других тестов docker'ов у вас порты были свобоны лучше потушить поднятый докер командой: 
+5. Для того чтобы потушить поднятый сервер в docker'e и убрать данные командой: 
 
 ```
 docker compose -f docker-compose.yaml down -v
@@ -46,8 +46,8 @@ docker-compose -f docker-compose-tests.yaml up -d && docker logs --follow test_w
 ```
 
 2. Это позволит вам увидеть в терминале результат успешно выполненных 31 тестов.
-3. По пункту 4 (Реализовать тестовый сценарий «Проверка кол-ва блюд и подменю в меню» из Postman с помощью pytest) тесты этого сценария находятся в файле `test_case4_counters.py`. Доступны по этой ссылке: https://github.com/eddy-di/learning_fastapi/blob/main/tests/test_case4_counters.py
-4. Юнит тесты проверяющие CRUD эндпоинтов доступны по этой ссылке: https://github.com/eddy-di/learning_fastapi/blob/main/tests/test_crud.py
+3. По пункту 4 (Реализовать тестовый сценарий «Проверка кол-ва блюд и подменю в меню» из Postman с помощью pytest) тесты этого сценария находятся в файле `test_case4_counters.py`. Доступны по [этой ссылке](https://github.com/eddy-di/learning_fastapi/blob/main/tests/test_case4_counters.py).
+4. Юнит тесты проверяющие CRUD эндпоинтов доступны по [этой ссылке](https://github.com/eddy-di/learning_fastapi/blob/main/tests/test_crud.py).
 
 
 ## 4. Путь к сложному ORM запросу (3 пункт домашнего задания 2)
