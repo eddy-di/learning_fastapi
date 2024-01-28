@@ -18,7 +18,6 @@ git clone https://github.com/eddy-di/learning_fastapi.git
 ## 2. Запуск web сервера в docker (1, 2, 4 пункты домашнего задания 2)
 
 1. Я предполагаю что у вас уже установлен Docker.
-
 2. Введите в командную строку находясь в корневой директории проекта.
 
 ```
@@ -26,7 +25,6 @@ docker compose -f docker-compose.yaml up -d
 ```
 
 3. Это позволит в виртуальной среде установить все пакеты и запустить проект в docker'e.
-
 4. Проект доступен через браузер по адресу:
 
 ```
@@ -41,17 +39,14 @@ http://localhost:8008/docs
 docker-compose -f docker-compose-tests.yaml up -d && docker logs --follow test_web && docker compose -f docker-compose-tests.yaml down -v
 ```
 
-2. Это позволит вам увидеть в терминале результат успешно выполненных 30 тестов.
-
+2. Это позволит вам увидеть в терминале результат успешно выполненных 31 тестов.
 3. По пункту 4 (Реализовать тестовый сценарий «Проверка кол-ва блюд и подменю в меню» из Postman с помощью pytest) тесты этого сценария находятся в файле `test_case4_counters.py`. Доступны по этой ссылке: https://github.com/eddy-di/learning_fastapi/blob/main/tests/test_case4_counters.py
-
 4. Юнит тесты проверяющие CRUD эндпоинтов доступны по этой ссылке: https://github.com/eddy-di/learning_fastapi/blob/main/tests/test_crud.py
 
 
 ## 4. Путь к сложному ORM запросу (3 пункт домашнего задания 2)
 
 1. Можете увидеть выполнение SQLAlchemy ORM запроса по этой ссылке в функции `read_menus`: https://github.com/eddy-di/learning_fastapi/blob/main/app/main.py#L23
-
 2. В переменной `menus` хранится ORM запрос к базе данных. Начало 24 линия, конец 31.
 
 

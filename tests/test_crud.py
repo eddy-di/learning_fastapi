@@ -50,22 +50,22 @@ def test_menu_post(setup_test_db):
     # then: expecting to get status code 201 and response data being similar to post_data
     assert response.status_code == 201
     data = response.json()
-        # Check if 'id' is a valid UUID4
+    # Check if 'id' is a valid UUID4
     assert 'id' in data
     assert isinstance(uuid.UUID(data['id'], version=4), uuid.UUID)
-        # Check other fields excluding 'id'
+    # Check other fields excluding 'id'
     expected_data = {
         'title': 'Menu 1',
         'description': 'Menu 1 description',
-        'submenus_count': None,
-        'dishes_count': None
+        'submenus_count': 0,
+        'dishes_count': 0
     }
     assert {k: data[k] for k in expected_data.keys()} == expected_data
 
 
 
 
-def test_menu_get_target_menu(setup_test_db):
+def test_menu_get_target_id(setup_test_db):
     # given: an instance of menu obj
     menu = create_menu()
     client = setup_test_db
@@ -92,8 +92,8 @@ def test_menu_patch_target_id(setup_test_db):
     # then: expecting to to get status code 200 and response description changed
     assert response.status_code == 200
     assert response.json()['description'] == 'patchedMenuDescription'
-    assert response.json()['submenus_count'] == None or 0
-    assert response.json()['dishes_count'] == None or 0
+    assert response.json()['submenus_count'] == 0
+    assert response.json()['dishes_count'] == 0
 
 
 def test_menu_delete_target_id(setup_test_db):
@@ -125,23 +125,6 @@ def test_submenu_get_list(setup_test_db):
     assert response.json() == []
 
 
-def test_submenu_post(setup_test_db):
-    # given: menu instance
-    menu = create_menu()
-    client = setup_test_db
-    url = f'/api/v1/menus/{menu.id}/submenus'
-    # when: executing CRUD operation post
-    post_data = {
-        "title": "subMenuTitle1",
-        "description": "subMenuDescription1"
-    }
-    response = client.post(url, json=post_data)
-    # then: expecting status code 201 and post_data in response
-    assert response.status_code == 201
-    assert response.json()['title'] == 'subMenuTitle1'
-    assert response.json()['description'] == 'subMenuDescription1'
-
-
 def test_submenu_get_list_with_data_in_db(setup_test_db):
     # given: an instance of menu, submenu and dish objs
     client = setup_test_db
@@ -159,6 +142,23 @@ def test_submenu_get_list_with_data_in_db(setup_test_db):
     assert response.json()[0]['dishes_count'] == 1
 
 
+def test_submenu_post(setup_test_db):
+    # given: menu instance
+    menu = create_menu()
+    client = setup_test_db
+    url = f'/api/v1/menus/{menu.id}/submenus'
+    # when: executing CRUD operation post
+    post_data = {
+        "title": "subMenuTitle1",
+        "description": "subMenuDescription1"
+    }
+    response = client.post(url, json=post_data)
+    # then: expecting status code 201 and post_data in response
+    assert response.status_code == 201
+    assert response.json()['title'] == 'subMenuTitle1'
+    assert response.json()['description'] == 'subMenuDescription1'
+
+
 def test_submenu_get_target_id(setup_test_db):
     # given: menu and submenu instances
     menu = create_menu()
@@ -174,7 +174,7 @@ def test_submenu_get_target_id(setup_test_db):
     assert response.json()['id'] == submenu.id
 
 
-def test_submenu_update_target_id(setup_test_db):
+def test_submenu_patch_target_id(setup_test_db):
     # given: menu and submenu instances
     menu = create_menu()
     submenu = create_submenu(menu.id)
@@ -220,6 +220,20 @@ def test_dish_get_list(setup_test_db):
     # then: expecting to get 200 and empty list
     assert response.status_code == 200
     assert response.json() == []
+
+
+def test_dish_get_list_with_data_in_db(setup_test_db):
+    # given: available menu, submenu and dish
+    menu = create_menu()
+    submenu = create_submenu(menu.id)
+    create_dish(submenu.id)
+    client = setup_test_db
+    url = f"/api/v1/menus/{menu.id}/submenus/{submenu.id}/dishes"
+    # when: executing CRUD operation get on list
+    response = client.get(url)
+    # then: expecting to get 200 and empty list
+    assert response.status_code == 200
+    assert response.json() != []
 
 
 def test_dish_post(setup_test_db):

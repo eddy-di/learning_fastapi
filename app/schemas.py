@@ -37,7 +37,7 @@ class SubMenuUpdate(SubMenuBase):
 class SubMenu(SubMenuBase):
     id: str
     dishes: list[Dish] = []
-    dishes_count: int | None = None
+    dishes_count: int = 0
 
     class Config:
         from_attributes = True
@@ -56,8 +56,8 @@ class MenuUpdate(MenuBase):
 
 class Menu(MenuBase):
     id: str
-    submenus_count: int | None = None
-    dishes_count: int | None = None
+    submenus_count: int = 0
+    dishes_count: int = 0
 
     class Config:
         from_attributes = True
