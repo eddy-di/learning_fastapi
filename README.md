@@ -44,9 +44,9 @@ docker-compose -f docker-compose-tests.yaml up -d && docker logs --follow test_w
 2. Это позволит вам увидеть в терминале результат успешно выполненных 30 тестов.
 
 
-## 4. Путь к сложному ОРМ запросу (3 пункт домашнего задания 2)
+## 4. Путь к сложному ORM запросу (3 пункт домашнего задания 2)
 
-1. Можете увидеть выполнение ОРМ запроса по этому адресу: https://github.com/eddy-di/learning_fastapi/blob/main/app/main.py
+1. Можете увидеть выполнение SQLAlchemy ORM запроса по этой ссылке в функции `read_menus``: https://github.com/eddy-di/learning_fastapi/blob/main/app/main.py#L23
 
 2. В переменной menus хранится орм запрос к базе данных. Начало 24 линия, конец 31. 
 
@@ -154,108 +154,3 @@ pytest -v
 Теперь вы можете приступить к проверке домашнего задания на Postman. 
 
 Спасибо!
-
-
-# Homework 1
-
-This git repository is made purely to fulfill the requirements for getting the internship at Y-Lab company. 
-Further details are for moderators who are going to test it.
-
-# Installation and setting project up
-## 1. Clone git repository
-
-1. Open terminal.
-2. Change the current working directory to the location where you want the cloned directory.
-3. Copy this line of code.
-
-HTTPS:
-
-```
-git clone https://github.com/eddy-di/learning_fastapi.git
-```
-
-4. Paste the command above into the terminal and press enter.
-## 2. Setting up database
-
-1. Raise the database via Docker with the command
-
-```
-docker-compose -f local.yaml up -d
-```
-
-2. For this project to work correctly, ensure that the environment variable `SQLALCHEMY_DATABASE_URL` exists with the value `postgresql://menu_db_admin:menu_db_admin@localhost:5432/menu_db` for local tests. To do this, you need to make sure there is a `.env` file with the value `SQLALCHEMY_DATABASE_URL = "postgresql://menu_db_admin:menu_db_admin@localhost:5432/menu_db"`.
-3. This project already has `.env` and `example.env` files.
-
-## 3. Downloading Poetry package
-
-1. I would assume that you have preinstalled poetry on your computer, if not please make sure to check if it is available to you by typing this command in your terminal:
-
-```
-poetry --version
-```
-
-2. If you see an output like this: `Poetry (version 1.X.X)` then you are good to go follow the instructions in 4th part "Installing packages". In most of the cases, Poetry has to be available by default.
-3. If you were unable to get any output as mentioned in the previous step, then please follow the following link: https://python-poetry.org/docs/#installing-with-pipx 
-4. Or use the following commands to install poetry to Windows or Linux/MacOS:
-
-For Windows:
-Run the following command in Terminal:
-
-```
-(Invoke-WebRequest -Uri https://install.python-poetry.org -UseBasicParsing).Content | py -
-```
-
-For Linux/MacOS:
-Run the following command in Terminal:
-
-```
-curl -sSL https://install.python-poetry.org | python3 -
-```
-
-## 4. Installing packages
-
-1. In your terminal, go to the location where the cloned repository is.
-2. To install all the necessary packages that will help to execute homework properly type in:
-
-```
-poetry install
-```
-
-3. This will set up the required packages for the homework project.
-4. Then run the following command to initialize the virtual environment:
-
-```
-poetry shell
-```
-
-5. The `shell` command allows you to work in a separate environment, and to run tests accordingly.
-6. Make sure to see if the virtual environment has been activated.
-
-```
-(env-name) username@computer-name:path/to/the/cloned/repo$  <-- [this is an example]
-```
-
-7. The above example applies to Linux/MacOS 
-
-## 5. Initiating server
-
-1. To make sure that the homework project will be available for tests via Postman, it is important to initiate the local server. Run this command in your terminal:
-
-```
-uvicorn main:app --reload
-```
-
-2. Make sure to check if you are getting an output similar to this, with the other details specific to your computer only.
-
-```
-INFO:     Will watch for changes in these directories: ['path/to/the/cloned/repo']
-INFO:     Uvicorn running on http://127.0.0.1:8000 (Press CTRL+C to quit)
-INFO:     Started reloader process [101969] using WatchFiles
-INFO:     Started server process [101971]
-INFO:     Waiting for application startup.
-INFO:     Application startup complete.
-```
-
-Now you are good to go testing homework on Postman.
-
-Thank you!
