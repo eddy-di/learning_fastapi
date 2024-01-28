@@ -1,0 +1,31 @@
+version: '3'
+
+services:
+  test_db:
+    image: postgres:15.1-alpine
+    volumes:
+      - test_postgres_data:/var/lib/postgresql/data/
+    expose:
+      - 5432
+    environment:
+      POSTGRES_DB: menu_test_db
+      POSTGRES_USER: menu_db_admin
+      POSTGRES_PASSWORD: menu_db_admin
+  
+  test_web:
+    build: .
+    container_name: test_web
+    command: sh -c "pytest -v"
+    volumes:
+      - .:/app
+      - .:/tests
+    ports:
+      - 8009:8000
+    environment:
+      - SQLALCHEMY_DATABASE_URL=postgresql://menu_db_admin:menu_db_admin@test_db:5432/menu_test_db
+      - TEST_DB_URL=postgresql://menu_db_admin:menu_db_admin@test_db:5432/menu_test_db
+    depends_on:
+      - test_db
+
+volumes:
+  test_postgres_data:

@@ -1,13 +1,17 @@
+import os
 import uuid # used in tests
 import pytest
+from dotenv import load_dotenv
 from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from app.database import Base, engine
 from app.models import Menu, SubMenu, Dish, generate_uuid # used in tests
 
-
 from app.main import app, get_db
+
+
+load_dotenv()
 
 @pytest.fixture
 def init_db():
@@ -18,12 +22,11 @@ def drop_db():
     Base.metadata.drop_all(bind=engine)
 
 
-TEST_DB_URL = 'sqlite:///./test_sqlite_db.sqlite3'
+TEST_DB_URL = os.environ.get('TEST_DB_URL')
 SQLALCHEMY_DATABASE_URL = TEST_DB_URL
 
 engine = create_engine(
-    SQLALCHEMY_DATABASE_URL,
-    connect_args={"check_same_thread": False}
+    SQLALCHEMY_DATABASE_URL
 )
 
 TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
