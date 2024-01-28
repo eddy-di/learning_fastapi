@@ -46,9 +46,9 @@ docker-compose -f docker-compose-tests.yaml up -d && docker logs --follow test_w
 
 ## 4. Путь к сложному ORM запросу (3 пункт домашнего задания 2)
 
-1. Можете увидеть выполнение SQLAlchemy ORM запроса по этой ссылке в функции `read_menus``: https://github.com/eddy-di/learning_fastapi/blob/main/app/main.py#L23
+1. Можете увидеть выполнение SQLAlchemy ORM запроса по этой ссылке в функции `read_menus`: https://github.com/eddy-di/learning_fastapi/blob/main/app/main.py#L23
 
-2. В переменной menus хранится орм запрос к базе данных. Начало 24 линия, конец 31. 
+2. В переменной `menus` хранится ORM запрос к базе данных. Начало 24 линия, конец 31. 
 
 
 # Домашнее задание 1 
