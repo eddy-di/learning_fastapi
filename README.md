@@ -43,12 +43,16 @@ docker-compose -f docker-compose-tests.yaml up -d && docker logs --follow test_w
 
 2. Это позволит вам увидеть в терминале результат успешно выполненных 30 тестов.
 
+3. По пункту 4 (Реализовать тестовый сценарий «Проверка кол-ва блюд и подменю в меню» из Postman с помощью pytest) тесты этого сценария находятся в файле `test_case4_counters.py`. Доступны по этой ссылке: https://github.com/eddy-di/learning_fastapi/blob/main/tests/test_case4_counters.py
+
+4. Юнит тесты проверяющие CRUD эндпоинтов доступны по этой ссылке: https://github.com/eddy-di/learning_fastapi/blob/main/tests/test_crud.py
+
 
 ## 4. Путь к сложному ORM запросу (3 пункт домашнего задания 2)
 
 1. Можете увидеть выполнение SQLAlchemy ORM запроса по этой ссылке в функции `read_menus`: https://github.com/eddy-di/learning_fastapi/blob/main/app/main.py#L23
 
-2. В переменной `menus` хранится ORM запрос к базе данных. Начало 24 линия, конец 31. 
+2. В переменной `menus` хранится ORM запрос к базе данных. Начало 24 линия, конец 31.
 
 
 # Домашнее задание 1 
