@@ -1,13 +1,11 @@
 import os
-import uuid # used in tests
 import pytest
 from dotenv import load_dotenv
 from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from app.database import Base, engine
-from app.models import Menu, SubMenu, Dish, generate_uuid # used in tests
-
+from app.models import Menu, SubMenu, Dish
 from app.main import app, get_db
 
 
@@ -21,12 +19,8 @@ def init_db():
 def drop_db():
     Base.metadata.drop_all(bind=engine)
 
-
-TEST_DB_URL = os.environ.get('TEST_DB_URL')
-SQLALCHEMY_DATABASE_URL = TEST_DB_URL
-
 engine = create_engine(
-    SQLALCHEMY_DATABASE_URL
+    os.environ.get('TEST_DB_URL')
 )
 
 TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
@@ -38,6 +32,7 @@ def override_get_db():
         yield db
     finally:
         db.close()
+
 
 app.dependency_overrides[get_db] = override_get_db
 
@@ -53,63 +48,45 @@ def setup_test_db():
     # drop test_db after tests
     Base.metadata.drop_all(bind=engine)
 
-# 
-def create_menu(id: str):
+
+def create_menu():
     session = TestingSessionLocal()
     db_menu_item = Menu(
-        id=id,
         title='testMenu1', 
         description='testMenu1Description'
     )
     session.add(db_menu_item)
     session.commit()
     session.refresh(db_menu_item)
-
-
-def create_submenu(menu_id, submenu_id):
-    session = TestingSessionLocal()
-    db_menu_item = Menu(
-        id=menu_id, 
-        title='testMenu1', 
-        description='testMenu1Description'
-    )
-    session.add(db_menu_item)
-    session.commit()
-    db_submenu_item = SubMenu(
-        id=submenu_id,
-        title='testSubMenu1',
-        description='testSubMenu1Description',
-        menu_id=db_menu_item.id
-    )
-    session.add(db_submenu_item)
-    session.commit()
     session.close()
+    return db_menu_item
 
 
-def create_dish(menu_id, submenu_id, dish_id):
+def create_submenu(menu_id):
     session = TestingSessionLocal()
-    db_menu_item = Menu(
-        id=menu_id, 
-        title='testMenu1', 
-        description='testMenu1Description'
-    )
-    session.add(db_menu_item)
-    session.commit()
     db_submenu_item = SubMenu(
-        id=submenu_id,
         title='testSubMenu1',
         description='testSubMenu1Description',
-        menu_id=db_menu_item.id
+        menu_id=menu_id
     )
     session.add(db_submenu_item)
     session.commit()
+    session.refresh(db_submenu_item)
+    session.close()
+    return db_submenu_item
+
+
+def create_dish(submenu_id):
+    session = TestingSessionLocal()
     db_dish_item = Dish(
-        id=dish_id,
         title='testDishTitle1',
         description='testDishDescription1',
         price='11.10',
-        submenu_id=db_submenu_item.id
+        submenu_id=submenu_id
     )
     session.add(db_dish_item)
     session.commit()
+    session.refresh(db_dish_item)
     session.close()
+    return db_dish_item
+    

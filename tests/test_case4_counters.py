@@ -1,4 +1,5 @@
 from .conftest import *
+import uuid
 
 
 menu_url = f"/api/v1/menus"
