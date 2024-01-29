@@ -45,7 +45,7 @@ docker compose -f docker-compose.yaml down -v
 docker-compose -f docker-compose-tests.yaml up -d && docker logs --follow test_web && docker compose -f docker-compose-tests.yaml down -v
 ```
 
-2. Это позволит вам увидеть в терминале результат успешно выполненных 31 тестов.
+2. Это позволит вам увидеть в терминале результат успешно выполненных 32 тестов.
 3. По пункту 4 (Реализовать тестовый сценарий «Проверка кол-ва блюд и подменю в меню» из Postman с помощью pytest) тесты этого сценария находятся в файле `test_case4_counters.py`. Доступны по [этой ссылке](https://github.com/eddy-di/learning_fastapi/blob/main/tests/test_case4_counters.py).
 4. Юнит тесты проверяющие CRUD эндпоинтов доступны по [этой ссылке](https://github.com/eddy-di/learning_fastapi/blob/main/tests/test_crud.py).
 
