@@ -23,7 +23,6 @@ services:
       - 8009:8000
     environment:
       - SQLALCHEMY_DATABASE_URL=postgresql://menu_db_admin:menu_db_admin@test_db:5432/menu_test_db
-      - TEST_DB_URL=postgresql://menu_db_admin:menu_db_admin@test_db:5432/menu_test_db
     depends_on:
       - test_db
 

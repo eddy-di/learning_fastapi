@@ -20,7 +20,7 @@ def drop_db():
     Base.metadata.drop_all(bind=engine)
 
 engine = create_engine(
-    os.environ.get('TEST_DB_URL')
+    os.environ.get('SQLALCHEMY_DATABASE_URL')
 )
 
 TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)

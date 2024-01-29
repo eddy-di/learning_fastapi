@@ -25,8 +25,8 @@ def read_menus(db: Session = Depends(get_db)):
         func.count(distinct(models.SubMenu.id)).label('submenus_count'),
         func.count(distinct(models.Dish.id)).label('dishes_count'),
     )\
-        .join(models.SubMenu, models.Menu.id == models.SubMenu.menu_id)\
-        .join(models.Dish, models.SubMenu.id == models.Dish.submenu_id)\
+        .join(models.SubMenu, models.Menu.id == models.SubMenu.menu_id, isouter=True)\
+        .join(models.Dish, models.SubMenu.id == models.Dish.submenu_id, isouter=True)\
         .group_by(models.Menu.id, models.Menu.title, models.Menu.description)\
         .all()
     result = []
