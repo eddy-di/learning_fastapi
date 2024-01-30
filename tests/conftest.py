@@ -9,7 +9,7 @@ from app.models import Menu, SubMenu, Dish
 from app.main import app, get_db
 
 
-load_dotenv()
+# load_dotenv()
 
 @pytest.fixture
 def init_db():
@@ -48,7 +48,7 @@ def setup_test_db():
     # drop test_db after tests
     Base.metadata.drop_all(bind=engine)
 
-
+@pytest.fixture
 def create_menu():
     session = TestingSessionLocal()
     db_menu_item = Menu(
@@ -61,32 +61,36 @@ def create_menu():
     session.close()
     return db_menu_item
 
+@pytest.fixture
+def create_submenu():
+    def make_menu(menu_id):
+        session = TestingSessionLocal()
+        db_submenu_item = SubMenu(
+            title='testSubMenu1',
+            description='testSubMenu1Description',
+            menu_id=menu_id
+        )
+        session.add(db_submenu_item)
+        session.commit()
+        session.refresh(db_submenu_item)
+        session.close()
+        return db_submenu_item
+    return make_menu
 
-def create_submenu(menu_id):
-    session = TestingSessionLocal()
-    db_submenu_item = SubMenu(
-        title='testSubMenu1',
-        description='testSubMenu1Description',
-        menu_id=menu_id
-    )
-    session.add(db_submenu_item)
-    session.commit()
-    session.refresh(db_submenu_item)
-    session.close()
-    return db_submenu_item
-
-
-def create_dish(submenu_id):
-    session = TestingSessionLocal()
-    db_dish_item = Dish(
-        title='testDishTitle1',
-        description='testDishDescription1',
-        price='11.10',
-        submenu_id=submenu_id
-    )
-    session.add(db_dish_item)
-    session.commit()
-    session.refresh(db_dish_item)
-    session.close()
-    return db_dish_item
+@pytest.fixture
+def create_dish():
+    def make_dish(submenu_id):
+        session = TestingSessionLocal()
+        db_dish_item = Dish(
+            title='testDishTitle1',
+            description='testDishDescription1',
+            price='11.10',
+            submenu_id=submenu_id
+        )
+        session.add(db_dish_item)
+        session.commit()
+        session.refresh(db_dish_item)
+        session.close()
+        return db_dish_item
+    return make_dish
     

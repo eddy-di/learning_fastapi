@@ -1,4 +1,4 @@
-from .conftest import *
+# from .conftest import *
 import uuid
 
 
@@ -16,9 +16,9 @@ def test_menu_get_list(setup_test_db):
     assert response.json() == []
 
 
-def test_menu_get_list_with_submenu_and_dishes(setup_test_db):
+def test_menu_get_list_with_submenu_and_dishes(setup_test_db, create_menu, create_dish, create_submenu):
     # given: an instance of menu, submenu and dish objs
-    menu = create_menu()
+    menu = create_menu
     submenu1 = create_submenu(menu.id)
     submenu2 = create_submenu(menu.id)
     create_dish(submenu1.id)
@@ -37,9 +37,9 @@ def test_menu_get_list_with_submenu_and_dishes(setup_test_db):
     assert response.json()[0]['dishes_count'] == 3
 
 
-def test_menu_get_list_with_no_submenu_and_dishes(setup_test_db):
+def test_menu_get_list_with_no_submenu_and_dishes(setup_test_db, create_menu):
     # given: an instance of menu obj with empty submenu and dishes
-    create_menu()
+    create_menu
     client = setup_test_db
     url = '/api/v1/menus'
     # when: executing CRUD operation get on menus list
@@ -75,9 +75,9 @@ def test_menu_post(setup_test_db):
     assert {k: data[k] for k in expected_data.keys()} == expected_data
 
 
-def test_menu_get_target_id(setup_test_db):
+def test_menu_get_target_id(setup_test_db, create_menu):
     # given: an instance of menu obj
-    menu = create_menu()
+    menu = create_menu
     client = setup_test_db
     # when: executing CRUD operation get on target id
     url = f'/api/v1/menus/{menu.id}'
@@ -89,9 +89,9 @@ def test_menu_get_target_id(setup_test_db):
     assert response_data['description'] == 'testMenu1Description'
 
 
-def test_menu_patch_target_id(setup_test_db):
+def test_menu_patch_target_id(setup_test_db, create_menu):
     # given: an instance of menu obj
-    menu = create_menu()
+    menu = create_menu
     client = setup_test_db
     # when: executing CRUD operation patch on target id
     url = f'/api/v1/menus/{menu.id}'
@@ -106,9 +106,9 @@ def test_menu_patch_target_id(setup_test_db):
     assert response.json()['dishes_count'] == 0
 
 
-def test_menu_delete_target_id(setup_test_db):
+def test_menu_delete_target_id(setup_test_db, create_menu):
     # given: an instance of menu obj
-    menu = create_menu()
+    menu = create_menu
     client = setup_test_db
     url = f'/api/v1/menus/{menu.id}'
     # when: executing CRUD operation delete on target id
@@ -123,9 +123,9 @@ def test_menu_delete_target_id(setup_test_db):
 
 
 # testing CRUD for submenus endpoints
-def test_submenu_get_list(setup_test_db):
+def test_submenu_get_list(setup_test_db, create_menu):
     # given: menu instance
-    menu = create_menu()
+    menu = create_menu
     client = setup_test_db
     url = f'/api/v1/menus/{menu.id}/submenus'
     # when: executing CRUD operation get on list
@@ -135,10 +135,10 @@ def test_submenu_get_list(setup_test_db):
     assert response.json() == []
 
 
-def test_submenu_get_list_with_data_in_db(setup_test_db):
+def test_submenu_get_list_with_data_in_db(setup_test_db, create_menu, create_submenu, create_dish):
     # given: an instance of menu, submenu and dish objs
     client = setup_test_db
-    menu = create_menu()
+    menu = create_menu
     submenu = create_submenu(menu.id)
     create_dish(submenu.id)
     # when: executing CRUD operation get on menus list
@@ -152,9 +152,9 @@ def test_submenu_get_list_with_data_in_db(setup_test_db):
     assert response.json()[0]['dishes_count'] == 1
 
 
-def test_submenu_post(setup_test_db):
+def test_submenu_post(setup_test_db, create_menu):
     # given: menu instance
-    menu = create_menu()
+    menu = create_menu
     client = setup_test_db
     url = f'/api/v1/menus/{menu.id}/submenus'
     # when: executing CRUD operation post
@@ -169,9 +169,9 @@ def test_submenu_post(setup_test_db):
     assert response.json()['description'] == 'subMenuDescription1'
 
 
-def test_submenu_get_target_id(setup_test_db):
+def test_submenu_get_target_id(setup_test_db, create_menu, create_submenu):
     # given: menu and submenu instances
-    menu = create_menu()
+    menu = create_menu
     submenu = create_submenu(menu.id)
     client = setup_test_db
     url = f'/api/v1/menus/{menu.id}/submenus/{submenu.id}'
@@ -184,9 +184,9 @@ def test_submenu_get_target_id(setup_test_db):
     assert response.json()['id'] == submenu.id
 
 
-def test_submenu_patch_target_id(setup_test_db):
+def test_submenu_patch_target_id(setup_test_db, create_menu, create_submenu):
     # given: menu and submenu instances
-    menu = create_menu()
+    menu = create_menu
     submenu = create_submenu(menu.id)
     client = setup_test_db
     url = f'/api/v1/menus/{menu.id}/submenus/{submenu.id}'
@@ -201,9 +201,9 @@ def test_submenu_patch_target_id(setup_test_db):
     assert response.json()['title'] != 'patchedSubMenuData1'
 
 
-def test_submenu_delete_taget_id(setup_test_db):
+def test_submenu_delete_taget_id(setup_test_db, create_menu, create_submenu):
     # given: menu and submenu instances
-    menu = create_menu()
+    menu = create_menu
     submenu = create_submenu(menu.id)
     client = setup_test_db
     url = f'/api/v1/menus/{menu.id}/submenus/{submenu.id}'
@@ -219,9 +219,9 @@ def test_submenu_delete_taget_id(setup_test_db):
 
 
 # unit testing CRUD for dishes endpoints
-def test_dish_get_list(setup_test_db):
+def test_dish_get_list(setup_test_db, create_menu, create_submenu):
     # given: available menu and submenu
-    menu = create_menu()
+    menu = create_menu
     submenu = create_submenu(menu.id)
     client = setup_test_db
     url = f"/api/v1/menus/{menu.id}/submenus/{submenu.id}/dishes"
@@ -232,9 +232,9 @@ def test_dish_get_list(setup_test_db):
     assert response.json() == []
 
 
-def test_dish_get_list_with_data_in_db(setup_test_db):
+def test_dish_get_list_with_data_in_db(setup_test_db, create_menu, create_submenu, create_dish):
     # given: available menu, submenu and dish
-    menu = create_menu()
+    menu = create_menu
     submenu = create_submenu(menu.id)
     create_dish(submenu.id)
     client = setup_test_db
@@ -246,9 +246,9 @@ def test_dish_get_list_with_data_in_db(setup_test_db):
     assert response.json() != []
 
 
-def test_dish_post(setup_test_db):
+def test_dish_post(setup_test_db, create_menu, create_submenu):
     # given: available menu and submenu
-    menu = create_menu()
+    menu = create_menu
     submenu = create_submenu(menu.id)
     client = setup_test_db
     url = f"/api/v1/menus/{menu.id}/submenus/{submenu.id}/dishes"
@@ -266,9 +266,9 @@ def test_dish_post(setup_test_db):
     assert response.json()['price'] == '12.12'
 
 
-def test_dish_get_target_id(setup_test_db):
+def test_dish_get_target_id(setup_test_db, create_menu, create_submenu, create_dish):
     # given: available menu, submenu and dish
-    menu = create_menu()
+    menu = create_menu
     submenu = create_submenu(menu.id)
     dish = create_dish(submenu.id)
     client = setup_test_db
@@ -283,9 +283,9 @@ def test_dish_get_target_id(setup_test_db):
     assert response.json()['price'] == '11.10'
 
 
-def test_dish_update_target_id(setup_test_db):
+def test_dish_update_target_id(setup_test_db, create_menu, create_submenu, create_dish):
     # given: available menu, submenu and dish
-    menu = create_menu()
+    menu = create_menu
     submenu = create_submenu(menu.id)
     dish = create_dish(submenu.id)
     client = setup_test_db
@@ -302,9 +302,9 @@ def test_dish_update_target_id(setup_test_db):
     assert response.json()['description'] != '33.99'
 
 
-def test_dish_delete_target_id(setup_test_db):
+def test_dish_delete_target_id(setup_test_db, create_menu, create_submenu, create_dish):
     # given: available menu, submenu and dish
-    menu = create_menu()
+    menu = create_menu
     submenu = create_submenu(menu.id)
     dish = create_dish(submenu.id)
     client = setup_test_db
