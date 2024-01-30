@@ -189,4 +189,5 @@ def test_get_menus_list():
     assert response.json() == []
 
 def test_end(drop_db):
+    # necessary to cleanup db
     drop_db

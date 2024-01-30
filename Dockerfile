@@ -15,3 +15,5 @@ COPY ./app /code/app
 COPY ./tests /code/tests
 
 COPY ./pytest.ini /code/pytest.ini
+
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
