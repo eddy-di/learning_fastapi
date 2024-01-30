@@ -13,3 +13,5 @@ RUN pip install --no-cache-dir --upgrade -r /code/requirements.txt
 COPY ./app /code/app
 
 COPY ./tests /code/tests
+
+COPY ./pytest.ini /code/pytest.ini

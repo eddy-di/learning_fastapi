@@ -3,14 +3,19 @@ version: '3'
 services:
   test_db:
     image: postgres:15.1-alpine
+    restart: always
+    container_name: test_db
     volumes:
       - test_postgres_data:/var/lib/postgresql/data/
     expose:
-      - 5432
-    environment:
-      POSTGRES_DB: menu_test_db
-      POSTGRES_USER: menu_db_admin
-      POSTGRES_PASSWORD: menu_db_admin
+      - "5432"
+    env_file:
+      - .env_test
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
   
   test_web:
     build: .
@@ -21,10 +26,11 @@ services:
       - .:/tests
     ports:
       - 8009:8000
-    environment:
-      - SQLALCHEMY_DATABASE_URL=postgresql://menu_db_admin:menu_db_admin@test_db:5432/menu_test_db
+    env_file:
+      - .env_test
     depends_on:
-      - test_db
+      test_db:
+        condition: service_healthy
 
 volumes:
   test_postgres_data:

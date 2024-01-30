@@ -7,9 +7,10 @@ from sqlalchemy.orm import sessionmaker
 from app.database import Base, engine
 from app.models import Menu, SubMenu, Dish
 from app.main import app, get_db
+from app.config import db_url
 
 
-# load_dotenv()
+
 
 @pytest.fixture
 def init_db():
@@ -19,9 +20,7 @@ def init_db():
 def drop_db():
     Base.metadata.drop_all(bind=engine)
 
-engine = create_engine(
-    os.environ.get('SQLALCHEMY_DATABASE_URL')
-)
+engine = create_engine(db_url)
 
 TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
