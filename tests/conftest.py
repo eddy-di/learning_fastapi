@@ -1,12 +1,10 @@
-import os
 import pytest
-from dotenv import load_dotenv
 from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from app.database import Base, engine
-from app.models import Menu, SubMenu, Dish
-from app.main import app, get_db
+from app.database.database import Base, engine, get_db
+from app.database.models import Menu, SubMenu, Dish
+from app.main import app
 from app.config import db_url
 
 
