@@ -1,10 +1,14 @@
-from .database import Base
-from sqlalchemy import Column, ForeignKey, String, DECIMAL
-from sqlalchemy.orm import relationship
 import uuid
+
+from sqlalchemy import DECIMAL, Column, ForeignKey, String
+from sqlalchemy.orm import relationship
+
+from .database import Base
+
 
 def generate_uuid():
     return str(uuid.uuid4())
+
 
 class Menu(Base):
     __tablename__ = 'menus'
@@ -13,7 +17,7 @@ class Menu(Base):
     title = Column(String)
     description = Column(String)
 
-    submenus = relationship("SubMenu", back_populates="menu", cascade="all, delete-orphan")
+    submenus = relationship('SubMenu', back_populates='menu', cascade='all, delete-orphan')
 
 
 class SubMenu(Base):
@@ -23,11 +27,10 @@ class SubMenu(Base):
     title = Column(String)
     description = Column(String)
 
-    menu_id = Column(String, ForeignKey("menus.id", ondelete='CASCADE'))
+    menu_id = Column(String, ForeignKey('menus.id', ondelete='CASCADE'))
     menu = relationship('Menu', back_populates='submenus')
 
-    dishes = relationship("Dish", back_populates="submenu", cascade="all, delete-orphan")
-
+    dishes = relationship('Dish', back_populates='submenu', cascade='all, delete-orphan')
 
 
 class Dish(Base):
@@ -38,6 +41,5 @@ class Dish(Base):
     description = Column(String)
     price = Column(DECIMAL(precision=10, scale=2))
 
-    submenu_id = Column(String, ForeignKey("submenus.id", ondelete='CASCADE'))
+    submenu_id = Column(String, ForeignKey('submenus.id', ondelete='CASCADE'))
     submenu = relationship('SubMenu', back_populates='dishes')
-

@@ -1,8 +1,7 @@
-from fastapi import FastAPI, Depends
-from app.routers import menu, submenu, dish
-from app.database.database import get_db, Base, engine
+from fastapi import Depends, FastAPI
 
-
+from app.database.database import Base, engine, get_db
+from app.routers import dish, menu, submenu
 
 app = FastAPI(
     title='Y-lab intensive course API',

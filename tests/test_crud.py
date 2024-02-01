@@ -96,7 +96,7 @@ def test_menu_patch_target_id(setup_test_db, create_menu):
     # when: executing CRUD operation patch on target id
     url = f'/api/v1/menus/{menu.id}'
     patch_data = {
-        "description": "patchedMenuDescription"
+        'description': 'patchedMenuDescription'
     }
     response = client.patch(url, json=patch_data)
     # then: expecting to to get status code 200 and response description changed
@@ -113,13 +113,13 @@ def test_menu_delete_target_id(setup_test_db, create_menu):
     url = f'/api/v1/menus/{menu.id}'
     # when: executing CRUD operation delete on target id
     response = client.delete(url)
-    # then: expecting to to get status code 200 
+    # then: expecting to to get status code 200
     assert response.status_code == 200
     # when: executing CRUD operation get on  deleted target id
     response = client.get(url)
     # then: expecting to get status code 404 and not found detail
     assert response.status_code == 404
-    assert response.json() == {"detail":"menu not found"}
+    assert response.json() == {'detail': 'menu not found'}
 
 
 # testing CRUD for submenus endpoints
@@ -159,8 +159,8 @@ def test_submenu_post(setup_test_db, create_menu):
     url = f'/api/v1/menus/{menu.id}/submenus'
     # when: executing CRUD operation post
     post_data = {
-        "title": "subMenuTitle1",
-        "description": "subMenuDescription1"
+        'title': 'subMenuTitle1',
+        'description': 'subMenuDescription1'
     }
     response = client.post(url, json=post_data)
     # then: expecting status code 201 and post_data in response
@@ -179,8 +179,8 @@ def test_submenu_get_target_id(setup_test_db, create_menu, create_submenu):
     response = client.get(url)
     # then: expecting status code 200 and create_menu info in response
     assert response.status_code == 200
-    assert response.json()['title'] == "testSubMenu1"
-    assert response.json()['description'] == "testSubMenu1Description"
+    assert response.json()['title'] == 'testSubMenu1'
+    assert response.json()['description'] == 'testSubMenu1Description'
     assert response.json()['id'] == submenu.id
 
 
@@ -209,13 +209,13 @@ def test_submenu_delete_taget_id(setup_test_db, create_menu, create_submenu):
     url = f'/api/v1/menus/{menu.id}/submenus/{submenu.id}'
     # when: executing CRUD operation delete
     response = client.delete(url)
-    # then: expecting status code 200 
-    assert response.status_code == 200 
+    # then: expecting status code 200
+    assert response.status_code == 200
     # when: executing CRUD operation get
     response = client.get(url)
     # then: expecting status code 404 and not found details
     assert response.status_code == 404
-    assert response.json() == {"detail":"submenu not found"}
+    assert response.json() == {'detail': 'submenu not found'}
 
 
 # unit testing CRUD for dishes endpoints
@@ -224,7 +224,7 @@ def test_dish_get_list(setup_test_db, create_menu, create_submenu):
     menu = create_menu
     submenu = create_submenu(menu.id)
     client = setup_test_db
-    url = f"/api/v1/menus/{menu.id}/submenus/{submenu.id}/dishes"
+    url = f'/api/v1/menus/{menu.id}/submenus/{submenu.id}/dishes'
     # when: executing CRUD operation get on list
     response = client.get(url)
     # then: expecting to get 200 and empty list
@@ -238,7 +238,7 @@ def test_dish_get_list_with_data_in_db(setup_test_db, create_menu, create_submen
     submenu = create_submenu(menu.id)
     create_dish(submenu.id)
     client = setup_test_db
-    url = f"/api/v1/menus/{menu.id}/submenus/{submenu.id}/dishes"
+    url = f'/api/v1/menus/{menu.id}/submenus/{submenu.id}/dishes'
     # when: executing CRUD operation get on list
     response = client.get(url)
     # then: expecting to get 200 and empty list
@@ -251,12 +251,12 @@ def test_dish_post(setup_test_db, create_menu, create_submenu):
     menu = create_menu
     submenu = create_submenu(menu.id)
     client = setup_test_db
-    url = f"/api/v1/menus/{menu.id}/submenus/{submenu.id}/dishes"
+    url = f'/api/v1/menus/{menu.id}/submenus/{submenu.id}/dishes'
     # when: executing CRUD operation post
     post_data = {
-        "title": "testDishTitle1",
-        "description": "testDishDescription1",
-        "price": "12.12"
+        'title': 'testDishTitle1',
+        'description': 'testDishDescription1',
+        'price': '12.12'
     }
     response = client.post(url, json=post_data)
     # then: expecting to get 201 and post_data in response
@@ -272,7 +272,7 @@ def test_dish_get_target_id(setup_test_db, create_menu, create_submenu, create_d
     submenu = create_submenu(menu.id)
     dish = create_dish(submenu.id)
     client = setup_test_db
-    url = f"/api/v1/menus/{menu.id}/submenus/{submenu.id}/dishes/{dish.id}"
+    url = f'/api/v1/menus/{menu.id}/submenus/{submenu.id}/dishes/{dish.id}'
     # when: executing CRUD operation get on target id
     response = client.get(url)
     # then: expecting to get 200 and available instance data in response
@@ -289,7 +289,7 @@ def test_dish_update_target_id(setup_test_db, create_menu, create_submenu, creat
     submenu = create_submenu(menu.id)
     dish = create_dish(submenu.id)
     client = setup_test_db
-    url = f"/api/v1/menus/{menu.id}/submenus/{submenu.id}/dishes/{dish.id}"
+    url = f'/api/v1/menus/{menu.id}/submenus/{submenu.id}/dishes/{dish.id}'
     # when: executing CRUD operation patch
     patch_data = {
         'price': '33.99'
@@ -308,7 +308,7 @@ def test_dish_delete_target_id(setup_test_db, create_menu, create_submenu, creat
     submenu = create_submenu(menu.id)
     dish = create_dish(submenu.id)
     client = setup_test_db
-    url = f"/api/v1/menus/{menu.id}/submenus/{submenu.id}/dishes/{dish.id}"
+    url = f'/api/v1/menus/{menu.id}/submenus/{submenu.id}/dishes/{dish.id}'
     # when: executing CRUD operation delete
     response = client.delete(url)
     # then: expecting to get status code 200
@@ -317,5 +317,4 @@ def test_dish_delete_target_id(setup_test_db, create_menu, create_submenu, creat
     response = client.get(url)
     # then: expecting to get 404 status code and not found message
     assert response.status_code == 404
-    assert response.json() == {"detail":"dish not found"}
-
+    assert response.json() == {'detail': 'dish not found'}

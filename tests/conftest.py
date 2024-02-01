@@ -2,27 +2,30 @@ import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from app.database.database import Base, engine, get_db
-from app.database.models import Menu, SubMenu, Dish
-from app.main import app
+
 from app.config import db_url
+from app.database.database import Base, get_db
+from app.database.models import Dish, Menu, SubMenu
+from app.main import app
 
-
+engine = create_engine(db_url)
 
 
 @pytest.fixture
 def init_db():
     Base.metadata.create_all(bind=engine)
 
+
 @pytest.fixture
 def drop_db():
     Base.metadata.drop_all(bind=engine)
 
-engine = create_engine(db_url)
 
 TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 # Override the database dependency for testing
+
+
 def override_get_db():
     db = TestingSessionLocal()
     try:
@@ -36,6 +39,7 @@ app.dependency_overrides[get_db] = override_get_db
 
 client = TestClient(app)
 
+
 @pytest.fixture
 def setup_test_db():
     # creates db and drops it at the end
@@ -45,11 +49,12 @@ def setup_test_db():
     # drop test_db after tests
     Base.metadata.drop_all(bind=engine)
 
+
 @pytest.fixture
 def create_menu():
     session = TestingSessionLocal()
     db_menu_item = Menu(
-        title='testMenu1', 
+        title='testMenu1',
         description='testMenu1Description'
     )
     session.add(db_menu_item)
@@ -57,6 +62,7 @@ def create_menu():
     session.refresh(db_menu_item)
     session.close()
     return db_menu_item
+
 
 @pytest.fixture
 def create_submenu():
@@ -74,6 +80,7 @@ def create_submenu():
         return db_submenu_item
     return make_menu
 
+
 @pytest.fixture
 def create_dish():
     def make_dish(submenu_id):
@@ -90,4 +97,3 @@ def create_dish():
         session.close()
         return db_dish_item
     return make_dish
-    
