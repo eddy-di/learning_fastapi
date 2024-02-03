@@ -49,7 +49,7 @@ def create_menu(
     db: Session = Depends(get_db),
     cache: Redis = Depends(redis)
 ):
-    result = MenuCRUD(db).create_menu(menu_endpoint=menu)
+    result = MenuCRUD(db).create_menu(menu_schema=menu)
 
     return result
 
@@ -66,7 +66,7 @@ def read_menu(
     cache: Redis = Depends(redis)
 ):
     # Fetch the menu from the database
-    result = MenuCRUD(db).get_menu(target_menu_id=target_menu_id)
+    result = MenuCRUD(db).read_menu(target_menu_id=target_menu_id)
 
     return result
 

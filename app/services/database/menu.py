@@ -59,20 +59,20 @@ class MenuCRUD(AppCRUD):
             .filter(MenuModel.id == target_id).scalar()
         return menu
 
-    def create_menu(self, menu_endpoint: MenuCreate) -> MenuModel | None:
+    def create_menu(self, menu_schema: MenuCreate) -> MenuModel | None:
         """
         CREATE / POST
         """
         new_menu = MenuModel(
-            title=menu_endpoint.title,
-            description=menu_endpoint.description
+            title=menu_schema.title,
+            description=menu_schema.description
         )
         self.db.add(new_menu)
         self.db.commit()
         self.db.refresh(new_menu)
         return new_menu
 
-    def get_menu(self, target_menu_id: str) -> dict | HTTPException:
+    def read_menu(self, target_menu_id: str) -> dict | HTTPException:
         """
         READ / GET menu by id
         """
