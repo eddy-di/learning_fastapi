@@ -4,11 +4,13 @@ from redis import Redis
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-from app.config import db_url
-from app.database.database import Base, get_db
-from app.database.models import Dish, Menu, SubMenu
-from app.database.redis_cache import create_redis as redis
+from app.config.base import db_url
+from app.config.cache import create_redis as redis
+from app.config.database import Base, get_db
 from app.main import app
+from app.models.dish import Dish
+from app.models.menu import Menu
+from app.models.submenu import SubMenu
 
 engine = create_engine(db_url)
 

@@ -1,6 +1,6 @@
 from fastapi import Depends, FastAPI
 
-from app.database.database import Base, engine, get_db
+from app.config.database import Base, engine, get_db
 from app.routers import dish, menu, submenu
 
 app = FastAPI(
