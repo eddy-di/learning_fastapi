@@ -1,9 +1,13 @@
+import json
+
 from fastapi import APIRouter, Depends, HTTPException
+from redis import Redis
 from sqlalchemy import distinct, func
 from sqlalchemy.orm import Session
 
 from app.database import models, schemas
 from app.database.database import get_db
+from app.database.redis_cache import create_redis as redis
 
 menu_router = APIRouter()
 
@@ -14,7 +18,9 @@ MENU_LINK = '/api/v1/menus/{target_menu_id}'
 
 # GET endpoint for list of menus, and a count of related items in it
 @menu_router.get(MENUS_LINK, response_model=list[schemas.Menu], tags=['menus'])
-def read_menus(db: Session = Depends(get_db)):
+def read_menus(db: Session = Depends(get_db), cache: Redis = Depends(redis)):
+    if read_menus := cache.get('read_menus'):
+        return json.loads(read_menus)
     menus = db.query(models.Menu,
                      func.count(distinct(models.SubMenu.id)).label('submenus_count'),
                      func.count(distinct(models.Dish.id)).label('dishes_count'),
@@ -33,6 +39,10 @@ def read_menus(db: Session = Depends(get_db)):
             'submenus_count': submenus_count,
             'dishes_count': dishes_count
         })
+    cache.set('read_menus', json.dumps(result))
+    # print(type(cache.get('read_menus')))
+    # print(type(json.loads(cache.get('read_menus'))))
+    # print(type(result))
     return result
 
 

@@ -1,11 +1,13 @@
 import pytest
 from fastapi.testclient import TestClient
+from redis import Redis
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
 from app.config import db_url
 from app.database.database import Base, get_db
 from app.database.models import Dish, Menu, SubMenu
+from app.database.redis_cache import create_redis as redis
 from app.main import app
 
 engine = create_engine(db_url)
@@ -44,10 +46,22 @@ client = TestClient(app)
 def setup_test_db():
     # creates db and drops it at the end
     Base.metadata.create_all(bind=engine)
+    r = redis()
     test_client = TestClient(app)
     yield test_client
     # drop test_db after tests
     Base.metadata.drop_all(bind=engine)
+    r.flushdb()
+
+
+@pytest.fixture
+def cache_connect() -> Redis:
+    return redis()
+
+
+@pytest.fixture
+def cache_flush():
+    return redis().flushdb()
 
 
 @pytest.fixture

@@ -12,6 +12,7 @@ app = FastAPI(
 
 Base.metadata.create_all(bind=engine)
 
+
 app.include_router(menu.menu_router)
 app.include_router(submenu.submenu_router)
 app.include_router(dish.dish_router)

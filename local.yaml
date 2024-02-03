@@ -11,5 +11,25 @@ services:
       - "15432:5432"
     env_file: local.env
 
+  redis:
+    image: redis:latest
+    container_name: redis
+    restart: always
+    volumes:
+      - redis_local_test_data:/data
+    expose:
+      - 6379
+    ports:
+      - "6379:6379"
+    env_file:
+      - local.env
+    healthcheck:
+      test: ["CMD-SHELL", "redis-cli ping | grep PONG"]
+      interval: 1s
+      timeout: 3s
+      retries: 5
+
+
 volumes:
   postgres_local_test_data:
+  redis_local_test_data:
