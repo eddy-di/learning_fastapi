@@ -1,14 +1,10 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends
 from redis import Redis
-from sqlalchemy import func
 from sqlalchemy.orm import Session
 
 from app.config.base import MENU_LINK, MENUS_LINK
 from app.config.cache import create_redis as redis
 from app.config.database import get_db
-from app.models.dish import Dish
-from app.models.menu import Menu
-from app.models.submenu import SubMenu
 from app.schemas.menu import Menu as MenuSchema
 from app.schemas.menu import MenuCreate as MenuCreateSchema
 from app.schemas.menu import MenuUpdate as MenuUpdateSchema
@@ -70,26 +66,9 @@ def read_menu(
     cache: Redis = Depends(redis)
 ):
     # Fetch the menu from the database
-    db_menu = db.query(Menu).filter(Menu.id == target_menu_id).first()
+    result = MenuCRUD(db).get_menu(target_menu_id=target_menu_id)
 
-    # Check if the menu exists
-    if db_menu is None:
-        raise HTTPException(status_code=404, detail='menu not found')
-
-    db_menu.submenus_count = (
-        db.query(func.count(SubMenu.id))
-        .filter(SubMenu.menu_id == db_menu.id)
-        .scalar()
-    )
-
-    db_menu.dishes_count = (
-        db.query(func.count(Dish.id))
-        .join(SubMenu)
-        .filter(SubMenu.menu_id == db_menu.id)
-        .scalar()
-    )
-
-    return db_menu
+    return result
 
 
 @menu_router.patch(
@@ -104,17 +83,8 @@ def update_menu(
     db: Session = Depends(get_db),
     cache: Redis = Depends(redis)
 ):
-    db_menu = db.query(Menu).filter(Menu.id == target_menu_id).first()
-    if db_menu is None:
-        raise HTTPException(status_code=404, detail='menu not found')
-
-    # Update menu attributes
-    for key, value in menu_update.model_dump(exclude_unset=True).items():
-        setattr(db_menu, key, value)
-
-    db.commit()
-    db.refresh(db_menu)
-    return db_menu
+    result = MenuCRUD(db).update_menu(target_menu_id, menu_update)
+    return result
 
 
 @menu_router.delete(
@@ -128,12 +98,6 @@ def delete_menu(
     db: Session = Depends(get_db),
     cache: Redis = Depends(redis)
 ):
-    db_menu = db.query(Menu).filter(Menu.id == target_menu_id).first()
+    result = MenuCRUD(db).delete_menu(target_menu_id)
 
-    if db_menu is None:
-        raise HTTPException(status_code=404, detail='menu not found')
-
-    # Delete the menu and its associated submenus and dishes
-    db.delete(db_menu)
-    db.commit()
-    return db_menu
+    return result
