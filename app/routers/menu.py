@@ -1,8 +1,6 @@
-import json
-
 from fastapi import APIRouter, Depends, HTTPException
 from redis import Redis
-from sqlalchemy import distinct, func
+from sqlalchemy import func
 from sqlalchemy.orm import Session
 
 from app.config.base import MENU_LINK, MENUS_LINK
@@ -14,6 +12,7 @@ from app.models.submenu import SubMenu
 from app.schemas.menu import Menu as MenuSchema
 from app.schemas.menu import MenuCreate as MenuCreateSchema
 from app.schemas.menu import MenuUpdate as MenuUpdateSchema
+from app.services.database.menu import MenuCRUD, MenuService
 
 menu_router = APIRouter()
 
@@ -32,30 +31,13 @@ def read_menus(
     """
     Endoint for getting list of menus.
     """
-    if read_menus := cache.get('read_menus'):
-        return json.loads(read_menus)
-    menus = db.query(Menu,
-                     func.count(distinct(SubMenu.id)).label('submenus_count'),
-                     func.count(distinct(Dish.id)).label('dishes_count'),
-                     )\
-        .join(SubMenu, Menu.id == SubMenu.menu_id, isouter=True)\
-        .join(Dish, SubMenu.id == Dish.submenu_id, isouter=True)\
-        .group_by(Menu.id, Menu.title, Menu.description)\
-        .all()
-    result = []
-    for i in menus:
-        menu, submenus_count, dishes_count = i
-        result.append({
-            'title': menu.title,
-            'description': menu.description,
-            'id': menu.id,
-            'submenus_count': submenus_count,
-            'dishes_count': dishes_count
-        })
-    cache.set('read_menus', json.dumps(result))
-    # print(type(cache.get('read_menus')))
-    # print(type(json.loads(cache.get('read_menus'))))
-    # print(type(result))
+    # if read_menus := cache.get('read_menus'):
+    # return json.loads(read_menus)
+
+    result = MenuService(db).read_menus()
+
+    # cache.set('read_menus', json.dumps(result))
+
     return result
 
 
@@ -71,11 +53,9 @@ def create_menu(
     db: Session = Depends(get_db),
     cache: Redis = Depends(redis)
 ):
-    db_menu = Menu(**menu.model_dump())
-    db.add(db_menu)
-    db.commit()
-    db.refresh(db_menu)
-    return db_menu
+    result = MenuCRUD(db).create_menu(menu_endpoint=menu)
+
+    return result
 
 
 @menu_router.get(
