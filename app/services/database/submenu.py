@@ -1,5 +1,6 @@
 from fastapi import HTTPException
 from sqlalchemy import distinct, func
+from sqlalchemy.orm import selectinload
 
 from app.models.dish import Dish as DishModel
 from app.models.menu import Menu as MenuModel
@@ -70,7 +71,10 @@ class SubMenuCRUD(AppCRUD):
     def read_submenu(self, menu_id: str, submenu_id: str):
         self.check_menu_id(menu_id=menu_id)
 
-        submenu_with_counter = self.db.query(SubMenuModel).filter(SubMenuModel.id == submenu_id).first()
+        submenu_with_counter = self.db.query(SubMenuModel).filter(SubMenuModel.id == submenu_id)\
+            .options(
+                selectinload(SubMenuModel.dishes)
+        ).first()
         if not submenu_with_counter:
             return not_found_exception()
         submenu_with_counter.dishes_count = self.db.query(

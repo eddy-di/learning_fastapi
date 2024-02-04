@@ -8,6 +8,7 @@ class MenuCacheService(CacheService):
     def read_menus(self):
         if all_menus := self.cache.get('all_menus'):
             return pickle.loads(all_menus)
+        return None
 
     def set_menus(self, query_result: list[dict]):
         self.cache.set('all_menus', pickle.dumps(query_result))
@@ -17,12 +18,13 @@ class MenuCacheService(CacheService):
 
 
 class MenuCacheCRUD(CacheCRUD):
-    def read_menu(self, menu_id: str):
+    def read_menu(self, menu_id: str) -> Menu | None:
         if target_menu := self.cache.get(f'menu_id_{menu_id}'):
             return pickle.loads(target_menu)
+        return None
 
-    def set_menu(self, menu_id: str, query_result: Menu):
-        self.cache.set(f'menu_id_{menu_id}', pickle.dumps(query_result))
+    def set_menu(self, query_result: Menu):
+        self.cache.set(f'menu_id_{query_result.id}', pickle.dumps(query_result))
 
     def create_or_update(self, query_result: Menu):
         self.cache.set(f'menu_id_{query_result.id}', pickle.dumps(query_result))

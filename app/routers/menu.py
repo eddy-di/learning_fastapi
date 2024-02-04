@@ -83,7 +83,7 @@ def read_menu(
 
     result = MenuCRUD(db).read_menu(menu_id=target_menu_id)
 
-    MenuCacheCRUD(cache).set_menu(menu_id=target_menu_id, query_result=result)
+    MenuCacheCRUD(cache).set_menu(query_result=result)
 
     return result
 

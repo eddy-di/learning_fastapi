@@ -1,5 +1,6 @@
 from fastapi import HTTPException
 from sqlalchemy import distinct, func
+from sqlalchemy.orm import selectinload
 
 from app.models.dish import Dish as DishModel
 from app.models.menu import Menu as MenuModel
@@ -64,7 +65,11 @@ class MenuCRUD(AppCRUD):
         """
         READ / GET menu by id
         """
-        target_menu_from_db = self.db.query(MenuModel).filter(MenuModel.id == menu_id).first()
+        target_menu_from_db = self.db.query(MenuModel).filter(MenuModel.id == menu_id).options(
+            selectinload(MenuModel.submenus).options(
+                selectinload(SubMenuModel.dishes)
+            )
+        ).first()
 
         if not target_menu_from_db:
             return not_found_exception()
