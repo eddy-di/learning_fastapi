@@ -6,7 +6,7 @@ from app.models.menu import Menu as MenuModel
 from app.models.submenu import SubMenu as SubMenuModel
 from app.schemas.menu import MenuCreate, MenuUpdate
 
-from .main import AppCRUD, AppService
+from ..main import AppCRUD, AppService
 
 
 def not_found_exception() -> HTTPException:
@@ -47,7 +47,7 @@ class MenuCRUD(AppCRUD):
     Menu queries to execute Create, Retrieve, Update and Destroy commands.
     """
 
-    def create_menu(self, menu_schema: MenuCreate) -> MenuModel | None:
+    def create_menu(self, menu_schema: MenuCreate) -> MenuModel:
         """
         CREATE / POST
         """
@@ -60,7 +60,7 @@ class MenuCRUD(AppCRUD):
         self.db.refresh(new_menu)
         return new_menu
 
-    def read_menu(self, menu_id: str) -> dict | HTTPException:
+    def read_menu(self, menu_id: str):
         """
         READ / GET menu by id
         """

@@ -8,6 +8,7 @@ from app.config.database import get_db
 from app.schemas.menu import Menu as MenuSchema
 from app.schemas.menu import MenuCreate as MenuCreateSchema
 from app.schemas.menu import MenuUpdate as MenuUpdateSchema
+from app.services.cache.menu import MenuCacheCRUD, MenuCacheService
 from app.services.database.menu import MenuCRUD, MenuService
 
 menu_router = APIRouter()
@@ -26,12 +27,12 @@ def read_menus(
     """
     GET endpoint for list of menus, and a count of related items in it
     """
-    # if read_menus := cache.get('read_menus'):
-    # return json.loads(read_menus)
+
+    MenuCacheService(cache).read_menus()
 
     result = MenuService(db).read_menus()
 
-    # cache.set('read_menus', json.dumps(result))
+    MenuCacheService(cache).set_menus(query_result=result)
 
     return result
 
@@ -51,7 +52,12 @@ def create_menu(
     """
     POST operation for creating menu.
     """
+
     result = MenuCRUD(db).create_menu(menu_schema=menu)
+
+    MenuCacheCRUD(cache).create_or_update(query_result=result)
+
+    MenuCacheService(cache).invalidate_menus()
 
     return result
 
@@ -71,7 +77,11 @@ def read_menu(
     GET operation for specific menu.
     """
 
+    MenuCacheCRUD(cache).read_menu(menu_id=target_menu_id)
+
     result = MenuCRUD(db).read_menu(menu_id=target_menu_id)
+
+    MenuCacheCRUD(cache).set_menu(menu_id=target_menu_id, query_result=result)
 
     return result
 
@@ -91,10 +101,16 @@ def update_menu(
     """
     PATCH operation for specific menu.
     """
+
     result = MenuCRUD(db).update_menu(
         menu_id=target_menu_id,
         menu_schema=menu_update
     )
+
+    MenuCacheCRUD(cache).create_or_update(query_result=result)
+
+    MenuCacheService(cache).invalidate_menus()
+
     return result
 
 
@@ -112,6 +128,11 @@ def delete_menu(
     """
     DELETE operation for specific menu.
     """
+
     result = MenuCRUD(db).delete_menu(menu_id=target_menu_id)
+
+    MenuCacheCRUD(cache).delete(menu_id=target_menu_id)
+
+    MenuCacheService(cache).invalidate_menus()
 
     return result
