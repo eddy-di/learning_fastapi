@@ -34,7 +34,6 @@ def read_dishes(
         return all_dishes
 
     result = DishService(db).read_dishes(
-        menu_id=target_menu_id,
         submenu_id=target_submenu_id
     )
 

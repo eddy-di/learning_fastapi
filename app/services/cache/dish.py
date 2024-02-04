@@ -18,7 +18,8 @@ class DishCacheService(CacheService):
             f'menu_id_{menu_id}',
             f'submenu_id_{submenu_id}',
             'all_submenus',
-            'all_menus'
+            'all_menus',
+            'all_dishes'
         )
 
 

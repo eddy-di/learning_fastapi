@@ -25,7 +25,7 @@ class DishService(AppService):
         if not res:
             return no_submenu()
 
-    def read_dishes(self, menu_id: str, submenu_id: str):
+    def read_dishes(self, submenu_id: str):
 
         result = self.db.query(DishModel).filter(DishModel.submenu_id == submenu_id).all()
 
