@@ -47,7 +47,7 @@ class MenuCRUD(AppCRUD):
     Menu queries to execute Create, Retrieve, Update and Destroy commands.
     """
 
-    def create_menu(self, menu_schema: MenuCreate) -> MenuModel | None:
+    def create_menu(self, menu_schema: MenuCreate) -> MenuModel:
         """
         CREATE / POST
         """

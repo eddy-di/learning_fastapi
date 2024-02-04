@@ -1,5 +1,3 @@
-import pickle
-
 from fastapi import APIRouter, Depends
 from redis import Redis
 from sqlalchemy.orm import Session
@@ -10,6 +8,7 @@ from app.config.database import get_db
 from app.schemas.menu import Menu as MenuSchema
 from app.schemas.menu import MenuCreate as MenuCreateSchema
 from app.schemas.menu import MenuUpdate as MenuUpdateSchema
+from app.services.cache.menu import MenuCacheCRUD, MenuCacheService
 from app.services.database.menu import MenuCRUD, MenuService
 
 menu_router = APIRouter()
@@ -28,12 +27,12 @@ def read_menus(
     """
     GET endpoint for list of menus, and a count of related items in it
     """
-    if all_menus := cache.get('all_menus'):
-        return pickle.loads(all_menus)
+
+    MenuCacheService(cache).read_menus()
 
     result = MenuService(db).read_menus()
 
-    cache.set('all_menus', pickle.dumps(result))
+    MenuCacheService(cache).set_menus(query_result=result)
 
     return result
 
@@ -53,12 +52,12 @@ def create_menu(
     """
     POST operation for creating menu.
     """
+
     result = MenuCRUD(db).create_menu(menu_schema=menu)
 
-    if result:
-        cache.set(f'menu_id_{result.id}', pickle.dumps(result))
+    MenuCacheCRUD(cache).create_or_update(query_result=result)
 
-    cache.delete('all_menus')
+    MenuCacheService(cache).invalidate_menus()
 
     return result
 
@@ -77,12 +76,12 @@ def read_menu(
     """
     GET operation for specific menu.
     """
-    if target_menu := cache.get(f'menu_id_{target_menu_id}'):
-        return pickle.loads(target_menu)
+
+    MenuCacheCRUD(cache).read_menu(menu_id=target_menu_id)
 
     result = MenuCRUD(db).read_menu(menu_id=target_menu_id)
 
-    cache.set(f'menu_id_{result.id}', pickle.dumps(result))
+    MenuCacheCRUD(cache).set_menu(menu_id=target_menu_id, query_result=result)
 
     return result
 
@@ -102,12 +101,15 @@ def update_menu(
     """
     PATCH operation for specific menu.
     """
+
     result = MenuCRUD(db).update_menu(
         menu_id=target_menu_id,
         menu_schema=menu_update
     )
-    cache.set(f'menu_id_{target_menu_id}', pickle.dumps(result))
-    cache.delete('all_menus')
+
+    MenuCacheCRUD(cache).create_or_update(query_result=result)
+
+    MenuCacheService(cache).invalidate_menus()
 
     return result
 
@@ -126,9 +128,11 @@ def delete_menu(
     """
     DELETE operation for specific menu.
     """
+
     result = MenuCRUD(db).delete_menu(menu_id=target_menu_id)
 
-    cache.delete(f'menu_id_{target_menu_id}')
-    cache.delete('all_menus')
+    MenuCacheCRUD(cache).delete(menu_id=target_menu_id)
+
+    MenuCacheService(cache).invalidate_menus()
 
     return result
