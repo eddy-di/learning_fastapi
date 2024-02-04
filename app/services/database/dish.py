@@ -79,7 +79,7 @@ class DishCRUD(AppCRUD):
         self.db.refresh(dish_to_update)
         return dish_to_update
 
-    def delete_dish(self, menu_id: str, submenu_id: str, dish_id: str) -> DishModel | HTTPException:
+    def delete_dish(self, menu_id: str, submenu_id: str, dish_id: str) -> None | HTTPException:
         self.check_menu_id(menu_id=menu_id)
 
         self.check_submenu_id(submenu_id=submenu_id)
@@ -90,4 +90,4 @@ class DishCRUD(AppCRUD):
             return not_found_exception()
         self.db.delete(dish_to_delete)
         self.db.commit()
-        return dish_to_delete
+        return None

@@ -16,13 +16,8 @@ def not_found_exception() -> HTTPException:
 
 
 class SubMenuService(AppService):
-    def check_menu_id(self, menu_id: str) -> HTTPException:
-        res = self.db.query(MenuModel).filter(MenuModel.id == menu_id).first()
-        if not res:
-            return no_menu()
 
-    def read_submenus(self, menu_id: str) -> list[dict]:
-        self.check_menu_id(menu_id)
+    def read_submenus(self) -> list[dict]:
 
         all_submenus = self.db.query(
             SubMenuModel,
@@ -52,10 +47,10 @@ class SubMenuCRUD(AppCRUD):
         if not res:
             return no_menu()
 
-    def fetch_menus_submenu(self, submenu_id: str):
+    def fetch_menus_submenu(self, submenu_id: str) -> SubMenuModel | None:
         return self.db.query(SubMenuModel).filter(SubMenuModel.id == submenu_id).first()
 
-    def create_submenu(self, submenu_schema: SubMenuCreate, menu_id: str):
+    def create_submenu(self, submenu_schema: SubMenuCreate, menu_id: str) -> SubMenuModel | HTTPException:
         self.check_menu_id(menu_id)
 
         new_submenu = SubMenuModel(
@@ -68,7 +63,7 @@ class SubMenuCRUD(AppCRUD):
         self.db.refresh(new_submenu)
         return new_submenu
 
-    def read_submenu(self, menu_id: str, submenu_id: str):
+    def read_submenu(self, menu_id: str, submenu_id: str) -> SubMenuModel | HTTPException:
         self.check_menu_id(menu_id=menu_id)
 
         submenu_with_counter = self.db.query(SubMenuModel).filter(SubMenuModel.id == submenu_id)\
@@ -85,7 +80,7 @@ class SubMenuCRUD(AppCRUD):
 
         return submenu_with_counter
 
-    def update_submenu(self, submenu_schema: SubMenuUpdate, menu_id: str, submenu_id: str):
+    def update_submenu(self, submenu_schema: SubMenuUpdate, menu_id: str, submenu_id: str) -> SubMenuModel | HTTPException:
         self.check_menu_id(menu_id)
 
         target_submenu_for_update = self.fetch_menus_submenu(submenu_id=submenu_id)
@@ -99,7 +94,7 @@ class SubMenuCRUD(AppCRUD):
         self.db.refresh(target_submenu_for_update)
         return target_submenu_for_update
 
-    def delete_submenu(self, menu_id: str, submenu_id: str):
+    def delete_submenu(self, menu_id: str, submenu_id: str) -> None | HTTPException:
         self.check_menu_id(menu_id)
 
         target_submenu_for_delete = self.fetch_menus_submenu(submenu_id=submenu_id)
@@ -108,4 +103,4 @@ class SubMenuCRUD(AppCRUD):
             return not_found_exception()
         self.db.delete(target_submenu_for_delete)
         self.db.commit()
-        return target_submenu_for_delete
+        return None

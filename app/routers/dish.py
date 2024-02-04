@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Depends
+from fastapi.responses import JSONResponse
 from redis import Redis
 from sqlalchemy.orm import Session
 
@@ -153,7 +154,7 @@ def delete_dish(
     DELETE operation for deleting a specific dish of a specific submenu
     """
 
-    result = DishCRUD(db).delete_dish(
+    DishCRUD(db).delete_dish(
         menu_id=target_menu_id,
         submenu_id=target_submenu_id,
         dish_id=target_dish_id
@@ -163,4 +164,4 @@ def delete_dish(
 
     DishCacheService(cache).invalidate_dishes(menu_id=target_menu_id, submenu_id=target_submenu_id)
 
-    return result
+    return JSONResponse(status_code=200, content='dish deleted')

@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Depends
+from fastapi.responses import JSONResponse
 from redis import Redis
 from sqlalchemy.orm import Session
 
@@ -131,10 +132,10 @@ def delete_menu(
     DELETE operation for specific menu.
     """
 
-    result = MenuCRUD(db).delete_menu(menu_id=target_menu_id)
+    MenuCRUD(db).delete_menu(menu_id=target_menu_id)
 
     MenuCacheCRUD(cache).delete(menu_id=target_menu_id)
 
     MenuCacheService(cache).invalidate_menus()
 
-    return result
+    return JSONResponse(status_code=200, content='menu deleted')

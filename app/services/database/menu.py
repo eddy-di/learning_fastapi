@@ -61,7 +61,7 @@ class MenuCRUD(AppCRUD):
         self.db.refresh(new_menu)
         return new_menu
 
-    def read_menu(self, menu_id: str):
+    def read_menu(self, menu_id: str) -> MenuModel | HTTPException:
         """
         READ / GET menu by id
         """
@@ -103,7 +103,7 @@ class MenuCRUD(AppCRUD):
         self.db.refresh(target_menu_from_db)
         return target_menu_from_db
 
-    def delete_menu(self, menu_id: str):
+    def delete_menu(self, menu_id: str) -> None | HTTPException:
         """
         DELETE menu by id
         """
@@ -114,4 +114,4 @@ class MenuCRUD(AppCRUD):
 
         self.db.delete(target_menu_from_db)
         self.db.commit()
-        return target_menu_from_db
+        return None

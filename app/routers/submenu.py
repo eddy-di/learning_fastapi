@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Depends
+from fastapi.responses import JSONResponse
 from redis import Redis
 from sqlalchemy.orm import Session
 
@@ -32,7 +33,7 @@ def read_submenus(
     if all_submenus := SubMenuCacheService(cache).read_submenus():
         return all_submenus
 
-    result = SubMenuService(db).read_submenus(menu_id=target_menu_id)
+    result = SubMenuService(db).read_submenus()
 
     SubMenuCacheService(cache).set_submenus(query_result=result)
 
@@ -143,7 +144,7 @@ def delete_submenu(
     DELETE operation for deleting a specific submenu of a specific menu.
     """
 
-    result = SubMenuCRUD(db).delete_submenu(
+    SubMenuCRUD(db).delete_submenu(
         menu_id=target_menu_id,
         submenu_id=target_submenu_id
     )
@@ -152,4 +153,4 @@ def delete_submenu(
 
     SubMenuCacheService(cache).invalidate_submenus(menu_id=target_menu_id)
 
-    return result
+    return JSONResponse(status_code=200, content='submenu deleted')
