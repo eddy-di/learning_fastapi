@@ -75,6 +75,7 @@ class SubMenuCRUD(AppCRUD):
             .options(
                 selectinload(SubMenuModel.dishes)
         ).first()
+
         if not submenu_with_counter:
             return not_found_exception()
         submenu_with_counter.dishes_count = self.db.query(

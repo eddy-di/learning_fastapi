@@ -61,7 +61,9 @@ def create_submenu(
         menu_id=target_menu_id
     )
 
-    SubMenuCacheCRUD(cache).create_or_update(query_result=result)
+    SubMenuCacheCRUD(cache).create_or_update(
+        query_result=SubMenuCRUD(db).read_submenu(menu_id=target_menu_id, submenu_id=result.id)
+    )
 
     SubMenuCacheService(cache).invalidate_submenus(menu_id=target_menu_id)
 
@@ -120,7 +122,9 @@ def update_submenu(
         menu_id=target_menu_id
     )
 
-    SubMenuCacheCRUD(cache).create_or_update(query_result=result)
+    SubMenuCacheCRUD(cache).create_or_update(
+        query_result=SubMenuCRUD(db).read_submenu(menu_id=target_menu_id, submenu_id=result.id)
+    )
 
     SubMenuCacheService(cache).invalidate_submenus(menu_id=target_menu_id)
 
