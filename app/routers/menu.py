@@ -28,7 +28,8 @@ def read_menus(
     GET endpoint for list of menus, and a count of related items in it
     """
 
-    MenuCacheService(cache).read_menus()
+    if all_menus := MenuCacheService(cache).read_menus():
+        return all_menus
 
     result = MenuService(db).read_menus()
 
@@ -77,7 +78,8 @@ def read_menu(
     GET operation for specific menu.
     """
 
-    MenuCacheCRUD(cache).read_menu(menu_id=target_menu_id)
+    if target_menu := MenuCacheCRUD(cache).read_menu(menu_id=target_menu_id):
+        return target_menu
 
     result = MenuCRUD(db).read_menu(menu_id=target_menu_id)
 

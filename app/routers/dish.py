@@ -30,7 +30,8 @@ def read_dishes(
     GET operation for retrieving list of dishes related to a specific submenu
     """
 
-    DishCacheService(cache).read_dishes()
+    if all_dishes := DishCacheService(cache).read_dishes():
+        return all_dishes
 
     result = DishService(db).read_dishes(
         menu_id=target_menu_id,
@@ -90,7 +91,8 @@ def read_dish(
     GET operation for retrieving a specific dish of a specific submenu
     """
 
-    DishCacheCRUD(cache).read_dish(dish_id=target_dish_id)
+    if target_dish := DishCacheCRUD(cache).read_dish(dish_id=target_dish_id):
+        return target_dish
 
     result = DishCRUD(db).read_dish(
         menu_id=target_menu_id,

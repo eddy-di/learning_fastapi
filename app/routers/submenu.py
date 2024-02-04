@@ -29,7 +29,8 @@ def read_submenus(
     GET operation for retrieving submenus related to a specific menu.
     """
 
-    SubMenuCacheService(cache).read_submenus()
+    if all_submenus := SubMenuCacheService(cache).read_submenus():
+        return all_submenus
 
     result = SubMenuService(db).read_submenus(menu_id=target_menu_id)
 
@@ -83,7 +84,8 @@ def read_submenu(
     GET operation for retrieving a specific submenu of a specific menu.
     """
 
-    SubMenuCacheCRUD(cache).read_submenu(submenu_id=target_submenu_id)
+    if target_submenu := SubMenuCacheCRUD(cache).read_submenu(submenu_id=target_submenu_id):
+        return target_submenu
 
     result = SubMenuCRUD(db).read_submenu(
         menu_id=target_menu_id,
