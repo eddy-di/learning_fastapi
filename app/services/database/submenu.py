@@ -6,7 +6,7 @@ from app.models.menu import Menu as MenuModel
 from app.models.submenu import SubMenu as SubMenuModel
 from app.schemas.submenu import SubMenuCreate, SubMenuUpdate
 
-from .main import AppCRUD, AppService
+from ..main import AppCRUD, AppService
 from .menu import not_found_exception as no_menu
 
 

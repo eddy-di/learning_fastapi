@@ -6,7 +6,7 @@ from app.models.menu import Menu as MenuModel
 from app.models.submenu import SubMenu as SubMenuModel
 from app.schemas.menu import MenuCreate, MenuUpdate
 
-from .main import AppCRUD, AppService
+from ..main import AppCRUD, AppService
 
 
 def not_found_exception() -> HTTPException:
