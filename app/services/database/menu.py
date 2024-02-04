@@ -47,18 +47,6 @@ class MenuCRUD(AppCRUD):
     Menu queries to execute Create, Retrieve, Update and Destroy commands.
     """
 
-    def _get_target_menu(self, target_id: str) -> dict | None:
-        menu = self.db.query(
-            MenuModel,
-            func.count(distinct(SubMenuModel.id)).label('submenus_count'),
-            func.count(distinct(DishModel.id)).label('dishes_count'),
-        )\
-            .join(SubMenuModel, MenuModel.id == SubMenuModel.menu_id, isouter=True)\
-            .join(DishModel, SubMenuModel.id == DishModel.submenu_id, isouter=True)\
-            .group_by(MenuModel.id)\
-            .filter(MenuModel.id == target_id).scalar()
-        return menu
-
     def create_menu(self, menu_schema: MenuCreate) -> MenuModel | None:
         """
         CREATE / POST
@@ -76,11 +64,25 @@ class MenuCRUD(AppCRUD):
         """
         READ / GET menu by id
         """
-        target_menu_from_db = self._get_target_menu(target_id=menu_id)
+        target_menu_from_db = self.db.query(MenuModel).filter(MenuModel.id == menu_id).first()
 
-        if target_menu_from_db:
-            return target_menu_from_db
-        return not_found_exception()
+        if not target_menu_from_db:
+            return not_found_exception()
+
+        target_menu_from_db.submenus_count = self.db.query(
+            func.count(SubMenuModel.id)
+        )\
+            .filter(SubMenuModel.menu_id == target_menu_from_db.id)\
+            .scalar()
+
+        target_menu_from_db.dishes_count = self.db.query(
+            func.count(DishModel.id)
+        )\
+            .join(SubMenuModel)\
+            .filter(SubMenuModel.menu_id == target_menu_from_db.id)\
+            .scalar()
+
+        return target_menu_from_db
 
     def update_menu(self, menu_id: str, menu_schema: MenuUpdate) -> MenuModel | HTTPException:
         """

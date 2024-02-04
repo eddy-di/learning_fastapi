@@ -70,16 +70,14 @@ class SubMenuCRUD(AppCRUD):
     def read_submenu(self, menu_id: str, submenu_id: str):
         self.check_menu_id(menu_id=menu_id)
 
-        submenu_with_counter = self.db.query(
-            SubMenuModel,
-            func.count(distinct(DishModel.id)).label('dishes_count'),
-        )\
-            .join(DishModel, SubMenuModel.id == DishModel.submenu_id, isouter=True)\
-            .group_by(SubMenuModel.id)\
-            .filter(SubMenuModel.id == submenu_id).scalar()
-
+        submenu_with_counter = self.db.query(SubMenuModel).filter(SubMenuModel.id == submenu_id).first()
         if not submenu_with_counter:
             return not_found_exception()
+        submenu_with_counter.dishes_count = self.db.query(
+            func.count(DishModel.id)
+        ).join(SubMenuModel)\
+            .filter(SubMenuModel.id == submenu_with_counter.id).scalar()
+
         return submenu_with_counter
 
     def update_submenu(self, submenu_schema: SubMenuUpdate, menu_id: str, submenu_id: str):
