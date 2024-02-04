@@ -1,5 +1,3 @@
-import pickle
-
 from fastapi import APIRouter, Depends
 from redis import Redis
 from sqlalchemy.orm import Session
@@ -10,6 +8,7 @@ from app.config.database import get_db
 from app.schemas.submenu import SubMenu as SubMenuSchema
 from app.schemas.submenu import SubMenuCreate as SubMenuCreateSchema
 from app.schemas.submenu import SubMenuUpdate as SubMenuUpdateSchema
+from app.services.cache.submenu import SubMenuCacheCRUD, SubMenuCacheService
 from app.services.database.submenu import SubMenuCRUD, SubMenuService
 
 submenu_router = APIRouter()
@@ -28,12 +27,12 @@ def read_submenus(
     """
     GET operation for retrieving submenus related to a specific menu.
     """
-    if all_submenus := cache.get('all_submenus'):
-        return pickle.loads(all_submenus)
+
+    SubMenuCacheService(cache).read_submenus()
 
     result = SubMenuService(db).read_submenus(menu_id=target_menu_id)
 
-    cache.set('all_submenus', pickle.dumps(result))
+    SubMenuCacheService(cache).set_submenus(query_result=result)
 
     return result
 
@@ -53,15 +52,15 @@ def create_submenu(
     """
     POST operation for creating a new submenu for a specific menu.
     """
+
     result = SubMenuCRUD(db).create_submenu(
         submenu_schema=submenu,
         menu_id=target_menu_id
     )
 
-    cache.set(f'submenu_id_{result.id}', pickle.dumps(result))
-    cache.delete(f'menu_id_{target_menu_id}')
-    cache.delete('all_submenus')
-    cache.delete('all_menus')
+    SubMenuCacheCRUD(cache).create_or_update(query_result=result)
+
+    SubMenuCacheService(cache).invalidate_submenus(menu_id=target_menu_id)
 
     return result
 
@@ -81,15 +80,14 @@ def read_submenu(
     GET operation for retrieving a specific submenu of a specific menu.
     """
 
-    if target_submenu := cache.get(f'submenu_id_{target_submenu_id}'):
-        return pickle.loads(target_submenu)
+    SubMenuCacheCRUD(cache).read_submenu(submenu_id=target_submenu_id)
 
     result = SubMenuCRUD(db).read_submenu(
         menu_id=target_menu_id,
         submenu_id=target_submenu_id
     )
 
-    cache.set(f'submenu_id_{target_submenu_id}', pickle.dumps(result))
+    SubMenuCacheCRUD(cache).set_submenu(submenu_id=target_submenu_id, query_result=result)
 
     return result
 
@@ -109,16 +107,16 @@ def update_submenu(
     """
     PATCH operation for updating a specific submenu of a specific menu.
     """
+
     result = SubMenuCRUD(db).update_submenu(
         submenu_schema=submenu_update,
         submenu_id=target_submenu_id,
         menu_id=target_menu_id
     )
 
-    cache.set(f'submenu_id_{result.id}', pickle.dumps(result))
-    cache.delete(f'menu_id_{target_menu_id}')
-    cache.delete('all_submenus')
-    cache.delete('all_menus')
+    SubMenuCacheCRUD(cache).create_or_update(query_result=result)
+
+    SubMenuCacheService(cache).invalidate_submenus(menu_id=target_menu_id)
 
     return result
 
@@ -137,14 +135,14 @@ def delete_submenu(
     """
     DELETE operation for deleting a specific submenu of a specific menu.
     """
+
     result = SubMenuCRUD(db).delete_submenu(
         menu_id=target_menu_id,
         submenu_id=target_submenu_id
     )
 
-    cache.delete(f'submenu_id_{target_submenu_id}')
-    cache.delete(f'menu_id_{target_menu_id}')
-    cache.delete('all_submenus')
-    cache.delete('all_menus')
+    SubMenuCacheCRUD(cache).delete(submenu_id=target_submenu_id)
+
+    SubMenuCacheService(cache).invalidate_submenus(menu_id=target_menu_id)
 
     return result

@@ -24,8 +24,8 @@ class MenuCacheCRUD(CacheCRUD):
     def set_menu(self, menu_id: str, query_result: Menu):
         self.cache.set(f'menu_id_{menu_id}', pickle.dumps(query_result))
 
-    def delete(self, menu_id: str):
-        self.cache.delete(f'menu_id_{menu_id}')
-
     def create_or_update(self, query_result: Menu):
         self.cache.set(f'menu_id_{query_result.id}', pickle.dumps(query_result))
+
+    def delete(self, menu_id: str):
+        self.cache.delete(f'menu_id_{menu_id}')
