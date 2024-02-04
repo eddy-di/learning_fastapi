@@ -20,7 +20,7 @@ class SubMenuService(AppService):
         if not res:
             return no_menu()
 
-    def read_submenus(self, menu_id: str):
+    def read_submenus(self, menu_id: str) -> list[dict]:
         self.check_menu_id(menu_id)
 
         all_submenus = self.db.query(
@@ -32,7 +32,7 @@ class SubMenuService(AppService):
             .all()
 
         if not all_submenus:
-            return not_found_exception()
+            return []
         result = []
         for i in all_submenus:
             submenu, count = i

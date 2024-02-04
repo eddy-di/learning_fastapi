@@ -13,7 +13,6 @@ from app.services.database.menu import MenuCRUD, MenuService
 menu_router = APIRouter()
 
 
-# GET endpoint for list of menus, and a count of related items in it
 @menu_router.get(
     MENUS_LINK,
     response_model=list[MenuSchema],
@@ -25,7 +24,7 @@ def read_menus(
     cache: Redis = Depends(redis)
 ):
     """
-    Endoint for getting list of menus.
+    GET endpoint for list of menus, and a count of related items in it
     """
     # if read_menus := cache.get('read_menus'):
     # return json.loads(read_menus)
@@ -49,6 +48,9 @@ def create_menu(
     db: Session = Depends(get_db),
     cache: Redis = Depends(redis)
 ):
+    """
+    POST operation for creating menu.
+    """
     result = MenuCRUD(db).create_menu(menu_schema=menu)
 
     return result
@@ -65,8 +67,11 @@ def read_menu(
     db: Session = Depends(get_db),
     cache: Redis = Depends(redis)
 ):
-    # Fetch the menu from the database
-    result = MenuCRUD(db).read_menu(target_menu_id=target_menu_id)
+    """
+    GET operation for specific menu.
+    """
+
+    result = MenuCRUD(db).read_menu(menu_id=target_menu_id)
 
     return result
 
@@ -83,7 +88,13 @@ def update_menu(
     db: Session = Depends(get_db),
     cache: Redis = Depends(redis)
 ):
-    result = MenuCRUD(db).update_menu(target_menu_id, menu_update)
+    """
+    PATCH operation for specific menu.
+    """
+    result = MenuCRUD(db).update_menu(
+        menu_id=target_menu_id,
+        menu_schema=menu_update
+    )
     return result
 
 
@@ -98,6 +109,9 @@ def delete_menu(
     db: Session = Depends(get_db),
     cache: Redis = Depends(redis)
 ):
-    result = MenuCRUD(db).delete_menu(target_menu_id)
+    """
+    DELETE operation for specific menu.
+    """
+    result = MenuCRUD(db).delete_menu(menu_id=target_menu_id)
 
     return result

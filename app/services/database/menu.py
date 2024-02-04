@@ -72,21 +72,21 @@ class MenuCRUD(AppCRUD):
         self.db.refresh(new_menu)
         return new_menu
 
-    def read_menu(self, target_menu_id: str) -> dict | HTTPException:
+    def read_menu(self, menu_id: str) -> dict | HTTPException:
         """
         READ / GET menu by id
         """
-        target_menu_from_db = self._get_target_menu(target_id=target_menu_id)
+        target_menu_from_db = self._get_target_menu(target_id=menu_id)
 
         if target_menu_from_db:
             return target_menu_from_db
         return not_found_exception()
 
-    def update_menu(self, target_menu_id: str, menu_schema: MenuUpdate) -> MenuModel | HTTPException:
+    def update_menu(self, menu_id: str, menu_schema: MenuUpdate) -> MenuModel | HTTPException:
         """
         UPDATE / PATCH menu by id
         """
-        target_menu_from_db = self.db.query(MenuModel).filter(MenuModel.id == target_menu_id).first()
+        target_menu_from_db = self.db.query(MenuModel).filter(MenuModel.id == menu_id).first()
 
         if not target_menu_from_db:
             return not_found_exception()
@@ -96,11 +96,11 @@ class MenuCRUD(AppCRUD):
         self.db.refresh(target_menu_from_db)
         return target_menu_from_db
 
-    def delete_menu(self, target_menu_id: str):
+    def delete_menu(self, menu_id: str):
         """
         DELETE menu by id
         """
-        target_menu_from_db = self.db.query(MenuModel).filter(MenuModel.id == target_menu_id).first()
+        target_menu_from_db = self.db.query(MenuModel).filter(MenuModel.id == menu_id).first()
 
         if not target_menu_from_db:
             return not_found_exception()
