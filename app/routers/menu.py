@@ -28,12 +28,12 @@ def read_menus(
     """
     GET endpoint for list of menus, and a count of related items in it
     """
-    if read_menus := cache.get('read_menus'):
-        return pickle.loads(read_menus)
+    if all_menus := cache.get('all_menus'):
+        return pickle.loads(all_menus)
 
     result = MenuService(db).read_menus()
 
-    cache.set('read_menus', pickle.dumps(result))
+    cache.set('all_menus', pickle.dumps(result))
 
     return result
 
@@ -58,7 +58,7 @@ def create_menu(
     if result:
         cache.set(f'menu_id_{result.id}', pickle.dumps(result))
 
-    cache.delete('read_menus')
+    cache.delete('all_menus')
 
     return result
 
@@ -107,7 +107,7 @@ def update_menu(
         menu_schema=menu_update
     )
     cache.set(f'menu_id_{target_menu_id}', pickle.dumps(result))
-    cache.delete('read_menus')
+    cache.delete('all_menus')
 
     return result
 
@@ -129,6 +129,6 @@ def delete_menu(
     result = MenuCRUD(db).delete_menu(menu_id=target_menu_id)
 
     cache.delete(f'menu_id_{target_menu_id}')
-    cache.delete('read_menus')
+    cache.delete('all_menus')
 
     return result
