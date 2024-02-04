@@ -15,17 +15,7 @@ def not_found_exception() -> HTTPException:
 
 
 class DishService(AppService):
-    def check_menu_id(self, menu_id: str) -> HTTPException:
-        res = self.db.query(MenuModel).filter(MenuModel.id == menu_id).first()
-        if not res:
-            return no_menu()
-
-    def check_submenu_id(self, submenu_id: str) -> HTTPException:
-        res = self.db.query(SubMenuModel).filter(SubMenuModel.id == submenu_id).first()
-        if not res:
-            return no_submenu()
-
-    def read_dishes(self, submenu_id: str):
+    def read_dishes(self, submenu_id: str) -> list[DishModel]:
 
         result = self.db.query(DishModel).filter(DishModel.submenu_id == submenu_id).all()
 
@@ -46,7 +36,7 @@ class DishCRUD(AppCRUD):
     def fetch_dish(self, dish_id: str):
         return self.db.query(DishModel).filter(DishModel.id == dish_id).first()
 
-    def create_dish(self, menu_id: str, submenu_id: str, dish_schema: DishCreate):
+    def create_dish(self, menu_id: str, submenu_id: str, dish_schema: DishCreate) -> DishModel:
         self.check_menu_id(menu_id=menu_id)
 
         self.check_submenu_id(submenu_id=submenu_id)
@@ -62,7 +52,7 @@ class DishCRUD(AppCRUD):
         self.db.refresh(new_dish)
         return new_dish
 
-    def read_dish(self, menu_id: str, submenu_id: str, dish_id: str):
+    def read_dish(self, menu_id: str, submenu_id: str, dish_id: str) -> DishModel | HTTPException:
         self.check_menu_id(menu_id=menu_id)
 
         self.check_submenu_id(submenu_id=submenu_id)
@@ -73,7 +63,7 @@ class DishCRUD(AppCRUD):
             return not_found_exception()
         return dish
 
-    def update_dish(self, menu_id: str, submenu_id: str, dish_id: str, dish_schema: DishUpdate):
+    def update_dish(self, menu_id: str, submenu_id: str, dish_id: str, dish_schema: DishUpdate) -> DishModel | HTTPException:
         self.check_menu_id(menu_id=menu_id)
 
         self.check_submenu_id(submenu_id=submenu_id)
@@ -89,7 +79,7 @@ class DishCRUD(AppCRUD):
         self.db.refresh(dish_to_update)
         return dish_to_update
 
-    def delete_dish(self, menu_id: str, submenu_id: str, dish_id: str):
+    def delete_dish(self, menu_id: str, submenu_id: str, dish_id: str) -> DishModel | HTTPException:
         self.check_menu_id(menu_id=menu_id)
 
         self.check_submenu_id(submenu_id=submenu_id)
