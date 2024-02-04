@@ -1,6 +1,7 @@
 import pickle
 
 from app.models.dish import Dish
+from app.schemas.dish import Dish as DishSchema
 from app.services.main import CacheCRUD, CacheService
 
 
@@ -13,10 +14,12 @@ class DishCacheService(CacheService):
         self.cache.set('all_dishes', pickle.dumps(query_result))
 
     def invalidate_dishes(self, menu_id: str, submenu_id: str):
-        self.cache.delete(f'menu_id_{menu_id}')
-        self.cache.delete(f'submenu_id_{submenu_id}')
-        self.cache.delete('all_submenus')
-        self.cache.delete('all_menus')
+        self.cache.delete(
+            f'menu_id_{menu_id}',
+            f'submenu_id_{submenu_id}',
+            'all_submenus',
+            'all_menus'
+        )
 
 
 class DishCacheCRUD(CacheCRUD):
@@ -24,11 +27,9 @@ class DishCacheCRUD(CacheCRUD):
         if target_dish := self.cache.get(f'dish_id_{dish_id}'):
             return pickle.loads(target_dish)
 
-    def set_dish(self, dish_id: str, query_result: Dish):
-        self.cache.set(f'dish_id_{dish_id}', pickle.dumps(query_result))
-
-    def create_or_update(self, query_result: Dish):
-        self.cache.set(f'dish_id_{query_result.id}', pickle.dumps(query_result))
+    def set_dish(self, query_result: Dish):
+        serialized_dish = DishSchema.model_validate(query_result)
+        self.cache.set(f'dish_id_{query_result.id}', pickle.dumps(serialized_dish))
 
     def delete(self, dish_id: str):
         self.cache.delete(f'dish_id_{dish_id}')

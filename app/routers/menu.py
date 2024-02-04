@@ -56,9 +56,7 @@ def create_menu(
 
     result = MenuCRUD(db).create_menu(menu_schema=menu)
 
-    MenuCacheCRUD(cache).create_or_update(
-        query_result=MenuCRUD(db).read_menu(menu_id=result.id)
-    )
+    MenuCacheCRUD(cache).set_menu(query_result=result)
 
     MenuCacheService(cache).invalidate_menus()
 
@@ -111,9 +109,7 @@ def update_menu(
         menu_schema=menu_update
     )
 
-    MenuCacheCRUD(cache).create_or_update(
-        query_result=MenuCRUD(db).read_menu(menu_id=result.id)
-    )
+    MenuCacheCRUD(cache).set_menu(query_result=result)
 
     MenuCacheService(cache).invalidate_menus()
 

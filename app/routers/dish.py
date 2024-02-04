@@ -67,7 +67,7 @@ def create_dish(
         dish_schema=dish
     )
 
-    DishCacheCRUD(cache).create_or_update(query_result=result)
+    DishCacheCRUD(cache).set_dish(query_result=result)
 
     DishCacheService(cache).invalidate_dishes(menu_id=target_menu_id, submenu_id=target_submenu_id)
 
@@ -100,7 +100,7 @@ def read_dish(
         dish_id=target_dish_id
     )
 
-    DishCacheCRUD(cache).set_dish(dish_id=target_dish_id, query_result=result)
+    DishCacheCRUD(cache).set_dish(query_result=result)
 
     return result
 
@@ -130,7 +130,7 @@ def update_dish(
         dish_schema=dish_update
     )
 
-    DishCacheCRUD(cache).create_or_update(query_result=result)
+    DishCacheCRUD(cache).set_dish(query_result=result)
 
     DishCacheService(cache).invalidate_dishes(menu_id=target_menu_id, submenu_id=target_submenu_id)
 

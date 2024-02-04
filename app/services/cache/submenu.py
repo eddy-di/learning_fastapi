@@ -1,6 +1,7 @@
 import pickle
 
 from app.models.submenu import SubMenu
+from app.schemas.submenu import SubMenu as SubMenuSchema
 from app.services.main import CacheCRUD, CacheService
 
 
@@ -13,9 +14,11 @@ class SubMenuCacheService(CacheService):
         self.cache.set('all_submenus', pickle.dumps(query_result))
 
     def invalidate_submenus(self, menu_id: str):
-        self.cache.delete(f'menu_id_{menu_id}')
-        self.cache.delete('all_submenus')
-        self.cache.delete('all_menus')
+        self.cache.delete(
+            f'menu_id_{menu_id}',
+            'all_submenus',
+            'all_menus'
+        )
 
 
 class SubMenuCacheCRUD(CacheCRUD):
@@ -23,11 +26,9 @@ class SubMenuCacheCRUD(CacheCRUD):
         if target_submenu := self.cache.get(f'submenu_id_{submenu_id}'):
             return pickle.loads(target_submenu)
 
-    def set_submenu(self, submenu_id: str, query_result: SubMenu):
-        self.cache.set(f'submenu_id_{submenu_id}', pickle.dumps(query_result))
-
-    def create_or_update(self, query_result: SubMenu):
-        self.cache.set(f'submenu_id_{query_result.id}', pickle.dumps(query_result))
+    def set_submenu(self, query_result: SubMenu):
+        serialized_submenu = SubMenuSchema.model_validate(query_result)
+        self.cache.set(f'submenu_id_{query_result.id}', pickle.dumps(serialized_submenu))
 
     def delete(self, submenu_id: str):
         self.cache.delete(f'submenu_id_{submenu_id}')

@@ -1,6 +1,7 @@
 import pickle
 
 from app.models.menu import Menu
+from app.schemas.menu import Menu as MenuSchema
 from app.services.main import CacheCRUD, CacheService
 
 
@@ -24,10 +25,8 @@ class MenuCacheCRUD(CacheCRUD):
         return None
 
     def set_menu(self, query_result: Menu):
-        self.cache.set(f'menu_id_{query_result.id}', pickle.dumps(query_result))
-
-    def create_or_update(self, query_result: Menu):
-        self.cache.set(f'menu_id_{query_result.id}', pickle.dumps(query_result))
+        serialized_menu = MenuSchema.model_validate(query_result)
+        self.cache.set(f'menu_id_{query_result.id}', pickle.dumps(serialized_menu))
 
     def delete(self, menu_id: str):
         self.cache.delete(f'menu_id_{menu_id}')
