@@ -5,7 +5,7 @@ from app.routers import dish, menu, submenu
 
 app = FastAPI(
     title='Y-lab intensive course API',
-    description='Приложение для управления меню',
+    description='Menu management app',
     version='2.3.6',
     dependencies=[Depends(get_db)]
 )

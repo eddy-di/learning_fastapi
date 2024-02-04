@@ -17,7 +17,8 @@ submenu_router = APIRouter()
 @submenu_router.get(
     SUBMENUS_LINK,
     response_model=list[SubMenuSchema],
-    tags=['Submenus']
+    tags=['Submenus'],
+    summary='Get all submenus'
 )
 def read_submenus(
     target_menu_id: str,
@@ -42,6 +43,7 @@ def read_submenus(
     response_model=SubMenuSchema,
     status_code=201,
     tags=['Submenus'],
+    summary='Create a submenu'
 )
 def create_submenu(
     target_menu_id: str,
@@ -68,7 +70,8 @@ def create_submenu(
 @submenu_router.get(
     SUBMENU_LINK,
     response_model=SubMenuSchema,
-    tags=['Submenus']
+    tags=['Submenus'],
+    summary='Get specific submenu'
 )
 def read_submenu(
     target_menu_id: str,
@@ -95,7 +98,8 @@ def read_submenu(
 @submenu_router.patch(
     SUBMENU_LINK,
     response_model=SubMenuSchema,
-    tags=['Submenus']
+    tags=['Submenus'],
+    summary='Update specific submenu'
 )
 def update_submenu(
     target_menu_id: str,
@@ -124,7 +128,8 @@ def update_submenu(
 @submenu_router.delete(
     SUBMENU_LINK,
     response_model=SubMenuSchema,
-    tags=['Submenus']
+    tags=['Submenus'],
+    summary='Delete specific submenu'
 )
 def delete_submenu(
     target_menu_id: str,

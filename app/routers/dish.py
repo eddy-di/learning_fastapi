@@ -17,7 +17,8 @@ dish_router = APIRouter()
 @dish_router.get(
     DISHES_LINK,
     response_model=list[DishSchema],
-    tags=['Dishes']
+    tags=['Dishes'],
+    summary='Get all dishes'
 )
 def read_dishes(
     target_menu_id: str,
@@ -45,7 +46,8 @@ def read_dishes(
     DISHES_LINK,
     response_model=DishSchema,
     status_code=201,
-    tags=['Dishes']
+    tags=['Dishes'],
+    summary='Create a dish'
 )
 def create_dish(
     target_menu_id: str,
@@ -74,7 +76,8 @@ def create_dish(
 @dish_router.get(
     DISH_LINK,
     response_model=DishSchema,
-    tags=['Dishes']
+    tags=['Dishes'],
+    summary='Get specific dish'
 )
 def read_dish(
     target_menu_id: str,
@@ -103,7 +106,8 @@ def read_dish(
 @dish_router.patch(
     DISH_LINK,
     response_model=DishSchema,
-    tags=['Dishes']
+    tags=['Dishes'],
+    summary='Update specific dish'
 )
 def update_dish(
     target_menu_id: str,
@@ -134,7 +138,8 @@ def update_dish(
 @dish_router.delete(
     DISH_LINK,
     response_model=DishSchema,
-    tags=['Dishes']
+    tags=['Dishes'],
+    summary='Delete specific dish'
 )
 def delete_dish(
     target_menu_id: str,
