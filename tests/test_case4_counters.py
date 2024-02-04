@@ -18,8 +18,9 @@ dish1_id = None
 dish2_id = None
 
 
-def test_create_menu(init_db):
+def test_create_menu(init_db, cache_connect):
     init_db
+    cache_connect
     # given: empty db with initialized tables
     global menu_id
     url = reverse(create_menu)
@@ -197,6 +198,7 @@ def test_get_menus_list():
     assert response.json() == []
 
 
-def test_end(drop_db):
+def test_end(drop_db, cache_flush):
     # necessary to cleanup db
     drop_db
+    cache_flush
