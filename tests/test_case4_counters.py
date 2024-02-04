@@ -1,8 +1,16 @@
 import uuid
 
-from .conftest import client
+from app.routers.dish import create_dish, read_dishes
+from app.routers.menu import create_menu, delete_menu, read_menu, read_menus
+from app.routers.submenu import (
+    create_submenu,
+    delete_submenu,
+    read_submenu,
+    read_submenus,
+)
+from app.utils.pathfinder import reverse
 
-menu_url = '/api/v1/menus'
+from .conftest import client
 
 menu_id = None
 submenu_id = None
@@ -14,7 +22,7 @@ def test_create_menu(init_db):
     init_db
     # given: empty db with initialized tables
     global menu_id
-    url = menu_url
+    url = reverse(create_menu)
     # when: executing POST operation for menu instance
     data = {
         'title': 'My menu 1',
@@ -34,7 +42,7 @@ def test_submenu_create():
     # given: menu instance
     global menu_id
     global submenu_id
-    submenus_url = menu_url + '/' + menu_id + '/submenus'
+    submenus_url = reverse(create_submenu, target_menu_id=menu_id)
     # when: executing POST operation for submenu instance
     submenu_data = {
         'title': 'My submenu 1',
@@ -55,7 +63,7 @@ def test_dish_create_case1():
     global menu_id
     global submenu_id
     global dish1_id
-    dish_url = menu_url + '/' + menu_id + '/submenus/' + submenu_id + '/dishes'
+    dish_url = reverse(create_dish, target_menu_id=menu_id, target_submenu_id=submenu_id)
     # when: executing POST operation for first dish instance
     dish1_data = {
         'title': 'My dish 2',
@@ -78,7 +86,7 @@ def test_dish_create_case2():
     global menu_id
     global submenu_id
     global dish2_id
-    dish_url = menu_url + '/' + menu_id + '/submenus/' + submenu_id + '/dishes'
+    dish_url = reverse(create_dish, target_menu_id=menu_id, target_submenu_id=submenu_id)
     # when: executing POST operation for second dish instance
     dish2_data = {
         'title': 'My dish 1',
@@ -99,7 +107,7 @@ def test_dish_create_case2():
 def test_get_counters_for_target_menu():
     # given: menu linked with submenu and two dish instances
     global menu_id
-    url = menu_url + '/' + menu_id
+    url = reverse(read_menu, target_menu_id=menu_id)
     # when: executing GET operation for target menu
     response = client.get(url)
     # then: expecting to get status code 200 and submenus_count == 1, dishes_count == 2
@@ -113,7 +121,7 @@ def test_get_counters_for_target_submenu():
     # given: menu linked with submenu and two dish instances
     global menu_id
     global submenu_id
-    url = menu_url + '/' + menu_id + '/submenus/' + submenu_id
+    url = reverse(read_submenu, target_menu_id=menu_id, target_submenu_id=submenu_id)
     # when: executing GET operation for target submenu
     response = client.get(url)
     # then: expecting to get status code 200 and dishes_count == 2
@@ -126,7 +134,7 @@ def test_delete_target_submenu():
     # given: menu linked with submenu and two dish instances
     global menu_id
     global submenu_id
-    url = menu_url + '/' + menu_id + '/submenus/' + submenu_id
+    url = reverse(delete_submenu, target_menu_id=menu_id, target_submenu_id=submenu_id)
     # when: executing DELETE operation for target submenu
     response = client.delete(url)
     # then: expecting to get status code 200
@@ -136,7 +144,7 @@ def test_delete_target_submenu():
 def test_get_submenu_list():
     # given: menu instance
     global menu_id
-    url = menu_url + '/' + menu_id + '/submenus'
+    url = reverse(read_submenus, target_menu_id=menu_id)
     # when: executing GET operation for submenu list
     response = client.get(url)
     # then: expecting to get status code 200 and empty submenus
@@ -148,7 +156,7 @@ def test_get_dishes_list():
     # given: menu instance
     global menu_id
     global submenu_id
-    url = menu_url + '/' + menu_id + '/submenus/' + submenu_id + '/dishes'
+    url = reverse(read_dishes, target_menu_id=menu_id, target_submenu_id=submenu_id)
     # when: executing GET operation for dishes list
     response = client.get(url)
     # then: expecting to get status code 200 and empty dishes
@@ -159,7 +167,7 @@ def test_get_dishes_list():
 def test_get_target_menu():
     # given: menu instance
     global menu_id
-    url = menu_url + '/' + menu_id
+    url = reverse(read_menu, target_menu_id=menu_id)
     # when: executing GET operation for target menu
     response = client.get(url)
     # then: expecting to get status code 200 and submenus_count == 0, dishes_count == 0
@@ -172,7 +180,7 @@ def test_get_target_menu():
 def test_delete_target_menu():
     # given: menu instance
     global menu_id
-    url = menu_url + '/' + menu_id
+    url = reverse(delete_menu, target_menu_id=menu_id)
     # when: executing DELETE operation for target menu
     response = client.delete(url)
     # then: expecting to get status code 200
@@ -181,7 +189,7 @@ def test_delete_target_menu():
 
 def test_get_menus_list():
     # given: empty db
-    url = menu_url
+    url = reverse(read_menus)
     # when: executing GET operation for menu list
     response = client.get(url)
     # then: expecting to get status code 200 and empty menus
