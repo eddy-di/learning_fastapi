@@ -60,7 +60,7 @@ class MenuCRUD(AppCRUD):
         self.db.refresh(new_menu)
         return new_menu
 
-    def read_menu(self, menu_id: str) -> dict | HTTPException:
+    def read_menu(self, menu_id: str):
         """
         READ / GET menu by id
         """

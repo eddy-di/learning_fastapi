@@ -1,3 +1,5 @@
+import pickle
+
 from fastapi import APIRouter, Depends
 from redis import Redis
 from sqlalchemy.orm import Session
@@ -26,12 +28,12 @@ def read_menus(
     """
     GET endpoint for list of menus, and a count of related items in it
     """
-    # if read_menus := cache.get('read_menus'):
-    # return json.loads(read_menus)
+    if read_menus := cache.get('read_menus'):
+        return pickle.loads(read_menus)
 
     result = MenuService(db).read_menus()
 
-    # cache.set('read_menus', json.dumps(result))
+    cache.set('read_menus', pickle.dumps(result))
 
     return result
 
@@ -53,6 +55,11 @@ def create_menu(
     """
     result = MenuCRUD(db).create_menu(menu_schema=menu)
 
+    if result:
+        cache.set(f'menu_id_{result.id}', pickle.dumps(result))
+
+    cache.delete('read_menus')
+
     return result
 
 
@@ -70,8 +77,12 @@ def read_menu(
     """
     GET operation for specific menu.
     """
+    if target_menu := cache.get(f'menu_id_{target_menu_id}'):
+        return pickle.loads(target_menu)
 
     result = MenuCRUD(db).read_menu(menu_id=target_menu_id)
+
+    cache.set(f'menu_id_{result.id}', pickle.dumps(result))
 
     return result
 
@@ -95,6 +106,9 @@ def update_menu(
         menu_id=target_menu_id,
         menu_schema=menu_update
     )
+    cache.set(f'menu_id_{target_menu_id}', pickle.dumps(result))
+    cache.delete('read_menus')
+
     return result
 
 
@@ -113,5 +127,8 @@ def delete_menu(
     DELETE operation for specific menu.
     """
     result = MenuCRUD(db).delete_menu(menu_id=target_menu_id)
+
+    cache.delete(f'menu_id_{target_menu_id}')
+    cache.delete('read_menus')
 
     return result
