@@ -25,7 +25,7 @@ def get_menus(
     db: Session = Depends(get_db),
     cache: Redis = Depends(redis)
 ) -> list[Menu] | list[dict]:
-    """GET endpoint for list of menus, and a count of related items in it"""
+    """GET endpoint for list of menus, and a count of related items in it."""
     result = MenuService(db, cache).get_menus()
     return result
 
@@ -58,7 +58,7 @@ def create_menu(
     db: Session = Depends(get_db),
     cache: Redis = Depends(redis)
 ) -> Menu:
-    """POST operation for creating menu"""
+    """POST operation for creating menu."""
     result = MenuService(db, cache).create_menu(menu_schema=menu_create_schema)
     return result
 
@@ -75,7 +75,7 @@ def update_menu(
     db: Session = Depends(get_db),
     cache: Redis = Depends(redis)
 ) -> Menu | HTTPException:
-    """PATCH operation for specific menu"""
+    """PATCH operation for specific menu."""
 
     result = MenuService(db, cache).update_menu(
         menu_id=target_menu_id,
@@ -95,7 +95,7 @@ def delete_menu(
     db: Session = Depends(get_db),
     cache: Redis = Depends(redis)
 ) -> JSONResponse:
-    """DELETE operation for specific menu"""
+    """DELETE operation for specific menu."""
 
     result = MenuService(db, cache).delete_menu(menu_id=target_menu_id)
     return result

@@ -10,7 +10,7 @@ from app.services.main import AppService
 
 
 class MenuService(AppService):
-    """Service for querying the list of all menus."""
+    """Service for querying the menu data from database and cache."""
 
     def get_menus(self) -> list[Menu] | list[dict]:
         """Query to get list of all menus."""
@@ -25,7 +25,7 @@ class MenuService(AppService):
         return result
 
     def get_menu(self, menu_id: str) -> Menu:
-        """GET operation for specific menu"""
+        """GET operation for specific menu."""
         if target_menu := MenuCacheCRUD(self.cache).get_menu(menu_id=menu_id):
             return target_menu
 
@@ -39,7 +39,7 @@ class MenuService(AppService):
         self,
         menu_schema: MenuCreateSchema
     ) -> Menu:
-        """POST operation for creating menu"""
+        """POST operation for creating menu."""
 
         result = MenuCRUD(self.db).create_menu(menu_schema=menu_schema)
 
@@ -54,7 +54,7 @@ class MenuService(AppService):
         menu_id: str,
         menu_schema: MenuUpdateSchema,
     ) -> Menu | HTTPException:
-        """PATCH operation for specific menu"""
+        """PATCH operation for specific menu."""
 
         result = MenuCRUD(self.db).update_menu(
             menu_id=menu_id,
@@ -71,7 +71,7 @@ class MenuService(AppService):
         self,
         menu_id: str,
     ) -> JSONResponse:
-        """DELETE operation for specific menu"""
+        """DELETE operation for specific menu."""
 
         MenuCRUD(self.db).delete_menu(menu_id=menu_id)
 

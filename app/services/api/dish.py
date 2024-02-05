@@ -10,13 +10,13 @@ from app.services.main import AppService
 
 
 class DishService(AppService):
-    """Service for querying the list of all dishes."""
+    """Service for querying the dish data from database and cache."""
 
     def get_dishes(
         self,
         submenu_id: str,
     ) -> list[Dish]:
-        """GET operation for retrieving list of dishes related to a specific submenu"""
+        """GET operation for retrieving list of dishes related to a specific submenu."""
 
         if all_dishes := DishCacheCRUD(self.cache).get_dishes():
             return all_dishes
@@ -35,7 +35,7 @@ class DishService(AppService):
         submenu_id: str,
         dish_id: str,
     ) -> Dish | HTTPException:
-        """GET operation for retrieving a specific dish of a specific submenu"""
+        """GET operation for retrieving a specific dish of a specific submenu."""
 
         if target_dish := DishCacheCRUD(self.cache).get_dish(dish_id=dish_id):
             return target_dish
@@ -56,7 +56,7 @@ class DishService(AppService):
         submenu_id: str,
         dish_schema: DishCreateSchema,
     ) -> Dish:
-        """POST operation for creating a new dish under a specific submenu"""
+        """POST operation for creating a new dish under a specific submenu."""
 
         result = DishCRUD(self.db).create_dish(
             menu_id=menu_id,
@@ -77,7 +77,7 @@ class DishService(AppService):
         dish_id: str,
         dish_schema: DishUpdateSchema,
     ) -> Dish | HTTPException:
-        """PATCH operation for updating a specific dish of a specific submenu"""
+        """PATCH operation for updating a specific dish of a specific submenu."""
 
         result = DishCRUD(self.db).update_dish(
             menu_id=menu_id,
@@ -99,7 +99,7 @@ class DishService(AppService):
         dish_id: str,
 
     ) -> JSONResponse:
-        """DELETE operation for deleting a specific dish of a specific submenu"""
+        """DELETE operation for deleting a specific dish of a specific submenu."""
 
         DishCRUD(self.db).delete_dish(
             menu_id=menu_id,

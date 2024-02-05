@@ -26,7 +26,7 @@ def get_submenus(
     db: Session = Depends(get_db),
     cache: Redis = Depends(redis)
 ) -> list[SubMenu] | list[dict]:
-    """GET operation for retrieving submenus related to a specific menu"""
+    """GET operation for retrieving submenus related to a specific menu."""
     result = SubMenuService(db, cache).get_submenus(menu_id=target_menu_id)
     return result
 
@@ -43,7 +43,7 @@ def get_submenu(
     db: Session = Depends(get_db),
     cache: Redis = Depends(redis)
 ) -> SubMenu | HTTPException:
-    """GET operation for retrieving a specific submenu of a specific menu"""
+    """GET operation for retrieving a specific submenu of a specific menu."""
 
     result = SubMenuService(db, cache).get_submenu(
         menu_id=target_menu_id,
@@ -66,7 +66,7 @@ def create_submenu(
     db: Session = Depends(get_db),
     cache: Redis = Depends(redis)
 ) -> SubMenu | HTTPException:
-    """POST operation for creating a new submenu for a specific menu"""
+    """POST operation for creating a new submenu for a specific menu."""
 
     result = SubMenuService(db, cache).create_submenu(
         menu_id=target_menu_id,
@@ -89,7 +89,7 @@ def update_submenu(
     db: Session = Depends(get_db),
     cache: Redis = Depends(redis)
 ) -> SubMenu | HTTPException:
-    """PATCH operation for updating a specific submenu of a specific menu"""
+    """PATCH operation for updating a specific submenu of a specific menu."""
 
     result = SubMenuService(db, cache).update_submenu(
         menu_id=target_menu_id,
@@ -112,7 +112,7 @@ def delete_submenu(
     db: Session = Depends(get_db),
     cache: Redis = Depends(redis)
 ) -> JSONResponse:
-    """DELETE operation for deleting a specific submenu of a specific menu"""
+    """DELETE operation for deleting a specific submenu of a specific menu."""
 
     result = SubMenuService(db, cache).delete_submenu(
         menu_id=target_menu_id,

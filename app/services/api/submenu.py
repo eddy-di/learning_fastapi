@@ -10,7 +10,7 @@ from app.services.main import AppService
 
 
 class SubMenuService(AppService):
-    """Service for querying the list of all submenus."""
+    """Service for querying the submenu data from database and cache."""
 
     def get_submenus(self, menu_id: str) -> list[SubMenu] | list[dict]:
         """Query to get list of all submenus."""
@@ -29,7 +29,7 @@ class SubMenuService(AppService):
         menu_id: str,
         submenu_id: str,
     ) -> SubMenu | HTTPException:
-        """GET operation for retrieving a specific submenu of a specific menu"""
+        """GET operation for retrieving a specific submenu of a specific menu."""
 
         if target_submenu := SubMenuCacheCRUD(self.cache).get_submenu(submenu_id=submenu_id):
             return target_submenu
@@ -48,7 +48,7 @@ class SubMenuService(AppService):
         menu_id: str,
         submenu_schema: SubMenuCreateSchema,
     ) -> SubMenu | HTTPException:
-        """POST operation for creating a new submenu for a specific menu"""
+        """POST operation for creating a new submenu for a specific menu."""
 
         result = SubMenuCRUD(self.db).create_submenu(
             menu_id=menu_id,
@@ -67,7 +67,7 @@ class SubMenuService(AppService):
         submenu_id: str,
         submenu_schema: SubMenuUpdateSchema,
     ) -> SubMenu | HTTPException:
-        """PATCH operation for updating a specific submenu of a specific menu"""
+        """PATCH operation for updating a specific submenu of a specific menu."""
 
         result = SubMenuCRUD(self.db).update_submenu(
             submenu_schema=submenu_schema,
@@ -85,7 +85,7 @@ class SubMenuService(AppService):
         menu_id: str,
         submenu_id: str,
     ) -> JSONResponse:
-        """DELETE operation for deleting a specific submenu of a specific menu"""
+        """DELETE operation for deleting a specific submenu of a specific menu."""
 
         SubMenuCRUD(self.db).delete_submenu(
             menu_id=menu_id,

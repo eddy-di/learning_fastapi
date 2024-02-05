@@ -27,7 +27,7 @@ def get_dishes(
     db: Session = Depends(get_db),
     cache: Redis = Depends(redis)
 ) -> list[Dish]:
-    """GET operation for retrieving list of dishes related to a specific submenu"""
+    """GET operation for retrieving list of dishes related to a specific submenu."""
     result = DishService(db, cache).get_dishes(
         submenu_id=target_submenu_id
     )
@@ -47,7 +47,7 @@ def get_dish(
     db: Session = Depends(get_db),
     cache: Redis = Depends(redis)
 ) -> Dish | HTTPException:
-    """GET operation for retrieving a specific dish of a specific submenu"""
+    """GET operation for retrieving a specific dish of a specific submenu."""
 
     result = DishService(db, cache).get_dish(
         menu_id=target_menu_id,
@@ -71,7 +71,7 @@ def create_dish(
     db: Session = Depends(get_db),
     cache: Redis = Depends(redis)
 ) -> Dish:
-    """POST operation for creating a new dish under a specific submenu"""
+    """POST operation for creating a new dish under a specific submenu."""
 
     result = DishService(db, cache).create_dish(
         menu_id=target_menu_id,
@@ -95,7 +95,7 @@ def update_dish(
     db: Session = Depends(get_db),
     cache: Redis = Depends(redis)
 ) -> Dish | HTTPException:
-    """PATCH operation for updating a specific dish of a specific submenu"""
+    """PATCH operation for updating a specific dish of a specific submenu."""
 
     result = DishService(db, cache).update_dish(
         menu_id=target_menu_id,
@@ -120,7 +120,7 @@ def delete_dish(
     db: Session = Depends(get_db),
     cache: Redis = Depends(redis)
 ) -> JSONResponse:
-    """DELETE operation for deleting a specific dish of a specific submenu"""
+    """DELETE operation for deleting a specific dish of a specific submenu."""
 
     result = DishService(db, cache).delete_dish(
         menu_id=target_menu_id,
