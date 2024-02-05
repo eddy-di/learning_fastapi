@@ -10,8 +10,7 @@ from app.models.menu import Menu
 from app.schemas.menu import Menu as MenuSchema
 from app.schemas.menu import MenuCreate as MenuCreateSchema
 from app.schemas.menu import MenuUpdate as MenuUpdateSchema
-from app.services.cache.menu import MenuCacheCRUD, MenuCacheService
-from app.services.database.menu import MenuCRUD, MenuService
+from app.services.api.menu import MenuService
 
 menu_router = APIRouter()
 
@@ -27,37 +26,7 @@ def get_menus(
     cache: Redis = Depends(redis)
 ) -> list[Menu] | list[dict]:
     """GET endpoint for list of menus, and a count of related items in it"""
-
-    if all_menus := MenuCacheService(cache).get_menus():
-        return all_menus
-
-    result = MenuService(db).get_menus()
-
-    MenuCacheService(cache).set_menus(query_result=result)
-
-    return result
-
-
-@menu_router.post(
-    MENUS_LINK,
-    response_model=MenuSchema,
-    status_code=201,
-    tags=['Menus'],
-    summary='Create a menu'
-)
-def create_menu(
-    menu: MenuCreateSchema,
-    db: Session = Depends(get_db),
-    cache: Redis = Depends(redis)
-) -> Menu:
-    """POST operation for creating menu"""
-
-    result = MenuCRUD(db).create_menu(menu_schema=menu)
-
-    MenuCacheCRUD(cache).set_menu(query_result=result)
-
-    MenuCacheService(cache).invalidate_menus()
-
+    result = MenuService(db, cache).get_menus()
     return result
 
 
@@ -73,14 +42,24 @@ def get_menu(
     cache: Redis = Depends(redis)
 ) -> Menu | HTTPException:
     """GET operation for specific menu"""
+    result = MenuService(db, cache).get_menu(menu_id=target_menu_id)
+    return result
 
-    if target_menu := MenuCacheCRUD(cache).get_menu(menu_id=target_menu_id):
-        return target_menu
 
-    result = MenuCRUD(db).get_menu(menu_id=target_menu_id)
-
-    MenuCacheCRUD(cache).set_menu(query_result=result)
-
+@menu_router.post(
+    MENUS_LINK,
+    response_model=MenuSchema,
+    status_code=201,
+    tags=['Menus'],
+    summary='Create a menu'
+)
+def create_menu(
+    menu_create_schema: MenuCreateSchema,
+    db: Session = Depends(get_db),
+    cache: Redis = Depends(redis)
+) -> Menu:
+    """POST operation for creating menu"""
+    result = MenuService(db, cache).create_menu(menu_schema=menu_create_schema)
     return result
 
 
@@ -92,21 +71,16 @@ def get_menu(
 )
 def update_menu(
     target_menu_id: str,
-    menu_update: MenuUpdateSchema,
+    menu_update_schema: MenuUpdateSchema,
     db: Session = Depends(get_db),
     cache: Redis = Depends(redis)
 ) -> Menu | HTTPException:
     """PATCH operation for specific menu"""
 
-    result = MenuCRUD(db).update_menu(
+    result = MenuService(db, cache).update_menu(
         menu_id=target_menu_id,
-        menu_schema=menu_update
+        menu_schema=menu_update_schema
     )
-
-    MenuCacheCRUD(cache).set_menu(query_result=result)
-
-    MenuCacheService(cache).invalidate_menus()
-
     return result
 
 
@@ -123,10 +97,5 @@ def delete_menu(
 ) -> JSONResponse:
     """DELETE operation for specific menu"""
 
-    MenuCRUD(db).delete_menu(menu_id=target_menu_id)
-
-    MenuCacheCRUD(cache).delete(menu_id=target_menu_id)
-
-    MenuCacheService(cache).invalidate_menus()
-
-    return JSONResponse(status_code=200, content='menu deleted')
+    result = MenuService(db, cache).delete_menu(menu_id=target_menu_id)
+    return result

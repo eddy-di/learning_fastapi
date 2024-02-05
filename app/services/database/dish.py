@@ -6,7 +6,7 @@ from app.models.submenu import SubMenu as SubMenuModel
 from app.schemas.dish import DishCreate, DishUpdate
 from app.services.database.menu import not_found_exception as no_menu
 from app.services.database.submenu import not_found_exception as no_submenu
-from app.services.main import AppCRUD, AppService
+from app.services.main import DatabaseCRUD
 
 
 def not_found_exception() -> HTTPException:
@@ -15,18 +15,7 @@ def not_found_exception() -> HTTPException:
     raise HTTPException(status_code=404, detail='dish not found')
 
 
-class DishService(AppService):
-    """Service for querying the list of all dishes."""
-
-    def get_dishes(self, submenu_id: str) -> list[DishModel]:
-        """Query to get list of all dishes."""
-
-        result = self.db.query(DishModel).filter(DishModel.submenu_id == submenu_id).all()
-
-        return result
-
-
-class DishCRUD(AppCRUD):
+class DishCRUD(DatabaseCRUD):
     """Service for querying specific dish."""
 
     def check_menu_id(self, menu_id: str) -> HTTPException | None:
@@ -49,6 +38,13 @@ class DishCRUD(AppCRUD):
         """Fetching specific dish by its id for furter operations."""
 
         return self.db.query(DishModel).filter(DishModel.id == dish_id).first()
+
+    def get_dishes(self, submenu_id: str) -> list[DishModel]:
+        """Query to get list of all dishes."""
+
+        result = self.db.query(DishModel).filter(DishModel.submenu_id == submenu_id).all()
+
+        return result
 
     def create_dish(
         self,

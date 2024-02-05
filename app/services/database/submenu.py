@@ -7,7 +7,7 @@ from app.models.menu import Menu as MenuModel
 from app.models.submenu import SubMenu as SubMenuModel
 from app.schemas.submenu import SubMenuCreate, SubMenuUpdate
 from app.services.database.menu import not_found_exception as no_menu
-from app.services.main import AppCRUD, AppService
+from app.services.main import DatabaseCRUD
 
 
 def not_found_exception() -> HTTPException:
@@ -16,11 +16,26 @@ def not_found_exception() -> HTTPException:
     raise HTTPException(status_code=404, detail='submenu not found')
 
 
-class SubMenuService(AppService):
-    """Service for querying the list of all submenus."""
+class SubMenuCRUD(DatabaseCRUD):
+    """Service for querying specific submenu."""
 
-    def get_submenus(self) -> list[dict]:
+    def check_menu_id(self, menu_id: str) -> HTTPException | None:
+        """Check if menu id given in endpoint is correct and exists."""
+
+        res = self.db.query(MenuModel).filter(MenuModel.id == menu_id).first()
+        if not res:
+            return no_menu()
+        return None
+
+    def fetch_menus_submenu(self, submenu_id: str) -> SubMenuModel | None:
+        """Fetching specific submenu by its id for furter operations."""
+
+        return self.db.query(SubMenuModel).filter(SubMenuModel.id == submenu_id).first()
+
+    def get_submenus(self, menu_id: str) -> list[dict]:
         """Query to get list of all submenus."""
+
+        self.check_menu_id(menu_id=menu_id)
 
         all_submenus = (self.db.query(
             SubMenuModel,
@@ -28,6 +43,7 @@ class SubMenuService(AppService):
         )
             .join(DishModel, SubMenuModel.id == DishModel.submenu_id, isouter=True)
             .group_by(SubMenuModel.id)
+            .filter(SubMenuModel.menu_id == menu_id)
             .all()
         )
 
@@ -43,23 +59,6 @@ class SubMenuService(AppService):
                 'dishes_count': count
             })
         return result
-
-
-class SubMenuCRUD(AppCRUD):
-    """Service for querying specific submenu."""
-
-    def check_menu_id(self, menu_id: str) -> HTTPException | None:
-        """Check if menu id given in endpoint is correct and exists."""
-
-        res = self.db.query(MenuModel).filter(MenuModel.id == menu_id).first()
-        if not res:
-            return no_menu()
-        return None
-
-    def fetch_menus_submenu(self, submenu_id: str) -> SubMenuModel | None:
-        """Fetching specific submenu by its id for furter operations."""
-
-        return self.db.query(SubMenuModel).filter(SubMenuModel.id == submenu_id).first()
 
     def create_submenu(
         self,

@@ -10,8 +10,7 @@ from app.models.dish import Dish
 from app.schemas.dish import Dish as DishSchema
 from app.schemas.dish import DishCreate as DishCreateSchema
 from app.schemas.dish import DishUpdate as DishUpdateSchema
-from app.services.cache.dish import DishCacheCRUD, DishCacheService
-from app.services.database.dish import DishCRUD, DishService
+from app.services.api.dish import DishService
 
 dish_router = APIRouter()
 
@@ -29,45 +28,9 @@ def get_dishes(
     cache: Redis = Depends(redis)
 ) -> list[Dish]:
     """GET operation for retrieving list of dishes related to a specific submenu"""
-
-    if all_dishes := DishCacheService(cache).get_dishes():
-        return all_dishes
-
-    result = DishService(db).get_dishes(
+    result = DishService(db, cache).get_dishes(
         submenu_id=target_submenu_id
     )
-
-    DishCacheService(cache).set_dishes(query_result=result)
-
-    return result
-
-
-@dish_router.post(
-    DISHES_LINK,
-    response_model=DishSchema,
-    status_code=201,
-    tags=['Dishes'],
-    summary='Create a dish'
-)
-def create_dish(
-    target_menu_id: str,
-    target_submenu_id: str,
-    dish: DishCreateSchema,
-    db: Session = Depends(get_db),
-    cache: Redis = Depends(redis)
-) -> Dish:
-    """POST operation for creating a new dish under a specific submenu"""
-
-    result = DishCRUD(db).create_dish(
-        menu_id=target_menu_id,
-        submenu_id=target_submenu_id,
-        dish_schema=dish
-    )
-
-    DishCacheCRUD(cache).set_dish(query_result=result)
-
-    DishCacheService(cache).invalidate_dishes(menu_id=target_menu_id, submenu_id=target_submenu_id)
-
     return result
 
 
@@ -86,17 +49,35 @@ def get_dish(
 ) -> Dish | HTTPException:
     """GET operation for retrieving a specific dish of a specific submenu"""
 
-    if target_dish := DishCacheCRUD(cache).get_dish(dish_id=target_dish_id):
-        return target_dish
-
-    result = DishCRUD(db).get_dish(
+    result = DishService(db, cache).get_dish(
         menu_id=target_menu_id,
         submenu_id=target_submenu_id,
         dish_id=target_dish_id
     )
+    return result
 
-    DishCacheCRUD(cache).set_dish(query_result=result)
 
+@dish_router.post(
+    DISHES_LINK,
+    response_model=DishSchema,
+    status_code=201,
+    tags=['Dishes'],
+    summary='Create a dish'
+)
+def create_dish(
+    target_menu_id: str,
+    target_submenu_id: str,
+    dish_create_schema: DishCreateSchema,
+    db: Session = Depends(get_db),
+    cache: Redis = Depends(redis)
+) -> Dish:
+    """POST operation for creating a new dish under a specific submenu"""
+
+    result = DishService(db, cache).create_dish(
+        menu_id=target_menu_id,
+        submenu_id=target_submenu_id,
+        dish_schema=dish_create_schema
+    )
     return result
 
 
@@ -110,22 +91,18 @@ def update_dish(
     target_menu_id: str,
     target_submenu_id: str,
     target_dish_id: str,
-    dish_update: DishUpdateSchema,
+    dish_update_schema: DishUpdateSchema,
     db: Session = Depends(get_db),
     cache: Redis = Depends(redis)
 ) -> Dish | HTTPException:
     """PATCH operation for updating a specific dish of a specific submenu"""
 
-    result = DishCRUD(db).update_dish(
+    result = DishService(db, cache).update_dish(
         menu_id=target_menu_id,
         submenu_id=target_submenu_id,
         dish_id=target_dish_id,
-        dish_schema=dish_update
+        dish_schema=dish_update_schema
     )
-
-    DishCacheCRUD(cache).set_dish(query_result=result)
-
-    DishCacheService(cache).invalidate_dishes(menu_id=target_menu_id, submenu_id=target_submenu_id)
 
     return result
 
@@ -145,14 +122,10 @@ def delete_dish(
 ) -> JSONResponse:
     """DELETE operation for deleting a specific dish of a specific submenu"""
 
-    DishCRUD(db).delete_dish(
+    result = DishService(db, cache).delete_dish(
         menu_id=target_menu_id,
         submenu_id=target_submenu_id,
         dish_id=target_dish_id
     )
 
-    DishCacheCRUD(cache).delete(dish_id=target_dish_id)
-
-    DishCacheService(cache).invalidate_dishes(menu_id=target_menu_id, submenu_id=target_submenu_id)
-
-    return JSONResponse(status_code=200, content='dish deleted')
+    return result

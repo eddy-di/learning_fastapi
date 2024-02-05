@@ -2,6 +2,20 @@ from redis import Redis
 from sqlalchemy.orm import Session
 
 
+class ServiceSessionContext:
+    """Context for database session and redis."""
+
+    def __init__(self, db: Session, cache: Redis) -> None:
+        """Initialization for session of connection to database and redis."""
+
+        self.db = db
+        self.cache = cache
+
+
+class AppService(ServiceSessionContext):
+    pass
+
+
 class DBSessionContext:
     """Context for database session."""
 
@@ -11,11 +25,7 @@ class DBSessionContext:
         self.db = db
 
 
-class AppService(DBSessionContext):
-    pass
-
-
-class AppCRUD(DBSessionContext):
+class DatabaseCRUD(DBSessionContext):
     pass
 
 
@@ -26,10 +36,6 @@ class CacheSessionContext:
         """Initialization for session of connection to cache database."""
 
         self.cache = cache
-
-
-class CacheService(CacheSessionContext):
-    pass
 
 
 class CacheCRUD(CacheSessionContext):

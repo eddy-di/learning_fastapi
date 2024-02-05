@@ -2,14 +2,14 @@ import pickle
 
 from app.models.dish import Dish
 from app.schemas.dish import Dish as DishSchema
-from app.services.main import CacheCRUD, CacheService
+from app.services.main import CacheCRUD
 
 
-class DishCacheService(CacheService):
+class DishCacheCRUD(CacheCRUD):
 
     """
-    Service for caching dishes endpoint that handles all dishes list output.\n
-    Available methods: `get_dishes`, `set_dishes`, `invalidate_dishes`.
+    Service for caching endpoints' CRUD operations.\n
+    Avaiable methods: `get_dish`, `set_dish`, `delete`.
     """
 
     def get_dishes(self) -> list[Dish] | None:
@@ -38,14 +38,6 @@ class DishCacheService(CacheService):
             'all_menus',
             'all_dishes'
         )
-
-
-class DishCacheCRUD(CacheCRUD):
-
-    """
-    Service for caching endpoints' CRUD operations.\n
-    Avaiable methods: `get_dish`, `set_dish`, `delete`.
-    """
 
     def get_dish(self, dish_id) -> Dish | None:
         """Returns cached dish instance if available."""
