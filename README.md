@@ -76,18 +76,18 @@ docker-compose -f docker-compose-tests.yaml up -d; docker logs --follow test_web
 
 1. Вынести бизнес логику и запросы:
     - бизнес логика доступна по роутерам по пути `.app/routers`,
-    - запросы в базы данных доступны по пути `.app/services/cache` или `.app/services/database`.
+    - запросы в redis кэш доступны по пути`.app/services/cache`,
+    - запросы в базу данных доступны по пути `.app/services/database`.
 
-2. Кеширование запросов у API и основная логика происходит по пути `.app/services/cache` с разделением на файлы для каждой модели отдельно. Инвалидация происходит в методах с названием `invalidate_<model_name>s` расположенных в классах `<ModelName>CacheService`.
+2. Кеширование запросов API происходит по пути `.app/services/cache` с разделением на файлы для каждой модели отдельно. Инвалидация кэша происходит в методах с названием `invalidate_<model_name>s`, например [тут](https://github.com/eddy-di/learning_fastapi/blob/895b422e3cf234199f8bfd745feceaba9bd34eeb/app/services/cache/dish.py#L27), расположенных в классах `<ModelName>CacheService`, например [тут](https://github.com/eddy-di/learning_fastapi/blob/895b422e3cf234199f8bfd745feceaba9bd34eeb/app/services/cache/dish.py#L8).
 
-3. pre-commit хуки в проект добалены, изменения были в трех местах:
-    - строка 8: `id: check-toml` так как использовал poetry,
-    - строка 44: `H301` в `args: ["--ignore=E501,F821,H301", "--max-line-length=120"]`,
-    - строка 52: `additional_dependencies: [types-redis, types-requests]` в момент работы ругался в работе с редис
+3. pre-commit хуки в проект добалены, изменения были в двух местах:
+    - [строка 8](https://github.com/eddy-di/learning_fastapi/blob/895b422e3cf234199f8bfd745feceaba9bd34eeb/.pre-commit-config.yaml#L8): `id: check-toml` так как используется poetry,
+    - [строка 52](https://github.com/eddy-di/learning_fastapi/blob/895b422e3cf234199f8bfd745feceaba9bd34eeb/.pre-commit-config.yaml#L52): `additional_dependencies: [types-redis, types-requests]` в момент работы ругался в работе с редис
 
-4. Везде доавлены кроме функции `create_redis` отвечающей за подключение к базе Redis из `.app/config/cache.py`, не получается даже с предыдущим 3 подпунктом pre-commit хука.
+4. Везде добавлены typehints кроме функции [`create_redis`](https://github.com/eddy-di/learning_fastapi/blob/895b422e3cf234199f8bfd745feceaba9bd34eeb/app/config/cache.py#L6) отвечающей за подключение к базе Redis из `.app/config/cache.py`, не получается даже с предыдущим 2 подпунктом pre-commit хука.
 
-5. Добавлены метаданные для более точного описания эндпоинтов и за что они ответственны.
+5. В роутерха присутствовали `response_model=`, [пример](https://github.com/eddy-di/learning_fastapi/blob/895b422e3cf234199f8bfd745feceaba9bd34eeb/app/routers/dish.py#L21C34-L21C37), у всех API эндпоинтов. А также добавлены метаданные для более точного описания эндпоинтов и за что они ответственны. Добавлены теги для каждой модели в роутерах, а также метаданные (имя и описание) в [`main.py`](https://github.com/eddy-di/learning_fastapi/blob/main/app/main.py) в [`openapi_tags=`](https://github.com/eddy-di/learning_fastapi/blob/895b422e3cf234199f8bfd745feceaba9bd34eeb/app/main.py#L30) части.
 
-6. Добавлена функция `reverse()`, доступна по пути `.app/utils/pathfinder.py`.
+6. Добавлена функция [`reverse()`](https://github.com/eddy-di/learning_fastapi/blob/895b422e3cf234199f8bfd745feceaba9bd34eeb/app/utils/pathfinder.py#L15), используется в тестах pytest.
 ---
