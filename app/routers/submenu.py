@@ -92,9 +92,9 @@ def update_submenu(
     """PATCH operation for updating a specific submenu of a specific menu"""
 
     result = SubMenuService(db, cache).update_submenu(
-        submenu_schema=submenu_update_schema,
+        menu_id=target_menu_id,
         submenu_id=target_submenu_id,
-        menu_id=target_menu_id
+        submenu_schema=submenu_update_schema,
     )
 
     return result

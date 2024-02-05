@@ -38,9 +38,5 @@ class CacheSessionContext:
         self.cache = cache
 
 
-class CacheService(CacheSessionContext):
-    pass
-
-
 class CacheCRUD(CacheSessionContext):
     pass

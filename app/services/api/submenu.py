@@ -1,10 +1,10 @@
 from fastapi import HTTPException
 from fastapi.responses import JSONResponse
 
-from app.models.submenu import SubMenu as SubMenuModel
+from app.models.submenu import SubMenu
 from app.schemas.submenu import SubMenuCreate as SubMenuCreateSchema
 from app.schemas.submenu import SubMenuUpdate as SubMenuUpdateSchema
-from app.services.cache.submenu import SubMenuCacheCRUD, SubMenuCacheService
+from app.services.cache.submenu import SubMenuCacheCRUD
 from app.services.database.submenu import SubMenuCRUD
 from app.services.main import AppService
 
@@ -12,15 +12,15 @@ from app.services.main import AppService
 class SubMenuService(AppService):
     """Service for querying the list of all submenus."""
 
-    def get_submenus(self, menu_id: str) -> list[SubMenuModel] | list[dict]:
+    def get_submenus(self, menu_id: str) -> list[SubMenu] | list[dict]:
         """Query to get list of all submenus."""
 
-        if all_submenus := SubMenuCacheService(self.cache).get_submenus():
+        if all_submenus := SubMenuCacheCRUD(self.cache).get_submenus():
             return all_submenus
 
         result = SubMenuCRUD(self.db).get_submenus(menu_id=menu_id)
 
-        SubMenuCacheService(self.cache).set_submenus(query_result=result)
+        SubMenuCacheCRUD(self.cache).set_submenus(query_result=result)
 
         return result
 
@@ -28,7 +28,7 @@ class SubMenuService(AppService):
         self,
         menu_id: str,
         submenu_id: str,
-    ) -> SubMenuModel | HTTPException:
+    ) -> SubMenu | HTTPException:
         """GET operation for retrieving a specific submenu of a specific menu"""
 
         if target_submenu := SubMenuCacheCRUD(self.cache).get_submenu(submenu_id=submenu_id):
@@ -47,7 +47,7 @@ class SubMenuService(AppService):
         self,
         menu_id: str,
         submenu_schema: SubMenuCreateSchema,
-    ) -> SubMenuModel | HTTPException:
+    ) -> SubMenu | HTTPException:
         """POST operation for creating a new submenu for a specific menu"""
 
         result = SubMenuCRUD(self.db).create_submenu(
@@ -57,7 +57,7 @@ class SubMenuService(AppService):
 
         SubMenuCacheCRUD(self.cache).set_submenu(query_result=result)
 
-        SubMenuCacheService(self.cache).invalidate_submenus(menu_id=menu_id)
+        SubMenuCacheCRUD(self.cache).invalidate_submenus(menu_id=menu_id)
 
         return result
 
@@ -66,7 +66,7 @@ class SubMenuService(AppService):
         menu_id: str,
         submenu_id: str,
         submenu_schema: SubMenuUpdateSchema,
-    ) -> SubMenuModel | HTTPException:
+    ) -> SubMenu | HTTPException:
         """PATCH operation for updating a specific submenu of a specific menu"""
 
         result = SubMenuCRUD(self.db).update_submenu(
@@ -76,7 +76,7 @@ class SubMenuService(AppService):
         )
 
         SubMenuCacheCRUD(self.cache).set_submenu(query_result=result)
-        SubMenuCacheService(self.cache).invalidate_submenus(menu_id=menu_id)
+        SubMenuCacheCRUD(self.cache).invalidate_submenus(menu_id=menu_id)
 
         return result
 
@@ -94,6 +94,6 @@ class SubMenuService(AppService):
 
         SubMenuCacheCRUD(self.cache).delete(submenu_id=submenu_id)
 
-        SubMenuCacheService(self.cache).invalidate_submenus(menu_id=menu_id)
+        SubMenuCacheCRUD(self.cache).invalidate_submenus(menu_id=menu_id)
 
         return JSONResponse(status_code=200, content='submenu deleted')

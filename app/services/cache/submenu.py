@@ -2,14 +2,14 @@ import pickle
 
 from app.models.submenu import SubMenu
 from app.schemas.submenu import SubMenu as SubMenuSchema
-from app.services.main import CacheCRUD, CacheService
+from app.services.main import CacheCRUD
 
 
-class SubMenuCacheService(CacheService):
+class SubMenuCacheCRUD(CacheCRUD):
 
     """
-    Service for caching submenu endpoint that handles all submenus list output.\n
-    Available methods: `get_submenus`, `set_submenus`, `invalidate_submenus`.
+    Service for caching endpoints' CRUD operations.\n
+    Avaiable methods: `get_submenu`, `set_submenu`, `delete`.
     """
 
     def get_submenus(self) -> list[SubMenu] | None:
@@ -36,14 +36,6 @@ class SubMenuCacheService(CacheService):
             'all_submenus',
             'all_menus'
         )
-
-
-class SubMenuCacheCRUD(CacheCRUD):
-
-    """
-    Service for caching endpoints' CRUD operations.\n
-    Avaiable methods: `get_submenu`, `set_submenu`, `delete`.
-    """
 
     def get_submenu(self, submenu_id: str) -> SubMenu | None:
         """Returns cached submenu instance if available."""

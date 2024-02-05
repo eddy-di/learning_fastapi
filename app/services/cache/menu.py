@@ -2,14 +2,14 @@ import pickle
 
 from app.models.menu import Menu
 from app.schemas.menu import Menu as MenuSchema
-from app.services.main import CacheCRUD, CacheService
+from app.services.main import CacheCRUD
 
 
-class MenuCacheService(CacheService):
+class MenuCacheCRUD(CacheCRUD):
 
     """
-    Service for caching menus endpoint that handles all menus list output.\n
-    Available methods: `get_menus`, `set_menus`, `invalidate_menus`.
+    Service for caching endpoints' CRUD operations.\n
+    Avaiable methods: `get_menu`, `set_menu`, `delete`.
     """
 
     def get_menus(self) -> list[Menu] | None:
@@ -31,14 +31,6 @@ class MenuCacheService(CacheService):
         """
 
         self.cache.delete('all_menus')
-
-
-class MenuCacheCRUD(CacheCRUD):
-
-    """
-    Service for caching endpoints' CRUD operations.\n
-    Avaiable methods: `get_menu`, `set_menu`, `delete`.
-    """
 
     def get_menu(self, menu_id: str) -> Menu | None:
         """Returns cached menu instance if available."""

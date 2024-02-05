@@ -1,10 +1,10 @@
 from fastapi import HTTPException
 from fastapi.responses import JSONResponse
 
-from app.models.dish import Dish as DishModel
+from app.models.dish import Dish
 from app.schemas.dish import DishCreate as DishCreateSchema
 from app.schemas.dish import DishUpdate as DishUpdateSchema
-from app.services.cache.dish import DishCacheCRUD, DishCacheService
+from app.services.cache.dish import DishCacheCRUD
 from app.services.database.dish import DishCRUD
 from app.services.main import AppService
 
@@ -16,17 +16,17 @@ class DishService(AppService):
         self,
         menu_id: str,
         submenu_id: str,
-    ) -> list[DishModel]:
+    ) -> list[Dish]:
         """GET operation for retrieving list of dishes related to a specific submenu"""
 
-        if all_dishes := DishCacheService(self.cache).get_dishes():
+        if all_dishes := DishCacheCRUD(self.cache).get_dishes():
             return all_dishes
 
         result = DishCRUD(self.db).get_dishes(
             submenu_id=submenu_id
         )
 
-        DishCacheService(self.cache).set_dishes(query_result=result)
+        DishCacheCRUD(self.cache).set_dishes(query_result=result)
 
         return result
 
@@ -35,7 +35,7 @@ class DishService(AppService):
         menu_id: str,
         submenu_id: str,
         dish_id: str,
-    ) -> DishModel | HTTPException:
+    ) -> Dish | HTTPException:
         """GET operation for retrieving a specific dish of a specific submenu"""
 
         if target_dish := DishCacheCRUD(self.cache).get_dish(dish_id=dish_id):
@@ -56,7 +56,7 @@ class DishService(AppService):
         menu_id: str,
         submenu_id: str,
         dish_schema: DishCreateSchema,
-    ) -> DishModel:
+    ) -> Dish:
         """POST operation for creating a new dish under a specific submenu"""
 
         result = DishCRUD(self.db).create_dish(
@@ -67,7 +67,7 @@ class DishService(AppService):
 
         DishCacheCRUD(self.cache).set_dish(query_result=result)
 
-        DishCacheService(self.cache).invalidate_dishes(menu_id=menu_id, submenu_id=submenu_id)
+        DishCacheCRUD(self.cache).invalidate_dishes(menu_id=menu_id, submenu_id=submenu_id)
 
         return result
 
@@ -77,7 +77,7 @@ class DishService(AppService):
         submenu_id: str,
         dish_id: str,
         dish_schema: DishUpdateSchema,
-    ) -> DishModel | HTTPException:
+    ) -> Dish | HTTPException:
         """PATCH operation for updating a specific dish of a specific submenu"""
 
         result = DishCRUD(self.db).update_dish(
@@ -89,7 +89,7 @@ class DishService(AppService):
 
         DishCacheCRUD(self.cache).set_dish(query_result=result)
 
-        DishCacheService(self.cache).invalidate_dishes(menu_id=menu_id, submenu_id=submenu_id)
+        DishCacheCRUD(self.cache).invalidate_dishes(menu_id=menu_id, submenu_id=submenu_id)
 
         return result
 
@@ -110,6 +110,6 @@ class DishService(AppService):
 
         DishCacheCRUD(self.cache).delete(dish_id=dish_id)
 
-        DishCacheService(self.cache).invalidate_dishes(menu_id=menu_id, submenu_id=submenu_id)
+        DishCacheCRUD(self.cache).invalidate_dishes(menu_id=menu_id, submenu_id=submenu_id)
 
         return JSONResponse(status_code=200, content='dish deleted')

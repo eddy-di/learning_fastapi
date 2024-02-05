@@ -92,7 +92,7 @@ def update_dish(
     target_menu_id: str,
     target_submenu_id: str,
     target_dish_id: str,
-    dish_update: DishUpdateSchema,
+    dish_update_schema: DishUpdateSchema,
     db: Session = Depends(get_db),
     cache: Redis = Depends(redis)
 ) -> Dish | HTTPException:
@@ -102,7 +102,7 @@ def update_dish(
         menu_id=target_menu_id,
         submenu_id=target_submenu_id,
         dish_id=target_dish_id,
-        dish_schema=dish_update
+        dish_schema=dish_update_schema
     )
 
     return result

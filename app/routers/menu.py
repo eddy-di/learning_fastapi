@@ -30,23 +30,6 @@ def get_menus(
     return result
 
 
-@menu_router.post(
-    MENUS_LINK,
-    response_model=MenuSchema,
-    status_code=201,
-    tags=['Menus'],
-    summary='Create a menu'
-)
-def create_menu(
-    menu: MenuCreateSchema,
-    db: Session = Depends(get_db),
-    cache: Redis = Depends(redis)
-) -> Menu:
-    """POST operation for creating menu"""
-    result = MenuService(db, cache).create_menu(menu_schema=menu)
-    return result
-
-
 @menu_router.get(
     MENU_LINK,
     response_model=MenuSchema,
@@ -63,6 +46,23 @@ def get_menu(
     return result
 
 
+@menu_router.post(
+    MENUS_LINK,
+    response_model=MenuSchema,
+    status_code=201,
+    tags=['Menus'],
+    summary='Create a menu'
+)
+def create_menu(
+    menu_create_schema: MenuCreateSchema,
+    db: Session = Depends(get_db),
+    cache: Redis = Depends(redis)
+) -> Menu:
+    """POST operation for creating menu"""
+    result = MenuService(db, cache).create_menu(menu_schema=menu_create_schema)
+    return result
+
+
 @menu_router.patch(
     MENU_LINK,
     response_model=MenuSchema,
@@ -71,7 +71,7 @@ def get_menu(
 )
 def update_menu(
     target_menu_id: str,
-    menu_update: MenuUpdateSchema,
+    menu_update_schema: MenuUpdateSchema,
     db: Session = Depends(get_db),
     cache: Redis = Depends(redis)
 ) -> Menu | HTTPException:
@@ -79,7 +79,7 @@ def update_menu(
 
     result = MenuService(db, cache).update_menu(
         menu_id=target_menu_id,
-        menu_schema=menu_update
+        menu_schema=menu_update_schema
     )
     return result
 
