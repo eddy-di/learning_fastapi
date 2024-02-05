@@ -14,7 +14,6 @@ class DishService(AppService):
 
     def get_dishes(
         self,
-        menu_id: str,
         submenu_id: str,
     ) -> list[Dish]:
         """GET operation for retrieving list of dishes related to a specific submenu"""

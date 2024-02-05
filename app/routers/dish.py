@@ -29,7 +29,6 @@ def get_dishes(
 ) -> list[Dish]:
     """GET operation for retrieving list of dishes related to a specific submenu"""
     result = DishService(db, cache).get_dishes(
-        menu_id=target_menu_id,
         submenu_id=target_submenu_id
     )
     return result
