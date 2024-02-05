@@ -29,19 +29,21 @@ class DishService(AppService):
 class DishCRUD(AppCRUD):
     """Service for querying specific dish."""
 
-    def check_menu_id(self, menu_id: str) -> HTTPException:
+    def check_menu_id(self, menu_id: str) -> HTTPException | None:
         """Check if menu id given in endpoint is correct and exists."""
 
         res = self.db.query(MenuModel).filter(MenuModel.id == menu_id).first()
         if not res:
             return no_menu()
+        return None
 
-    def check_submenu_id(self, submenu_id: str) -> HTTPException:
+    def check_submenu_id(self, submenu_id: str) -> HTTPException | None:
         """Check if submenu id given in endpoint is correct and exists."""
 
         res = self.db.query(SubMenuModel).filter(SubMenuModel.id == submenu_id).first()
         if not res:
             return no_submenu()
+        return None
 
     def fetch_dish(self, dish_id: str) -> DishModel | None:
         """Fetching specific dish by its id for furter operations."""

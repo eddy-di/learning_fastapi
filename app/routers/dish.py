@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from fastapi.responses import JSONResponse
 from redis import Redis
 from sqlalchemy.orm import Session
@@ -6,6 +6,7 @@ from sqlalchemy.orm import Session
 from app.config.base import DISH_LINK, DISHES_LINK
 from app.config.cache import create_redis as redis
 from app.config.database import get_db
+from app.models.dish import Dish
 from app.schemas.dish import Dish as DishSchema
 from app.schemas.dish import DishCreate as DishCreateSchema
 from app.schemas.dish import DishUpdate as DishUpdateSchema
@@ -26,7 +27,7 @@ def read_dishes(
     target_submenu_id: str,
     db: Session = Depends(get_db),
     cache: Redis = Depends(redis)
-):
+) -> list[Dish]:
     """GET operation for retrieving list of dishes related to a specific submenu"""
 
     if all_dishes := DishCacheService(cache).read_dishes():
@@ -54,7 +55,7 @@ def create_dish(
     dish: DishCreateSchema,
     db: Session = Depends(get_db),
     cache: Redis = Depends(redis)
-):
+) -> Dish:
     """POST operation for creating a new dish under a specific submenu"""
 
     result = DishCRUD(db).create_dish(
@@ -82,7 +83,7 @@ def read_dish(
     target_dish_id: str,
     db: Session = Depends(get_db),
     cache: Redis = Depends(redis)
-):
+) -> Dish | HTTPException:
     """GET operation for retrieving a specific dish of a specific submenu"""
 
     if target_dish := DishCacheCRUD(cache).read_dish(dish_id=target_dish_id):
@@ -112,7 +113,7 @@ def update_dish(
     dish_update: DishUpdateSchema,
     db: Session = Depends(get_db),
     cache: Redis = Depends(redis)
-):
+) -> Dish | HTTPException:
     """PATCH operation for updating a specific dish of a specific submenu"""
 
     result = DishCRUD(db).update_dish(
@@ -141,7 +142,7 @@ def delete_dish(
     target_dish_id: str,
     db: Session = Depends(get_db),
     cache: Redis = Depends(redis)
-):
+) -> JSONResponse:
     """DELETE operation for deleting a specific dish of a specific submenu"""
 
     DishCRUD(db).delete_dish(

@@ -71,4 +71,23 @@ docker-compose -f docker-compose-tests.yaml up -d; docker logs --follow test_web
 
 1. Можете увидеть выполнение SQLAlchemy ORM запроса по [этой ссылке](https://github.com/eddy-di/learning_fastapi/blob/43b9460be3b3a8b3530e365448cb39044091fe88/app/services/database/menu.py#L24).
 2. В переменной `menus` хранится ORM запрос к базе данных. Начало 25 линия, конец 35.
+
+## 5. Пункты 3 Домашнего задания
+
+1. Вынести бизнес логику и запросы:
+    - бизнес логика доступна по роутерам по пути `.app/routers`,
+    - запросы в базы данных доступны по пути `.app/services/cache` или `.app/services/database`.
+
+2. Кеширование запросов у API и основная логика происходит по пути `.app/services/cache` с разделением на файлы для каждой модели отдельно. Инвалидация происходит в методах с названием `invalidate_<model_name>s` расположенных в классах `<ModelName>CacheService`.
+
+3. pre-commit хуки в проект добалены, изменения были в трех местах:
+    - строка 8: `id: check-toml` так как использовал poetry,
+    - строка 44: `H301` в `args: ["--ignore=E501,F821,H301", "--max-line-length=120"]`,
+    - строка 52: `additional_dependencies: [types-redis, types-requests]` в момент работы ругался в работе с редис
+
+4. Везде доавлены кроме функции `create_redis` отвечающей за подключение к базе Redis из `.app/config/cache.py`, не получается даже с предыдущим 3 подпунктом pre-commit хука.
+
+5. Добавлены метаданные для более точного описания эндпоинтов и за что они ответственны.
+
+6. Добавлена функция `reverse()`, доступна по пути `.app/utils/pathfinder.py`.
 ---

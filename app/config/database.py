@@ -11,6 +11,11 @@ Base = declarative_base()
 
 
 def get_db() -> Session | None:
+    """
+    Creates a database session and closes it after finishing,
+    if exception comes out executes `rollback()` method and returns None.
+    """
+
     try:
         db = SessionLocal()
         yield db

@@ -12,7 +12,8 @@ class Dish(Base):
     title -> `str`\n
     description -> `str`\n
     price -> `Decimal`\n
-    submenu_id -> FK to 'submenus' through `submenus.id`
+    submenu_id -> FK to 'submenus' through `submenus.id`\n
+    submenu related to SubMenu model backpopulates dishes
     """
     __tablename__ = 'dishes'
 

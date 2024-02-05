@@ -48,12 +48,13 @@ class SubMenuService(AppService):
 class SubMenuCRUD(AppCRUD):
     """Service for querying specific submenu."""
 
-    def check_menu_id(self, menu_id: str) -> HTTPException:
+    def check_menu_id(self, menu_id: str) -> HTTPException | None:
         """Check if menu id given in endpoint is correct and exists."""
 
         res = self.db.query(MenuModel).filter(MenuModel.id == menu_id).first()
         if not res:
             return no_menu()
+        return None
 
     def fetch_menus_submenu(self, submenu_id: str) -> SubMenuModel | None:
         """Fetching specific submenu by its id for furter operations."""

@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from fastapi.responses import JSONResponse
 from redis import Redis
 from sqlalchemy.orm import Session
@@ -6,6 +6,7 @@ from sqlalchemy.orm import Session
 from app.config.base import SUBMENU_LINK, SUBMENUS_LINK
 from app.config.cache import create_redis as redis
 from app.config.database import get_db
+from app.models.submenu import SubMenu
 from app.schemas.submenu import SubMenu as SubMenuSchema
 from app.schemas.submenu import SubMenuCreate as SubMenuCreateSchema
 from app.schemas.submenu import SubMenuUpdate as SubMenuUpdateSchema
@@ -25,7 +26,7 @@ def read_submenus(
     target_menu_id: str,
     db: Session = Depends(get_db),
     cache: Redis = Depends(redis)
-):
+) -> list[SubMenu] | list[dict]:
     """GET operation for retrieving submenus related to a specific menu"""
 
     if all_submenus := SubMenuCacheService(cache).read_submenus():
@@ -50,7 +51,7 @@ def create_submenu(
     submenu: SubMenuCreateSchema,
     db: Session = Depends(get_db),
     cache: Redis = Depends(redis)
-):
+) -> SubMenu | HTTPException:
     """POST operation for creating a new submenu for a specific menu"""
 
     result = SubMenuCRUD(db).create_submenu(
@@ -76,7 +77,7 @@ def read_submenu(
     target_submenu_id: str,
     db: Session = Depends(get_db),
     cache: Redis = Depends(redis)
-):
+) -> SubMenu | HTTPException:
     """GET operation for retrieving a specific submenu of a specific menu"""
 
     if target_submenu := SubMenuCacheCRUD(cache).read_submenu(submenu_id=target_submenu_id):
@@ -104,7 +105,7 @@ def update_submenu(
     submenu_update: SubMenuUpdateSchema,
     db: Session = Depends(get_db),
     cache: Redis = Depends(redis)
-):
+) -> SubMenu | HTTPException:
     """PATCH operation for updating a specific submenu of a specific menu"""
 
     result = SubMenuCRUD(db).update_submenu(
@@ -131,7 +132,7 @@ def delete_submenu(
     target_submenu_id: str,
     db: Session = Depends(get_db),
     cache: Redis = Depends(redis)
-):
+) -> JSONResponse:
     """DELETE operation for deleting a specific submenu of a specific menu"""
 
     SubMenuCRUD(db).delete_submenu(
