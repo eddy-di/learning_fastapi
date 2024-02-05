@@ -27,9 +27,7 @@ def read_dishes(
     db: Session = Depends(get_db),
     cache: Redis = Depends(redis)
 ):
-    """
-    GET operation for retrieving list of dishes related to a specific submenu
-    """
+    """GET operation for retrieving list of dishes related to a specific submenu"""
 
     if all_dishes := DishCacheService(cache).read_dishes():
         return all_dishes
@@ -57,9 +55,7 @@ def create_dish(
     db: Session = Depends(get_db),
     cache: Redis = Depends(redis)
 ):
-    """
-    POST operation for creating a new dish under a specific submenu
-    """
+    """POST operation for creating a new dish under a specific submenu"""
 
     result = DishCRUD(db).create_dish(
         menu_id=target_menu_id,
@@ -87,9 +83,7 @@ def read_dish(
     db: Session = Depends(get_db),
     cache: Redis = Depends(redis)
 ):
-    """
-    GET operation for retrieving a specific dish of a specific submenu
-    """
+    """GET operation for retrieving a specific dish of a specific submenu"""
 
     if target_dish := DishCacheCRUD(cache).read_dish(dish_id=target_dish_id):
         return target_dish
@@ -119,9 +113,7 @@ def update_dish(
     db: Session = Depends(get_db),
     cache: Redis = Depends(redis)
 ):
-    """
-    PATCH operation for updating a specific dish of a specific submenu
-    """
+    """PATCH operation for updating a specific dish of a specific submenu"""
 
     result = DishCRUD(db).update_dish(
         menu_id=target_menu_id,
@@ -150,9 +142,7 @@ def delete_dish(
     db: Session = Depends(get_db),
     cache: Redis = Depends(redis)
 ):
-    """
-    DELETE operation for deleting a specific dish of a specific submenu
-    """
+    """DELETE operation for deleting a specific dish of a specific submenu"""
 
     DishCRUD(db).delete_dish(
         menu_id=target_menu_id,

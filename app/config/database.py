@@ -1,5 +1,5 @@
 from sqlalchemy import create_engine
-from sqlalchemy.orm import declarative_base, sessionmaker
+from sqlalchemy.orm import Session, declarative_base, sessionmaker
 
 from app.config.base import db_url
 
@@ -10,7 +10,7 @@ SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()
 
 
-def get_db():
+def get_db() -> Session | None:
     try:
         db = SessionLocal()
         yield db

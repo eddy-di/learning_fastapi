@@ -26,9 +26,7 @@ def read_submenus(
     db: Session = Depends(get_db),
     cache: Redis = Depends(redis)
 ):
-    """
-    GET operation for retrieving submenus related to a specific menu.
-    """
+    """GET operation for retrieving submenus related to a specific menu"""
 
     if all_submenus := SubMenuCacheService(cache).read_submenus():
         return all_submenus
@@ -53,9 +51,7 @@ def create_submenu(
     db: Session = Depends(get_db),
     cache: Redis = Depends(redis)
 ):
-    """
-    POST operation for creating a new submenu for a specific menu.
-    """
+    """POST operation for creating a new submenu for a specific menu"""
 
     result = SubMenuCRUD(db).create_submenu(
         submenu_schema=submenu,
@@ -81,9 +77,7 @@ def read_submenu(
     db: Session = Depends(get_db),
     cache: Redis = Depends(redis)
 ):
-    """
-    GET operation for retrieving a specific submenu of a specific menu.
-    """
+    """GET operation for retrieving a specific submenu of a specific menu"""
 
     if target_submenu := SubMenuCacheCRUD(cache).read_submenu(submenu_id=target_submenu_id):
         return target_submenu
@@ -111,9 +105,7 @@ def update_submenu(
     db: Session = Depends(get_db),
     cache: Redis = Depends(redis)
 ):
-    """
-    PATCH operation for updating a specific submenu of a specific menu.
-    """
+    """PATCH operation for updating a specific submenu of a specific menu"""
 
     result = SubMenuCRUD(db).update_submenu(
         submenu_schema=submenu_update,
@@ -140,9 +132,7 @@ def delete_submenu(
     db: Session = Depends(get_db),
     cache: Redis = Depends(redis)
 ):
-    """
-    DELETE operation for deleting a specific submenu of a specific menu.
-    """
+    """DELETE operation for deleting a specific submenu of a specific menu"""
 
     SubMenuCRUD(db).delete_submenu(
         menu_id=target_menu_id,

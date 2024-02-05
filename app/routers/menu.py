@@ -25,9 +25,7 @@ def read_menus(
     db: Session = Depends(get_db),
     cache: Redis = Depends(redis)
 ):
-    """
-    GET endpoint for list of menus, and a count of related items in it
-    """
+    """GET endpoint for list of menus, and a count of related items in it"""
 
     if all_menus := MenuCacheService(cache).read_menus():
         return all_menus
@@ -51,9 +49,7 @@ def create_menu(
     db: Session = Depends(get_db),
     cache: Redis = Depends(redis)
 ):
-    """
-    POST operation for creating menu.
-    """
+    """POST operation for creating menu"""
 
     result = MenuCRUD(db).create_menu(menu_schema=menu)
 
@@ -75,9 +71,7 @@ def read_menu(
     db: Session = Depends(get_db),
     cache: Redis = Depends(redis)
 ):
-    """
-    GET operation for specific menu.
-    """
+    """GET operation for specific menu"""
 
     if target_menu := MenuCacheCRUD(cache).read_menu(menu_id=target_menu_id):
         return target_menu
@@ -101,9 +95,7 @@ def update_menu(
     db: Session = Depends(get_db),
     cache: Redis = Depends(redis)
 ):
-    """
-    PATCH operation for specific menu.
-    """
+    """PATCH operation for specific menu"""
 
     result = MenuCRUD(db).update_menu(
         menu_id=target_menu_id,
@@ -128,9 +120,7 @@ def delete_menu(
     db: Session = Depends(get_db),
     cache: Redis = Depends(redis)
 ):
-    """
-    DELETE operation for specific menu.
-    """
+    """DELETE operation for specific menu"""
 
     MenuCRUD(db).delete_menu(menu_id=target_menu_id)
 
