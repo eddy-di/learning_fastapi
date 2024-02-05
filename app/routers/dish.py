@@ -22,7 +22,7 @@ dish_router = APIRouter()
     tags=['Dishes'],
     summary='Get all dishes'
 )
-def read_dishes(
+def get_dishes(
     target_menu_id: str,
     target_submenu_id: str,
     db: Session = Depends(get_db),
@@ -30,10 +30,10 @@ def read_dishes(
 ) -> list[Dish]:
     """GET operation for retrieving list of dishes related to a specific submenu"""
 
-    if all_dishes := DishCacheService(cache).read_dishes():
+    if all_dishes := DishCacheService(cache).get_dishes():
         return all_dishes
 
-    result = DishService(db).read_dishes(
+    result = DishService(db).get_dishes(
         submenu_id=target_submenu_id
     )
 
@@ -77,7 +77,7 @@ def create_dish(
     tags=['Dishes'],
     summary='Get specific dish'
 )
-def read_dish(
+def get_dish(
     target_menu_id: str,
     target_submenu_id: str,
     target_dish_id: str,
@@ -86,10 +86,10 @@ def read_dish(
 ) -> Dish | HTTPException:
     """GET operation for retrieving a specific dish of a specific submenu"""
 
-    if target_dish := DishCacheCRUD(cache).read_dish(dish_id=target_dish_id):
+    if target_dish := DishCacheCRUD(cache).get_dish(dish_id=target_dish_id):
         return target_dish
 
-    result = DishCRUD(db).read_dish(
+    result = DishCRUD(db).get_dish(
         menu_id=target_menu_id,
         submenu_id=target_submenu_id,
         dish_id=target_dish_id

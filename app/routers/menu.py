@@ -22,16 +22,16 @@ menu_router = APIRouter()
     tags=['Menus'],
     summary='Get all menus'
 )
-def read_menus(
+def get_menus(
     db: Session = Depends(get_db),
     cache: Redis = Depends(redis)
 ) -> list[Menu] | list[dict]:
     """GET endpoint for list of menus, and a count of related items in it"""
 
-    if all_menus := MenuCacheService(cache).read_menus():
+    if all_menus := MenuCacheService(cache).get_menus():
         return all_menus
 
-    result = MenuService(db).read_menus()
+    result = MenuService(db).get_menus()
 
     MenuCacheService(cache).set_menus(query_result=result)
 
@@ -67,17 +67,17 @@ def create_menu(
     tags=['Menus'],
     summary='Get specific menu'
 )
-def read_menu(
+def get_menu(
     target_menu_id: str,
     db: Session = Depends(get_db),
     cache: Redis = Depends(redis)
 ) -> Menu | HTTPException:
     """GET operation for specific menu"""
 
-    if target_menu := MenuCacheCRUD(cache).read_menu(menu_id=target_menu_id):
+    if target_menu := MenuCacheCRUD(cache).get_menu(menu_id=target_menu_id):
         return target_menu
 
-    result = MenuCRUD(db).read_menu(menu_id=target_menu_id)
+    result = MenuCRUD(db).get_menu(menu_id=target_menu_id)
 
     MenuCacheCRUD(cache).set_menu(query_result=result)
 

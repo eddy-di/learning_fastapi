@@ -9,10 +9,10 @@ class SubMenuCacheService(CacheService):
 
     """
     Service for caching submenu endpoint that handles all submenus list output.\n
-    Available methods: `read_submenus`, `set_submenus`, `invalidate_submenus`.
+    Available methods: `get_submenus`, `set_submenus`, `invalidate_submenus`.
     """
 
-    def read_submenus(self) -> list[SubMenu] | None:
+    def get_submenus(self) -> list[SubMenu] | None:
         """Returns cached list of all submenus if available in cache."""
 
         if all_submenus := self.cache.get('all_submenus'):
@@ -42,10 +42,10 @@ class SubMenuCacheCRUD(CacheCRUD):
 
     """
     Service for caching endpoints' CRUD operations.\n
-    Avaiable methods: `read_submenu`, `set_submenu`, `delete`.
+    Avaiable methods: `get_submenu`, `set_submenu`, `delete`.
     """
 
-    def read_submenu(self, submenu_id: str) -> SubMenu | None:
+    def get_submenu(self, submenu_id: str) -> SubMenu | None:
         """Returns cached submenu instance if available."""
 
         if target_submenu := self.cache.get(f'submenu_id_{submenu_id}'):

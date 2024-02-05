@@ -9,10 +9,10 @@ class DishCacheService(CacheService):
 
     """
     Service for caching dishes endpoint that handles all dishes list output.\n
-    Available methods: `read_dishes`, `set_dishes`, `invalidate_dishes`.
+    Available methods: `get_dishes`, `set_dishes`, `invalidate_dishes`.
     """
 
-    def read_dishes(self) -> list[Dish] | None:
+    def get_dishes(self) -> list[Dish] | None:
         """Returns cached list of all dishes if available in cache."""
 
         if all_dishes := self.cache.get('all_dishes'):
@@ -44,10 +44,10 @@ class DishCacheCRUD(CacheCRUD):
 
     """
     Service for caching endpoints' CRUD operations.\n
-    Avaiable methods: `read_dish`, `set_dish`, `delete`.
+    Avaiable methods: `get_dish`, `set_dish`, `delete`.
     """
 
-    def read_dish(self, dish_id) -> Dish | None:
+    def get_dish(self, dish_id) -> Dish | None:
         """Returns cached dish instance if available."""
 
         if target_dish := self.cache.get(f'dish_id_{dish_id}'):

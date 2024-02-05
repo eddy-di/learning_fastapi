@@ -9,10 +9,10 @@ class MenuCacheService(CacheService):
 
     """
     Service for caching menus endpoint that handles all menus list output.\n
-    Available methods: `read_menus`, `set_menus`, `invalidate_menus`.
+    Available methods: `get_menus`, `set_menus`, `invalidate_menus`.
     """
 
-    def read_menus(self) -> list[Menu] | None:
+    def get_menus(self) -> list[Menu] | None:
         """Returns cached list of all menus if available in cache."""
 
         if all_menus := self.cache.get('all_menus'):
@@ -37,10 +37,10 @@ class MenuCacheCRUD(CacheCRUD):
 
     """
     Service for caching endpoints' CRUD operations.\n
-    Avaiable methods: `read_menu`, `set_menu`, `delete`.
+    Avaiable methods: `get_menu`, `set_menu`, `delete`.
     """
 
-    def read_menu(self, menu_id: str) -> Menu | None:
+    def get_menu(self, menu_id: str) -> Menu | None:
         """Returns cached menu instance if available."""
 
         if target_menu := self.cache.get(f'menu_id_{menu_id}'):

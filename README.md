@@ -17,11 +17,11 @@ git clone https://github.com/eddy-di/learning_fastapi.git
 
 ## 2. Запуск WEB сервера в docker
 
-1. Я предполагаю что у вас уже установлен Docker.
+1. предполагается что у вас уже установлен Docker.
 
 > Данный образ и контейнеры в нем предназначены для прогона тестов через Postman. Прежде чем начать тестирование прошу убедитесь в том что в докере не остались включенными или занимают порты/хосты другие образы или контейнеры, в случае если есть таковые просьба очистить или удалить все связанные с этим заданием по меню контейнеры, образы, волюмы (volumes) и билды (builds) через CLI или Docker Desktop.
 
-2. Введите в командную строку находясь в корневой директории проекта.
+2. Перейдите в корневую директорию проекта и введите в командную:
 
 ```
 docker compose -f docker-compose.yaml up -d --build
@@ -48,7 +48,7 @@ docker compose -f docker-compose.yaml down -v
 
 > Данный образ и контейнеры предназначены для прогона тестов через pytest. Нижеуказанная команда в подпункте 1 реализует сценарий поднятия проекта, запроса команды `pytest -v` и удаления контейнеров проекта. Для корректной работы убедитесь что все другие контейнеры или образы docker не запущены. В случае если порты будут заняты другими проектами то необходимо остановить их.
 
-1. Введите в терминале находясь в корневой директории проекта данную команду:
+1. Перейдите в корневую директорию проекта и введите в терминале данную команду:
 
 ```
 docker-compose -f docker-compose-tests.yaml up -d && docker logs --follow test_web && docker compose -f docker-compose-tests.yaml down -v
@@ -83,11 +83,11 @@ docker-compose -f docker-compose-tests.yaml up -d; docker logs --follow test_web
 
 3. pre-commit хуки в проект добалены, изменения были в двух местах:
     - [строка 8](https://github.com/eddy-di/learning_fastapi/blob/895b422e3cf234199f8bfd745feceaba9bd34eeb/.pre-commit-config.yaml#L8): `id: check-toml` так как используется poetry,
-    - [строка 52](https://github.com/eddy-di/learning_fastapi/blob/895b422e3cf234199f8bfd745feceaba9bd34eeb/.pre-commit-config.yaml#L52): `additional_dependencies: [types-redis, types-requests]` в момент работы ругался в работе с редис
+    - [строка 52](https://github.com/eddy-di/learning_fastapi/blob/895b422e3cf234199f8bfd745feceaba9bd34eeb/.pre-commit-config.yaml#L52): `additional_dependencies: [types-redis, types-requests]` ругался в работе с редис
 
 4. Везде добавлены typehints кроме функции [`create_redis`](https://github.com/eddy-di/learning_fastapi/blob/895b422e3cf234199f8bfd745feceaba9bd34eeb/app/config/cache.py#L6) отвечающей за подключение к базе Redis из `.app/config/cache.py`, не получается даже с предыдущим 2 подпунктом pre-commit хука.
 
-5. В роутерха присутствовали `response_model=`, [пример](https://github.com/eddy-di/learning_fastapi/blob/895b422e3cf234199f8bfd745feceaba9bd34eeb/app/routers/dish.py#L21C34-L21C37), у всех API эндпоинтов. А также добавлены метаданные для более точного описания эндпоинтов и за что они ответственны. Добавлены теги для каждой модели в роутерах, а также метаданные (имя и описание) в [`main.py`](https://github.com/eddy-di/learning_fastapi/blob/main/app/main.py) в [`openapi_tags=`](https://github.com/eddy-di/learning_fastapi/blob/895b422e3cf234199f8bfd745feceaba9bd34eeb/app/main.py#L30) части.
+5. В роутерах присутствуют `response_model=`, [пример](https://github.com/eddy-di/learning_fastapi/blob/895b422e3cf234199f8bfd745feceaba9bd34eeb/app/routers/dish.py#L21C34-L21C37), у всех API эндпоинтов. А также добавлены метаданные для более точного описания эндпоинтов и за что они ответственны. Добавлены теги для каждой модели в роутерах, а также метаданные (имя и описание) в [`main.py`](https://github.com/eddy-di/learning_fastapi/blob/main/app/main.py) в [`openapi_tags=`](https://github.com/eddy-di/learning_fastapi/blob/895b422e3cf234199f8bfd745feceaba9bd34eeb/app/main.py#L30) части.
 
-6. Добавлена функция [`reverse()`](https://github.com/eddy-di/learning_fastapi/blob/895b422e3cf234199f8bfd745feceaba9bd34eeb/app/utils/pathfinder.py#L15), используется в тестах pytest.
+6. Добавлена функция [`reverse()`](https://github.com/eddy-di/learning_fastapi/blob/895b422e3cf234199f8bfd745feceaba9bd34eeb/app/utils/pathfinder.py#L15), используется в тестах pytest, [пример](https://github.com/eddy-di/learning_fastapi/blob/5794d5241c145fe9e5a3152010c3814227e9a37a/tests/test_case4_counters.py#L26).
 ---

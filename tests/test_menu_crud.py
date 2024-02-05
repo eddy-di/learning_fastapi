@@ -1,12 +1,6 @@
 import uuid
 
-from app.routers.menu import (
-    create_menu,
-    delete_menu,
-    read_menu,
-    read_menus,
-    update_menu,
-)
+from app.routers.menu import create_menu, delete_menu, get_menu, get_menus, update_menu
 from app.utils.pathfinder import reverse
 
 
@@ -14,7 +8,7 @@ from app.utils.pathfinder import reverse
 def test_menu_get_list(setup_test_db):
     client = setup_test_db
     # given: empty db in , client from client variable
-    url = reverse(read_menus)
+    url = reverse(get_menus)
     # when: executing CRUD operation get on list
     response = client.get(url)
     content = response.content.decode('utf-8')
@@ -34,7 +28,7 @@ def test_menu_get_list_with_submenu_and_dishes(setup_test_db, create_menu, creat
     create_dish(submenu2.id)
     client = setup_test_db
     # when: executing CRUD operation get on menus list
-    url = reverse(read_menus)
+    url = reverse(get_menus)
     response = client.get(url)
     # then: expecting to get status code 200 and data on available instances of each objects
     assert response.status_code == 200
@@ -49,7 +43,7 @@ def test_menu_get_list_with_no_submenu_and_dishes(setup_test_db, create_menu):
     # given: an instance of menu obj with empty submenu and dishes
     create_menu
     client = setup_test_db
-    url = reverse(read_menus)
+    url = reverse(get_menus)
     # when: executing CRUD operation get on menus list
     response = client.get(url)
     # then: expecting to get status code 200 and not empty list
@@ -88,7 +82,7 @@ def test_menu_get_target_id(setup_test_db, create_menu):
     menu = create_menu
     client = setup_test_db
     # when: executing CRUD operation get on target id
-    url = reverse(read_menu, target_menu_id=menu.id)
+    url = reverse(get_menu, target_menu_id=menu.id)
     response = client.get(url)
     # then: expecting to get status code 200 and response data similar to provided in fixture
     assert response.status_code == 200

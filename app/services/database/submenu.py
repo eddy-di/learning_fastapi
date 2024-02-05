@@ -19,7 +19,7 @@ def not_found_exception() -> HTTPException:
 class SubMenuService(AppService):
     """Service for querying the list of all submenus."""
 
-    def read_submenus(self) -> list[dict]:
+    def get_submenus(self) -> list[dict]:
         """Query to get list of all submenus."""
 
         all_submenus = (self.db.query(
@@ -80,7 +80,7 @@ class SubMenuCRUD(AppCRUD):
         self.db.refresh(new_submenu)
         return new_submenu
 
-    def read_submenu(
+    def get_submenu(
         self,
         menu_id: str,
         submenu_id: str

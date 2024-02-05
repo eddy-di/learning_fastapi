@@ -18,7 +18,7 @@ def not_found_exception() -> HTTPException:
 class DishService(AppService):
     """Service for querying the list of all dishes."""
 
-    def read_dishes(self, submenu_id: str) -> list[DishModel]:
+    def get_dishes(self, submenu_id: str) -> list[DishModel]:
         """Query to get list of all dishes."""
 
         result = self.db.query(DishModel).filter(DishModel.submenu_id == submenu_id).all()
@@ -73,7 +73,7 @@ class DishCRUD(AppCRUD):
         self.db.refresh(new_dish)
         return new_dish
 
-    def read_dish(
+    def get_dish(
         self,
         menu_id: str,
         submenu_id: str,

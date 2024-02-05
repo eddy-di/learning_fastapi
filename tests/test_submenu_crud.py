@@ -1,8 +1,8 @@
 from app.routers.submenu import (
     create_submenu,
     delete_submenu,
-    read_submenu,
-    read_submenus,
+    get_submenu,
+    get_submenus,
     update_submenu,
 )
 from app.utils.pathfinder import reverse
@@ -13,7 +13,7 @@ def test_submenu_get_list(setup_test_db, create_menu):
     # given: menu instance
     menu = create_menu
     client = setup_test_db
-    url = reverse(read_submenus, target_menu_id=menu.id)
+    url = reverse(get_submenus, target_menu_id=menu.id)
     # when: executing CRUD operation get on list
     response = client.get(url)
     # then: expecting status code 200 and empty list in response
@@ -28,7 +28,7 @@ def test_submenu_get_list_with_data_in_db(setup_test_db, create_menu, create_sub
     submenu = create_submenu(menu.id)
     create_dish(submenu.id)
     # when: executing CRUD operation get on menus list
-    url = reverse(read_submenus, target_menu_id=menu.id)
+    url = reverse(get_submenus, target_menu_id=menu.id)
     response = client.get(url)
     # then: expecting to get status code 200 and data on available instances of each objects
     assert response.status_code == 200
@@ -60,7 +60,7 @@ def test_submenu_get_target_id(setup_test_db, create_menu, create_submenu):
     menu = create_menu
     submenu = create_submenu(menu.id)
     client = setup_test_db
-    url = reverse(read_submenu, target_menu_id=menu.id, target_submenu_id=submenu.id)
+    url = reverse(get_submenu, target_menu_id=menu.id, target_submenu_id=submenu.id)
     # when: executing CRUD operation get on target id
     response = client.get(url)
     # then: expecting status code 200 and create_menu info in response

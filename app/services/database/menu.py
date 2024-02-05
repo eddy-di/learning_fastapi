@@ -18,7 +18,7 @@ def not_found_exception() -> HTTPException:
 class MenuService(AppService):
     """Service for querying the list of all menus."""
 
-    def read_menus(self) -> list[dict]:
+    def get_menus(self) -> list[dict]:
         """Query to get list of all menus."""
 
         menus = (
@@ -62,7 +62,7 @@ class MenuCRUD(AppCRUD):
         self.db.refresh(new_menu)
         return new_menu
 
-    def read_menu(self, menu_id: str) -> MenuModel | HTTPException:
+    def get_menu(self, menu_id: str) -> MenuModel | HTTPException:
         """Get specific menu from database."""
 
         target_menu_from_db = (

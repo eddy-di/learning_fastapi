@@ -22,17 +22,17 @@ submenu_router = APIRouter()
     tags=['Submenus'],
     summary='Get all submenus'
 )
-def read_submenus(
+def get_submenus(
     target_menu_id: str,
     db: Session = Depends(get_db),
     cache: Redis = Depends(redis)
 ) -> list[SubMenu] | list[dict]:
     """GET operation for retrieving submenus related to a specific menu"""
 
-    if all_submenus := SubMenuCacheService(cache).read_submenus():
+    if all_submenus := SubMenuCacheService(cache).get_submenus():
         return all_submenus
 
-    result = SubMenuService(db).read_submenus()
+    result = SubMenuService(db).get_submenus()
 
     SubMenuCacheService(cache).set_submenus(query_result=result)
 
@@ -72,7 +72,7 @@ def create_submenu(
     tags=['Submenus'],
     summary='Get specific submenu'
 )
-def read_submenu(
+def get_submenu(
     target_menu_id: str,
     target_submenu_id: str,
     db: Session = Depends(get_db),
@@ -80,10 +80,10 @@ def read_submenu(
 ) -> SubMenu | HTTPException:
     """GET operation for retrieving a specific submenu of a specific menu"""
 
-    if target_submenu := SubMenuCacheCRUD(cache).read_submenu(submenu_id=target_submenu_id):
+    if target_submenu := SubMenuCacheCRUD(cache).get_submenu(submenu_id=target_submenu_id):
         return target_submenu
 
-    result = SubMenuCRUD(db).read_submenu(
+    result = SubMenuCRUD(db).get_submenu(
         menu_id=target_menu_id,
         submenu_id=target_submenu_id
     )

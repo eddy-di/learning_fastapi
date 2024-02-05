@@ -1,10 +1,4 @@
-from app.routers.dish import (
-    create_dish,
-    delete_dish,
-    read_dish,
-    read_dishes,
-    update_dish,
-)
+from app.routers.dish import create_dish, delete_dish, get_dish, get_dishes, update_dish
 from app.utils.pathfinder import reverse
 
 
@@ -14,7 +8,7 @@ def test_dish_get_list(setup_test_db, create_menu, create_submenu):
     menu = create_menu
     submenu = create_submenu(menu.id)
     client = setup_test_db
-    url = reverse(read_dishes, target_menu_id=menu.id, target_submenu_id=submenu.id)
+    url = reverse(get_dishes, target_menu_id=menu.id, target_submenu_id=submenu.id)
     # when: executing CRUD operation get on list
     response = client.get(url)
     # then: expecting to get 200 and empty list
@@ -28,7 +22,7 @@ def test_dish_get_list_with_data_in_db(setup_test_db, create_menu, create_submen
     submenu = create_submenu(menu.id)
     create_dish(submenu.id)
     client = setup_test_db
-    url = reverse(read_dishes, target_menu_id=menu.id, target_submenu_id=submenu.id)
+    url = reverse(get_dishes, target_menu_id=menu.id, target_submenu_id=submenu.id)
     # when: executing CRUD operation get on list
     response = client.get(url)
     # then: expecting to get 200 and empty list
@@ -62,7 +56,7 @@ def test_dish_get_target_id(setup_test_db, create_menu, create_submenu, create_d
     submenu = create_submenu(menu.id)
     dish = create_dish(submenu.id)
     client = setup_test_db
-    url = reverse(read_dish, target_menu_id=menu.id, target_submenu_id=submenu.id, target_dish_id=dish.id)
+    url = reverse(get_dish, target_menu_id=menu.id, target_submenu_id=submenu.id, target_dish_id=dish.id)
     # when: executing CRUD operation get on target id
     response = client.get(url)
     # then: expecting to get 200 and available instance data in response
