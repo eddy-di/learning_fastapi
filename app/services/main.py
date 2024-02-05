@@ -25,7 +25,7 @@ class DBSessionContext:
         self.db = db
 
 
-class AppCRUD(DBSessionContext):
+class DatabaseCRUD(DBSessionContext):
     pass
 
 

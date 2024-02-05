@@ -7,7 +7,7 @@ from app.models.menu import Menu as MenuModel
 from app.models.submenu import SubMenu as SubMenuModel
 from app.schemas.submenu import SubMenuCreate, SubMenuUpdate
 from app.services.database.menu import not_found_exception as no_menu
-from app.services.main import AppCRUD
+from app.services.main import DatabaseCRUD
 
 
 def not_found_exception() -> HTTPException:
@@ -16,7 +16,7 @@ def not_found_exception() -> HTTPException:
     raise HTTPException(status_code=404, detail='submenu not found')
 
 
-class SubMenuCRUD(AppCRUD):
+class SubMenuCRUD(DatabaseCRUD):
     """Service for querying specific submenu."""
 
     def check_menu_id(self, menu_id: str) -> HTTPException | None:

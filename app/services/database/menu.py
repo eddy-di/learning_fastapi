@@ -6,7 +6,7 @@ from app.models.dish import Dish as DishModel
 from app.models.menu import Menu as MenuModel
 from app.models.submenu import SubMenu as SubMenuModel
 from app.schemas.menu import MenuCreate, MenuUpdate
-from app.services.main import AppCRUD
+from app.services.main import DatabaseCRUD
 
 
 def not_found_exception() -> HTTPException:
@@ -15,7 +15,7 @@ def not_found_exception() -> HTTPException:
     raise HTTPException(status_code=404, detail='menu not found')
 
 
-class MenuCRUD(AppCRUD):
+class MenuCRUD(DatabaseCRUD):
     """Service for querying specific menu."""
 
     def get_menus(self) -> list[dict]:
