@@ -70,18 +70,18 @@ docker-compose -f docker-compose-tests.yaml up -d; docker logs --follow test_web
 ## 4. Путь к сложному ORM запросу
 
 1. Можете увидеть выполнение SQLAlchemy ORM запроса по [этой ссылке](https://github.com/eddy-di/learning_fastapi/blob/469fca66b163d470eb87ff92a5537a41f532781f/app/services/database/menu.py#L24).
-2. В переменной `menus` хранится ORM запрос к базе данных. Начало 25 линия, конец 35.
+2. В переменной `menus` хранится ORM запрос к базе данных. Начало 25 линия, конец 33.
 
 ## 5. Пункты 3 Домашнего задания
 
-1. Вынести бизнес логику и запросы:
-    - бизнес логика доступна по пути [`.app/srvice/api`](https://github.com/eddy-di/learning_fastapi/tree/main/app/services/api),
+1. Вынести бизнес логику и запросы в отдельные слои приложения:
+    - бизнес логика доступна по пути [`.app/services/api`](https://github.com/eddy-di/learning_fastapi/tree/main/app/services/api),
     - запросы в redis кэш доступны по пути [`.app/services/cache`](https://github.com/eddy-di/learning_fastapi/tree/main/app/services/cache),
     - запросы в базу данных доступны по пути [`.app/services/database`](https://github.com/eddy-di/learning_fastapi/tree/main/app/services/database).
 
 2. Кеширование запросов API происходит по пути `.app/services/cache` с разделением на файлы для каждой модели отдельно. Инвалидация кэша происходит в методах с названием `invalidate_<model_name>s`, например [тут](https://github.com/eddy-di/learning_fastapi/blob/469fca66b163d470eb87ff92a5537a41f532781f/app/services/cache/dish.py#L27), расположенных в классах `<ModelName>CacheCRUD`, например [тут](https://github.com/eddy-di/learning_fastapi/blob/469fca66b163d470eb87ff92a5537a41f532781f/app/services/cache/dish.py#L8).
 
-3. pre-commit хуки в проект добалены, изменения были в двух местах:
+3. pre-commit хуки в проект добавлены, изменения были в двух местах:
     - [строка 8](https://github.com/eddy-di/learning_fastapi/blob/895b422e3cf234199f8bfd745feceaba9bd34eeb/.pre-commit-config.yaml#L8): `id: check-toml` так как используется poetry,
     - [строка 52](https://github.com/eddy-di/learning_fastapi/blob/895b422e3cf234199f8bfd745feceaba9bd34eeb/.pre-commit-config.yaml#L52): `additional_dependencies: [types-redis, types-requests]` ругался в работе с редис
 
