@@ -14,7 +14,6 @@ def test_dish_get_list(setup_test_db, create_menu, create_submenu):
     menu = create_menu
     submenu = create_submenu(menu.id)
     client = setup_test_db
-    url = f'/api/v1/menus/{menu.id}/submenus/{submenu.id}/dishes'
     url = reverse(read_dishes, target_menu_id=menu.id, target_submenu_id=submenu.id)
     # when: executing CRUD operation get on list
     response = client.get(url)
