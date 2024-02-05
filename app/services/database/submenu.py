@@ -7,42 +7,13 @@ from app.models.menu import Menu as MenuModel
 from app.models.submenu import SubMenu as SubMenuModel
 from app.schemas.submenu import SubMenuCreate, SubMenuUpdate
 from app.services.database.menu import not_found_exception as no_menu
-from app.services.main import AppCRUD, AppService
+from app.services.main import AppCRUD
 
 
 def not_found_exception() -> HTTPException:
     """Exception for unavailable/non-existent submenu instance."""
 
     raise HTTPException(status_code=404, detail='submenu not found')
-
-
-class SubMenuService(AppService):
-    """Service for querying the list of all submenus."""
-
-    def get_submenus(self) -> list[dict]:
-        """Query to get list of all submenus."""
-
-        all_submenus = (self.db.query(
-            SubMenuModel,
-            func.count(distinct(DishModel.id)).label('dishes_count')
-        )
-            .join(DishModel, SubMenuModel.id == DishModel.submenu_id, isouter=True)
-            .group_by(SubMenuModel.id)
-            .all()
-        )
-
-        if not all_submenus:
-            return []
-        result = []
-        for i in all_submenus:
-            submenu, count = i
-            result.append({
-                'title': submenu.title,
-                'description': submenu.description,
-                'id': submenu.id,
-                'dishes_count': count
-            })
-        return result
 
 
 class SubMenuCRUD(AppCRUD):
@@ -60,6 +31,34 @@ class SubMenuCRUD(AppCRUD):
         """Fetching specific submenu by its id for furter operations."""
 
         return self.db.query(SubMenuModel).filter(SubMenuModel.id == submenu_id).first()
+
+    def get_submenus(self, menu_id: str) -> list[dict]:
+        """Query to get list of all submenus."""
+
+        self.check_menu_id(menu_id=menu_id)
+
+        all_submenus = (self.db.query(
+            SubMenuModel,
+            func.count(distinct(DishModel.id)).label('dishes_count')
+        )
+            .join(DishModel, SubMenuModel.id == DishModel.submenu_id, isouter=True)
+            .group_by(SubMenuModel.id)
+            .filter(SubMenuModel.menu_id == menu_id)
+            .all()
+        )
+
+        if not all_submenus:
+            return []
+        result = []
+        for i in all_submenus:
+            submenu, count = i
+            result.append({
+                'title': submenu.title,
+                'description': submenu.description,
+                'id': submenu.id,
+                'dishes_count': count
+            })
+        return result
 
     def create_submenu(
         self,

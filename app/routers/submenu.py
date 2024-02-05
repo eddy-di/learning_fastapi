@@ -10,8 +10,7 @@ from app.models.submenu import SubMenu
 from app.schemas.submenu import SubMenu as SubMenuSchema
 from app.schemas.submenu import SubMenuCreate as SubMenuCreateSchema
 from app.schemas.submenu import SubMenuUpdate as SubMenuUpdateSchema
-from app.services.cache.submenu import SubMenuCacheCRUD, SubMenuCacheService
-from app.services.database.submenu import SubMenuCRUD, SubMenuService
+from app.services.api.submenu import SubMenuService
 
 submenu_router = APIRouter()
 
@@ -28,41 +27,7 @@ def get_submenus(
     cache: Redis = Depends(redis)
 ) -> list[SubMenu] | list[dict]:
     """GET operation for retrieving submenus related to a specific menu"""
-
-    if all_submenus := SubMenuCacheService(cache).get_submenus():
-        return all_submenus
-
-    result = SubMenuService(db).get_submenus()
-
-    SubMenuCacheService(cache).set_submenus(query_result=result)
-
-    return result
-
-
-@submenu_router.post(
-    SUBMENUS_LINK,
-    response_model=SubMenuSchema,
-    status_code=201,
-    tags=['Submenus'],
-    summary='Create a submenu'
-)
-def create_submenu(
-    target_menu_id: str,
-    submenu: SubMenuCreateSchema,
-    db: Session = Depends(get_db),
-    cache: Redis = Depends(redis)
-) -> SubMenu | HTTPException:
-    """POST operation for creating a new submenu for a specific menu"""
-
-    result = SubMenuCRUD(db).create_submenu(
-        submenu_schema=submenu,
-        menu_id=target_menu_id
-    )
-
-    SubMenuCacheCRUD(cache).set_submenu(query_result=result)
-
-    SubMenuCacheService(cache).invalidate_submenus(menu_id=target_menu_id)
-
+    result = SubMenuService(db, cache).get_submenus(menu_id=target_menu_id)
     return result
 
 
@@ -80,15 +45,33 @@ def get_submenu(
 ) -> SubMenu | HTTPException:
     """GET operation for retrieving a specific submenu of a specific menu"""
 
-    if target_submenu := SubMenuCacheCRUD(cache).get_submenu(submenu_id=target_submenu_id):
-        return target_submenu
-
-    result = SubMenuCRUD(db).get_submenu(
+    result = SubMenuService(db, cache).get_submenu(
         menu_id=target_menu_id,
         submenu_id=target_submenu_id
     )
 
-    SubMenuCacheCRUD(cache).set_submenu(query_result=result)
+    return result
+
+
+@submenu_router.post(
+    SUBMENUS_LINK,
+    response_model=SubMenuSchema,
+    status_code=201,
+    tags=['Submenus'],
+    summary='Create a submenu'
+)
+def create_submenu(
+    target_menu_id: str,
+    submenu_create_schema: SubMenuCreateSchema,
+    db: Session = Depends(get_db),
+    cache: Redis = Depends(redis)
+) -> SubMenu | HTTPException:
+    """POST operation for creating a new submenu for a specific menu"""
+
+    result = SubMenuService(db, cache).create_submenu(
+        menu_id=target_menu_id,
+        submenu_schema=submenu_create_schema
+    )
 
     return result
 
@@ -102,21 +85,17 @@ def get_submenu(
 def update_submenu(
     target_menu_id: str,
     target_submenu_id: str,
-    submenu_update: SubMenuUpdateSchema,
+    submenu_update_schema: SubMenuUpdateSchema,
     db: Session = Depends(get_db),
     cache: Redis = Depends(redis)
 ) -> SubMenu | HTTPException:
     """PATCH operation for updating a specific submenu of a specific menu"""
 
-    result = SubMenuCRUD(db).update_submenu(
-        submenu_schema=submenu_update,
+    result = SubMenuService(db, cache).update_submenu(
+        submenu_schema=submenu_update_schema,
         submenu_id=target_submenu_id,
         menu_id=target_menu_id
     )
-
-    SubMenuCacheCRUD(cache).set_submenu(query_result=result)
-
-    SubMenuCacheService(cache).invalidate_submenus(menu_id=target_menu_id)
 
     return result
 
@@ -135,13 +114,9 @@ def delete_submenu(
 ) -> JSONResponse:
     """DELETE operation for deleting a specific submenu of a specific menu"""
 
-    SubMenuCRUD(db).delete_submenu(
+    result = SubMenuService(db, cache).delete_submenu(
         menu_id=target_menu_id,
         submenu_id=target_submenu_id
     )
 
-    SubMenuCacheCRUD(cache).delete(submenu_id=target_submenu_id)
-
-    SubMenuCacheService(cache).invalidate_submenus(menu_id=target_menu_id)
-
-    return JSONResponse(status_code=200, content='submenu deleted')
+    return result
