@@ -3,11 +3,11 @@ from sqlalchemy.orm import Session
 
 
 class DBSessionContext:
-    """
-    Session of connection to database.
-    """
+    """Context for database session."""
 
-    def __init__(self, db: Session):
+    def __init__(self, db: Session) -> None:
+        """Initialization for session of connection to database."""
+
         self.db = db
 
 
@@ -20,7 +20,11 @@ class AppCRUD(DBSessionContext):
 
 
 class CacheSessionContext:
-    def __init__(self, cache: Redis):
+    """Context for cache database session."""
+
+    def __init__(self, cache: Redis) -> None:
+        """Initialization for session of connection to cache database."""
+
         self.cache = cache
 
 
