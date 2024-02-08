@@ -8,9 +8,7 @@ packages = [{include = "y_lab_menu"}]
 
 [tool.poetry.dependencies]
 python = "^3.11"
-fastapi = {extras = ["all"], version = "^0.109.0"}
 uvicorn = {extras = ["standard"], version = "^0.26.0"}
-sqlalchemy = "^2.0.25"
 psycopg2-binary = "^2.9.9"
 python-dotenv = "^1.0.0"
 httpx = "^0.26.0"
@@ -21,6 +19,8 @@ redis = {extras = ["hiredis"], version = "^5.0.1"}
 types-redis = "^4.6.0.20240106"
 stubs = "^1.0.0"
 loguru = "^0.7.2"
+fastapi = {extras = ["all"], version = "^0.109.2"}
+sqlalchemy = "^2.0.25"
 [tool.pytest.ini_options]
 testpaths = [
     "tests"

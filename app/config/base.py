@@ -4,6 +4,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+PREVIEW_LINK = '/api/v1'
 MENUS_LINK = '/api/v1/menus'
 MENU_LINK = '/api/v1/menus/{target_menu_id}'
 SUBMENUS_LINK = '/api/v1/menus/{target_menu_id}/submenus'

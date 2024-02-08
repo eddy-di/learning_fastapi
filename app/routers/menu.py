@@ -42,6 +42,7 @@ def get_menu(
     cache: Redis = Depends(redis)
 ) -> Menu | HTTPException:
     """GET operation for specific menu"""
+
     result = MenuService(db, cache).get_menu(menu_id=target_menu_id)
     return result
 
@@ -59,6 +60,7 @@ def create_menu(
     cache: Redis = Depends(redis)
 ) -> Menu:
     """POST operation for creating menu."""
+
     result = MenuService(db, cache).create_menu(menu_schema=menu_create_schema)
     return result
 
