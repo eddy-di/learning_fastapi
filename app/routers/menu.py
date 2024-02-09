@@ -36,14 +36,14 @@ def get_menus(
     tags=['Menus'],
     summary='Get specific menu'
 )
-def get_menu(
+async def get_menu(
     target_menu_id: str,
     db: Session = Depends(get_db),
     cache: Redis = Depends(redis)
 ) -> Menu | HTTPException:
     """GET operation for specific menu"""
 
-    result = MenuService(db, cache).get_menu(menu_id=target_menu_id)
+    result = await MenuService(db, cache).get_menu(menu_id=target_menu_id)
     return result
 
 
@@ -54,14 +54,14 @@ def get_menu(
     tags=['Menus'],
     summary='Create a menu'
 )
-def create_menu(
+async def create_menu(
     menu_create_schema: MenuCreateSchema,
     db: Session = Depends(get_db),
     cache: Redis = Depends(redis)
 ) -> Menu:
     """POST operation for creating menu."""
 
-    result = MenuService(db, cache).create_menu(menu_schema=menu_create_schema)
+    result = await MenuService(db, cache).create_menu(menu_schema=menu_create_schema)
     return result
 
 
@@ -71,7 +71,7 @@ def create_menu(
     tags=['Menus'],
     summary='Update specific menu'
 )
-def update_menu(
+async def update_menu(
     target_menu_id: str,
     menu_update_schema: MenuUpdateSchema,
     db: Session = Depends(get_db),
@@ -79,7 +79,7 @@ def update_menu(
 ) -> Menu | HTTPException:
     """PATCH operation for specific menu."""
 
-    result = MenuService(db, cache).update_menu(
+    result = await MenuService(db, cache).update_menu(
         menu_id=target_menu_id,
         menu_schema=menu_update_schema
     )
@@ -92,12 +92,12 @@ def update_menu(
     tags=['Menus'],
     summary='Delete specific menu',
 )
-def delete_menu(
+async def delete_menu(
     target_menu_id: str,
     db: Session = Depends(get_db),
     cache: Redis = Depends(redis)
 ) -> JSONResponse:
     """DELETE operation for specific menu."""
 
-    result = MenuService(db, cache).delete_menu(menu_id=target_menu_id)
+    result = await MenuService(db, cache).delete_menu(menu_id=target_menu_id)
     return result
