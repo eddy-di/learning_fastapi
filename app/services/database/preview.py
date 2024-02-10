@@ -1,7 +1,6 @@
-from sqlalchemy import Row
+from sqlalchemy import select
 from sqlalchemy.orm import selectinload
 
-from app.models.dish import Dish as DishModel
 from app.models.menu import Menu as MenuModel
 from app.models.submenu import SubMenu as SubMenuModel
 from app.services.main import DatabaseCRUD
@@ -10,7 +9,7 @@ from app.services.main import DatabaseCRUD
 class PreviewDatabase(DatabaseCRUD):
     """Service for querying all available objects in database."""
 
-    def get_all(self) -> list[Row[tuple[MenuModel, SubMenuModel, DishModel]]]:
+    async def get_all(self):
         """
         Returns result of a PostgreSQl query:
             SELECT
@@ -25,8 +24,8 @@ class PreviewDatabase(DatabaseCRUD):
                 dishes ON submenus.id = dishes.submenu_id;
         """
 
-        all = (
-            self.db.query(
+        all = await self.db.execute(
+            select(
                 MenuModel
             )
             .options(
@@ -38,7 +37,6 @@ class PreviewDatabase(DatabaseCRUD):
                 )
             )
             .order_by(MenuModel.id)
-            .all()
         )
 
-        return all
+        return all.all()

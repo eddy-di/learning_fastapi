@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session
 
 from app.config.base import MENU_LINK, MENUS_LINK
 from app.config.cache import create_redis as redis
-from app.config.database import get_db
+from app.config.database import get_async_db
 from app.models.menu import Menu
 from app.schemas.menu import Menu as MenuSchema
 from app.schemas.menu import MenuCreate as MenuCreateSchema
@@ -21,12 +21,13 @@ menu_router = APIRouter()
     tags=['Menus'],
     summary='Get all menus'
 )
-def get_menus(
-    db: Session = Depends(get_db),
+async def get_menus(
+    db: Session = Depends(get_async_db),
     cache: Redis = Depends(redis)
 ) -> list[Menu] | list[dict]:
     """GET endpoint for list of menus, and a count of related items in it."""
-    result = MenuService(db, cache).get_menus()
+
+    result = await MenuService(db, cache).get_menus()
     return result
 
 
@@ -38,7 +39,7 @@ def get_menus(
 )
 async def get_menu(
     target_menu_id: str,
-    db: Session = Depends(get_db),
+    db: Session = Depends(get_async_db),
     cache: Redis = Depends(redis)
 ) -> Menu | HTTPException:
     """GET operation for specific menu"""
@@ -56,7 +57,7 @@ async def get_menu(
 )
 async def create_menu(
     menu_create_schema: MenuCreateSchema,
-    db: Session = Depends(get_db),
+    db: Session = Depends(get_async_db),
     cache: Redis = Depends(redis)
 ) -> Menu:
     """POST operation for creating menu."""
@@ -74,7 +75,7 @@ async def create_menu(
 async def update_menu(
     target_menu_id: str,
     menu_update_schema: MenuUpdateSchema,
-    db: Session = Depends(get_db),
+    db: Session = Depends(get_async_db),
     cache: Redis = Depends(redis)
 ) -> Menu | HTTPException:
     """PATCH operation for specific menu."""
@@ -94,7 +95,7 @@ async def update_menu(
 )
 async def delete_menu(
     target_menu_id: str,
-    db: Session = Depends(get_db),
+    db: Session = Depends(get_async_db),
     cache: Redis = Depends(redis)
 ) -> JSONResponse:
     """DELETE operation for specific menu."""

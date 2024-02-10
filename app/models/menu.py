@@ -15,8 +15,16 @@ class Menu(Base):
     """
     __tablename__ = 'menus'
 
-    id = Column(String, primary_key=True, default=generate_uuid)
+    id = Column(
+        String,
+        primary_key=True,
+        default=generate_uuid
+    )
     title = Column(String)
     description = Column(String)
 
-    submenus: Mapped[list['SubMenu']] = relationship(back_populates='menu', cascade='all, delete-orphan')
+    submenus: Mapped[list['SubMenu']] = relationship(
+        back_populates='menu',
+        cascade='all, delete-orphan',
+        lazy='selectin'
+    )

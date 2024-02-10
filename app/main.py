@@ -1,6 +1,6 @@
 from fastapi import Depends, FastAPI
 
-from app.config.database import Base, engine, get_db
+from app.config.database import get_async_db
 from app.routers import dish, menu, preview, submenu
 
 description = """
@@ -21,7 +21,7 @@ app = FastAPI(
     title='Y-lab intensive course API',
     description=description,
     version='3.1.8',
-    dependencies=[Depends(get_db)],
+    dependencies=[Depends(get_async_db)],
     openapi_tags=[
         {
             'name': 'Preview',
@@ -41,8 +41,6 @@ app = FastAPI(
         }
     ]
 )
-
-Base.metadata.create_all(bind=engine)
 
 
 app.include_router(preview.main_router)

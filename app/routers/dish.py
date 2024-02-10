@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session
 
 from app.config.base import DISH_LINK, DISHES_LINK
 from app.config.cache import create_redis as redis
-from app.config.database import get_db
+from app.config.database import get_async_db
 from app.models.dish import Dish
 from app.schemas.dish import Dish as DishSchema
 from app.schemas.dish import DishCreate as DishCreateSchema
@@ -21,14 +21,15 @@ dish_router = APIRouter()
     tags=['Dishes'],
     summary='Get all dishes'
 )
-def get_dishes(
+async def get_dishes(
     target_menu_id: str,
     target_submenu_id: str,
-    db: Session = Depends(get_db),
+    db: Session = Depends(get_async_db),
     cache: Redis = Depends(redis)
 ) -> list[Dish]:
     """GET operation for retrieving list of dishes related to a specific submenu."""
-    result = DishService(db, cache).get_dishes(
+
+    result = await DishService(db, cache).get_dishes(
         submenu_id=target_submenu_id
     )
     return result
@@ -40,16 +41,16 @@ def get_dishes(
     tags=['Dishes'],
     summary='Get specific dish'
 )
-def get_dish(
+async def get_dish(
     target_menu_id: str,
     target_submenu_id: str,
     target_dish_id: str,
-    db: Session = Depends(get_db),
+    db: Session = Depends(get_async_db),
     cache: Redis = Depends(redis)
 ) -> Dish | HTTPException:
     """GET operation for retrieving a specific dish of a specific submenu."""
 
-    result = DishService(db, cache).get_dish(
+    result = await DishService(db, cache).get_dish(
         menu_id=target_menu_id,
         submenu_id=target_submenu_id,
         dish_id=target_dish_id
@@ -64,16 +65,16 @@ def get_dish(
     tags=['Dishes'],
     summary='Create a dish'
 )
-def create_dish(
+async def create_dish(
     target_menu_id: str,
     target_submenu_id: str,
     dish_create_schema: DishCreateSchema,
-    db: Session = Depends(get_db),
+    db: Session = Depends(get_async_db),
     cache: Redis = Depends(redis)
 ) -> Dish:
     """POST operation for creating a new dish under a specific submenu."""
 
-    result = DishService(db, cache).create_dish(
+    result = await DishService(db, cache).create_dish(
         menu_id=target_menu_id,
         submenu_id=target_submenu_id,
         dish_schema=dish_create_schema
@@ -87,17 +88,17 @@ def create_dish(
     tags=['Dishes'],
     summary='Update specific dish'
 )
-def update_dish(
+async def update_dish(
     target_menu_id: str,
     target_submenu_id: str,
     target_dish_id: str,
     dish_update_schema: DishUpdateSchema,
-    db: Session = Depends(get_db),
+    db: Session = Depends(get_async_db),
     cache: Redis = Depends(redis)
 ) -> Dish | HTTPException:
     """PATCH operation for updating a specific dish of a specific submenu."""
 
-    result = DishService(db, cache).update_dish(
+    result = await DishService(db, cache).update_dish(
         menu_id=target_menu_id,
         submenu_id=target_submenu_id,
         dish_id=target_dish_id,
@@ -113,16 +114,16 @@ def update_dish(
     tags=['Dishes'],
     summary='Delete specific dish'
 )
-def delete_dish(
+async def delete_dish(
     target_menu_id: str,
     target_submenu_id: str,
     target_dish_id: str,
-    db: Session = Depends(get_db),
+    db: Session = Depends(get_async_db),
     cache: Redis = Depends(redis)
 ) -> JSONResponse:
     """DELETE operation for deleting a specific dish of a specific submenu."""
 
-    result = DishService(db, cache).delete_dish(
+    result = await DishService(db, cache).delete_dish(
         menu_id=target_menu_id,
         submenu_id=target_submenu_id,
         dish_id=target_dish_id

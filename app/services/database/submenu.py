@@ -1,5 +1,5 @@
 from fastapi import HTTPException
-from sqlalchemy import distinct, func
+from sqlalchemy import distinct, func, select
 from sqlalchemy.orm import selectinload
 
 from app.models.dish import Dish as DishModel
@@ -19,33 +19,52 @@ def not_found_exception() -> HTTPException:
 class SubMenuCRUD(DatabaseCRUD):
     """Service for querying specific submenu."""
 
-    def check_menu_id(self, menu_id: str) -> HTTPException | None:
+    async def check_menu_id(self, menu_id: str) -> HTTPException | None:
         """Check if menu id given in endpoint is correct and exists."""
 
-        res = self.db.query(MenuModel).filter(MenuModel.id == menu_id).first()
+        res = await self.db.execute(
+            select(
+                MenuModel
+            )
+            .where(MenuModel.id == menu_id)
+        )
+
+        res = res.scalar()
+
         if not res:
             return no_menu()
         return None
 
-    def fetch_menus_submenu(self, submenu_id: str) -> SubMenuModel | None:
+    async def fetch_menus_submenu(self, submenu_id: str) -> SubMenuModel | None:
         """Fetching specific submenu by its id for furter operations."""
 
-        return self.db.query(SubMenuModel).filter(SubMenuModel.id == submenu_id).first()
+        query = await self.db.execute(
+            select(
+                SubMenuModel
+            )
+            .where(SubMenuModel.id == submenu_id)
+        )
 
-    def get_submenus(self, menu_id: str) -> list[dict]:
+        query = query.scalar()
+
+        return query
+
+    async def get_submenus(self, menu_id: str) -> list[dict]:
         """Query to get list of all submenus."""
 
-        self.check_menu_id(menu_id=menu_id)
+        await self.check_menu_id(menu_id=menu_id)
 
-        all_submenus = (self.db.query(
-            SubMenuModel,
-            func.count(distinct(DishModel.id)).label('dishes_count')
-        )
+        all_submenus = await self.db.execute(
+            select(
+                SubMenuModel,
+                func.count(distinct(DishModel.id)).label('dishes_count')
+            )
             .join(DishModel, SubMenuModel.id == DishModel.submenu_id, isouter=True)
             .group_by(SubMenuModel.id)
-            .filter(SubMenuModel.menu_id == menu_id)
-            .all()
+            .where(SubMenuModel.menu_id == menu_id)
         )
+
+        all_submenus = all_submenus.all()
 
         if not all_submenus:
             return []
@@ -60,14 +79,14 @@ class SubMenuCRUD(DatabaseCRUD):
             })
         return result
 
-    def create_submenu(
+    async def create_submenu(
         self,
         submenu_schema: SubMenuCreate,
         menu_id: str
     ) -> SubMenuModel | HTTPException:
         """Create submenu instance in database."""
 
-        self.check_menu_id(menu_id)
+        await self.check_menu_id(menu_id)
 
         new_submenu = SubMenuModel(
             title=submenu_schema.title,
@@ -75,41 +94,52 @@ class SubMenuCRUD(DatabaseCRUD):
             menu_id=menu_id
         )
         self.db.add(new_submenu)
-        self.db.commit()
-        self.db.refresh(new_submenu)
+
+        await self.db.commit()
+        await self.db.refresh(new_submenu)
         return new_submenu
 
-    def get_submenu(
+    async def get_submenu(
         self,
         menu_id: str,
         submenu_id: str
     ) -> SubMenuModel | HTTPException:
         """Get specific submenu from database."""
 
-        self.check_menu_id(menu_id=menu_id)
+        await self.check_menu_id(menu_id=menu_id)
 
-        submenu_with_counter = (
-            self.db.query(SubMenuModel)
-            .filter(SubMenuModel.id == submenu_id)
-            .options(
-                selectinload(SubMenuModel.dishes)
-            ).first()
+        submenu_with_counter = await (
+            self.db.execute(
+                select(
+                    SubMenuModel
+                )
+                .where(SubMenuModel.id == submenu_id)
+                .options(
+                    selectinload(SubMenuModel.dishes)
+                )
+            )
         )
+
+        submenu_with_counter = submenu_with_counter.scalar()
 
         if not submenu_with_counter:
             return not_found_exception()
 
-        submenu_with_counter.dishes_count = (
-            self.db.query(
-                func.count(DishModel.id)
-            ).join(SubMenuModel)
-            .filter(SubMenuModel.id == submenu_with_counter.id)
-            .scalar()
+        submenu_with_counter.dishes_count = await (
+            self.db.execute(
+                select(
+                    func.count(DishModel.id)
+                )
+                .join(SubMenuModel)
+                .where(SubMenuModel.id == submenu_with_counter.id)
+            )
         )
+
+        submenu_with_counter = submenu_with_counter.scalar()
 
         return submenu_with_counter
 
-    def update_submenu(
+    async def update_submenu(
         self,
         submenu_schema: SubMenuUpdate,
         menu_id: str,
@@ -117,32 +147,34 @@ class SubMenuCRUD(DatabaseCRUD):
     ) -> SubMenuModel | HTTPException:
         """Update specific submenu in database."""
 
-        self.check_menu_id(menu_id)
+        await self.check_menu_id(menu_id)
 
-        target_submenu_for_update = self.fetch_menus_submenu(submenu_id=submenu_id)
+        target_submenu_for_update = await self.fetch_menus_submenu(submenu_id=submenu_id)
 
         if not target_submenu_for_update:
             return not_found_exception()
 
         for key, value in submenu_schema.model_dump(exclude_unset=True).items():
             setattr(target_submenu_for_update, key, value)
-        self.db.commit()
-        self.db.refresh(target_submenu_for_update)
+
+        await self.db.commit()
+        await self.db.refresh(target_submenu_for_update)
         return target_submenu_for_update
 
-    def delete_submenu(
+    async def delete_submenu(
         self,
         menu_id: str,
         submenu_id: str
     ) -> None | HTTPException:
         """Delete specific menu in database."""
 
-        self.check_menu_id(menu_id)
+        await self.check_menu_id(menu_id)
 
-        target_submenu_for_delete = self.fetch_menus_submenu(submenu_id=submenu_id)
+        target_submenu_for_delete = await self.fetch_menus_submenu(submenu_id=submenu_id)
 
         if not target_submenu_for_delete:
             return not_found_exception()
-        self.db.delete(target_submenu_for_delete)
-        self.db.commit()
+
+        await self.db.delete(target_submenu_for_delete)
+        await self.db.commit()
         return None

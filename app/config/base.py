@@ -23,4 +23,7 @@ REDIS_HOST = os.getenv('REDIS_HOST')
 REDIS_PORT = os.getenv('REDIS_PORT')
 
 
-db_url = f'postgresql://{POSTGRES_USER}:{POSTGRES_PASSWORD}@{POSTGRES_SERVER}:{POSTGRES_PORT}/{POSTGRES_DB}'
+db_url = (
+    f'postgresql+asyncpg://{POSTGRES_USER}:{POSTGRES_PASSWORD}'
+    f'@{POSTGRES_SERVER}:{POSTGRES_PORT}/{POSTGRES_DB}'
+)

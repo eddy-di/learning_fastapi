@@ -6,13 +6,13 @@ from app.services.main import AppService
 
 class PreviewService(AppService):
 
-    def get_all(self) -> list[Menu]:
+    async def get_all(self) -> list[Menu]:
 
-        if everything := PreviewCache(self.cache).get_all():
+        if everything := await PreviewCache(self.cache).get_all():
             return everything
 
-        result = PreviewDatabase(self.db).get_all()
+        result = await PreviewDatabase(self.db).get_all()
 
-        PreviewCache(self.cache).set_all(query_result=result)
+        await PreviewCache(self.cache).set_all(query_result=result)
 
         return result

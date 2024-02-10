@@ -1,6 +1,6 @@
 from openpyxl import Workbook, load_workbook
 
-wb = load_workbook(filename='/app/admin/Menu.xlsx')
+wb = load_workbook(filename='/app/admin/Menu.xlsx')  # need to double check if everything is good
 
 sheet = wb['Лист1']
 

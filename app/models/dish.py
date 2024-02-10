@@ -19,11 +19,24 @@ class Dish(Base):
     """
     __tablename__ = 'dishes'
 
-    id = Column(String, primary_key=True, default=generate_uuid)
+    id = Column(
+        String,
+        primary_key=True,
+        default=generate_uuid
+    )
     title = Column(String)
     description = Column(String)
     price = Column(DECIMAL(precision=10, scale=2))
     discount = Column(Integer, default=0)
 
-    submenu_id = Column(String, ForeignKey('submenus.id', ondelete='CASCADE'))
-    submenu: Mapped['SubMenu'] = relationship(back_populates='dishes')
+    submenu_id = Column(
+        String,
+        ForeignKey(
+            'submenus.id',
+            ondelete='CASCADE'
+        )
+    )
+    submenu: Mapped['SubMenu'] = relationship(
+        back_populates='dishes',
+        # lazy='selectin'
+    )
