@@ -60,9 +60,20 @@ class MenuCRUD(DatabaseCRUD):
             )
         )
 
-        menus = menus.scalars().fetchall()
+        all_data = menus.all()
 
-        return menus
+        result = []
+        for i in all_data:
+            menu, submenus_count, dishes_count = i
+            result.append({
+                'title': menu.title,
+                'description': menu.description,
+                'id': menu.id,
+                'submenus_count': submenus_count,
+                'dishes_count': dishes_count
+            })
+
+        return result
 
     async def create_menu(self, menu_schema: MenuCreate) -> MenuModel:
         """Create menu instance in database."""
