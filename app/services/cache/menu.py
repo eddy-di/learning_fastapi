@@ -19,7 +19,7 @@ class MenuCacheCRUD(CacheCRUD):
     async def get_preview(self) -> list[Row[tuple[Menu, SubMenu, Dish]]] | None:
         """Checks if the `everything` key is present/existent in cache db."""
 
-        if everything := self.cache.get('menus_preview'):
+        if everything := await self.cache.get('menus_preview'):
             return pickle.loads(everything)
         return None
 
@@ -29,19 +29,19 @@ class MenuCacheCRUD(CacheCRUD):
     ) -> None:
         """Sets the key `evertyhing` in cache db."""
 
-        self.cache.set('menus_preview', pickle.dumps(query_result))
+        await self.cache.set('menus_preview', pickle.dumps(query_result))
 
     async def get_menus(self) -> list[Menu] | None:
         """Returns cached list of all menus if available in cache."""
 
-        if all_menus := self.cache.get('all_menus'):
+        if all_menus := await self.cache.get('all_menus'):
             return pickle.loads(all_menus)
         return None
 
     async def set_menus(self, query_result: list[dict]) -> None:
         """Sets into cache memory SQLAlchemy query result for getting list of all menus."""
 
-        self.cache.set('all_menus', pickle.dumps(query_result))
+        await self.cache.set('all_menus', pickle.dumps(query_result))
 
     async def invalidate_menus(self) -> None:
         """
@@ -49,7 +49,7 @@ class MenuCacheCRUD(CacheCRUD):
         Made to correctly store valid information at the time PostgreSQL database changes are made.
         """
 
-        self.cache.delete(
+        await self.cache.delete(
             'all_menus',
             'menus_preview'
         )
@@ -57,7 +57,7 @@ class MenuCacheCRUD(CacheCRUD):
     async def get_menu(self, menu_id: str) -> Menu | None:
         """Returns cached menu instance if available."""
 
-        if target_menu := self.cache.get(f'menu_id_{menu_id}'):
+        if target_menu := await self.cache.get(f'menu_id_{menu_id}'):
             return pickle.loads(target_menu)
         return None
 
@@ -65,9 +65,9 @@ class MenuCacheCRUD(CacheCRUD):
         """Sets into cache memory SQLAlchemy query result for getting, creating or updating menu instance."""
 
         serialized_menu = MenuSchema.model_validate(query_result)
-        self.cache.set(f'menu_id_{query_result.id}', pickle.dumps(serialized_menu))
+        await self.cache.set(f'menu_id_{query_result.id}', pickle.dumps(serialized_menu))
 
     async def delete(self, menu_id: str) -> None:
         """Deletes from cache specific menu instance by its key."""
 
-        self.cache.delete(f'menu_id_{menu_id}')
+        await self.cache.delete(f'menu_id_{menu_id}')

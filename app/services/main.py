@@ -1,4 +1,4 @@
-from redis import Redis
+from redis.asyncio import Redis
 from sqlalchemy.orm import Session
 
 

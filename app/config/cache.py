@@ -1,9 +1,9 @@
-import redis
+import redis.asyncio as redis
 
 from app.config.base import REDIS_HOST, REDIS_PORT
 
 
 async def create_redis():
     '''Connect to Redis database, using host and port variables from `.env`'''
-
-    return redis.Redis(host=REDIS_HOST, port=REDIS_PORT, db=0)
+    async with redis.Redis(host=REDIS_HOST, port=REDIS_PORT, db=0) as session:
+        yield session

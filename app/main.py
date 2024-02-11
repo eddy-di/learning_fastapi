@@ -21,7 +21,7 @@ app = FastAPI(
     title='Y-lab intensive course API',
     description=description,
     version='3.1.8',
-    dependencies=[Depends(get_async_db)],
+    dependencies=[Depends(get_async_db), ],
     openapi_tags=[
         {
             'name': 'Menus',

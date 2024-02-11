@@ -1,4 +1,4 @@
-from sqlalchemy.ext.asyncio import AsyncConnection, AsyncSession, create_async_engine
+from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import declarative_base, sessionmaker
 
 from app.config.base import db_url
@@ -22,13 +22,3 @@ async def get_async_db():
     # """
     async with AsyncSessionLocal() as session:
         yield session
-
-# for tests
-
-
-async def create_all(connection: AsyncConnection):
-    await connection.run_sync(Base.metadata.create_all)
-
-
-async def drop_all(connection: AsyncConnection):
-    await connection.run_sync(Base.metadata.drop_all)
