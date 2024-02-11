@@ -99,11 +99,6 @@ async def scenario_client(scenario_session):
         yield client
 
 
-async def drop_tables():
-    async with async_engine.begin() as conn:
-        await conn.run_sync(Base.metadata.drop_all)
-
-
 @pytest_asyncio.fixture(scope='function')
 async def create_menu(async_session: AsyncSession):
     db_menu_item = Menu(

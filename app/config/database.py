@@ -25,11 +25,5 @@ async def get_async_db():
     # """
     # Creates a database session and closes it after finishing.
     # """
-    async with AsyncSessionLocal.begin() as session:
-        try:
-            yield session
-        except Exception:
-            await session.rollback()
-            raise
-        finally:
-            await session.close()
+    async with AsyncSessionLocal() as session:
+        yield session
