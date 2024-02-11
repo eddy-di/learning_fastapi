@@ -100,7 +100,7 @@ class SubMenuCRUD(DatabaseCRUD):
 
         await self.check_menu_id(menu_id=menu_id)
 
-        submenu_with_counter = await (
+        target_submenu_query = await (
             self.db.execute(
                 select(
                     SubMenuModel
@@ -112,24 +112,24 @@ class SubMenuCRUD(DatabaseCRUD):
             )
         )
 
-        submenu_with_counter = submenu_with_counter.scalar()
+        target_submenu = target_submenu_query.scalar()
 
-        if not submenu_with_counter:
+        if not target_submenu:
             return not_found_exception()
 
-        submenu_with_counter.dishes_count = await (
+        dishes_count_query = await (
             self.db.execute(
                 select(
                     func.count(DishModel.id)
                 )
                 .join(SubMenuModel)
-                .where(SubMenuModel.id == submenu_with_counter.id)
+                .where(SubMenuModel.id == submenu_id)
             )
         )
 
-        submenu_with_counter = submenu_with_counter.scalar()
+        target_submenu.dishes_count = dishes_count_query.scalar()
 
-        return submenu_with_counter
+        return target_submenu
 
     async def update_submenu(
         self,

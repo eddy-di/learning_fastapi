@@ -80,7 +80,7 @@ class MenuCRUD(DatabaseCRUD):
     async def get_menu(self, menu_id: str) -> MenuModel | HTTPException:
         """Get specific menu from database."""
 
-        target_menu_from_db = await (
+        target_menu_query = await (
             self.db.execute(
                 select(
                     MenuModel
@@ -95,35 +95,34 @@ class MenuCRUD(DatabaseCRUD):
             )
         )
 
-        target_menu_from_db = target_menu_from_db.scalar()
+        target_menu = target_menu_query.scalar()
 
-        if not target_menu_from_db:
+        if not target_menu:
             return not_found_exception()
 
-        target_menu_from_db.submenus_count = await (
+        submenus_count_query = await (
             self.db.execute(
                 select(
                     func.count(SubMenuModel.id)
                 )
-                .where(SubMenuModel.menu_id == target_menu_from_db.id)
+                .where(SubMenuModel.menu_id == menu_id)
             )
         )
 
-        target_menu_from_db = target_menu_from_db.scalar()
-
-        target_menu_from_db.dishes_count = await (
+        dishes_count_query = await (
             self.db.execute(
                 select(
                     func.count(DishModel.id)
                 )
                 .join(SubMenuModel)
-                .where(SubMenuModel.menu_id == target_menu_from_db.id)
+                .where(SubMenuModel.menu_id == menu_id)
             )
         )
 
-        target_menu_from_db = target_menu_from_db.scalar()
+        target_menu.submenus_count = submenus_count_query.scalar()
+        target_menu.dishes_count = dishes_count_query.scalar()
 
-        return target_menu_from_db
+        return target_menu
 
     async def update_menu(
         self,
