@@ -36,7 +36,8 @@ class DishCacheCRUD(CacheCRUD):
             f'submenu_id_{submenu_id}',
             'all_submenus',
             'all_menus',
-            'all_dishes'
+            'all_dishes',
+            'menus_preview'
         )
 
     async def get_dish(self, dish_id) -> Dish | None:

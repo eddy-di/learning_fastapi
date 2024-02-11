@@ -34,7 +34,8 @@ class SubMenuCacheCRUD(CacheCRUD):
         self.cache.delete(
             f'menu_id_{menu_id}',
             'all_submenus',
-            'all_menus'
+            'all_menus',
+            'menus_preview'
         )
 
     async def get_submenu(self, submenu_id: str) -> SubMenu | None:

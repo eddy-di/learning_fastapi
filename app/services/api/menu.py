@@ -14,12 +14,12 @@ class MenuService(AppService):
 
     async def get_preview(self) -> list[Menu]:
 
-        # if everything := await MenuCacheCRUD(self.cache).get_preview():
-        # return everything
+        if everything := await MenuCacheCRUD(self.cache).get_preview():
+            return everything
 
         result = await MenuCRUD(self.db).get_preview()
 
-        # await MenuCacheCRUD(self.cache).set_preview(query_result=result)
+        await MenuCacheCRUD(self.cache).set_preview(query_result=result)
 
         return result
 

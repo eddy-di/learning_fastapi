@@ -10,7 +10,7 @@ from app.models.menu import Menu
 from app.schemas.menu import Menu as MenuSchema
 from app.schemas.menu import MenuCreate as MenuCreateSchema
 from app.schemas.menu import MenuUpdate as MenuUpdateSchema
-from app.schemas.menu_with_children import MenuPreview
+from app.schemas.menu_preview import MenuPreview
 from app.services.api.menu import MenuService
 
 menu_router = APIRouter()
