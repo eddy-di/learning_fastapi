@@ -18,8 +18,8 @@ class MenuService(AppService):
             return everything
 
         result = await MenuCRUD(self.db).get_preview()
-
-        await MenuCacheCRUD(self.cache).set_preview(query_result=result)
+        self.tasks.add_task(MenuCacheCRUD(self.cache).set_preview, result)
+        # await MenuCacheCRUD(self.cache).set_preview(query_result=result)
 
         return result
 
@@ -30,8 +30,9 @@ class MenuService(AppService):
             return all_menus
 
         result = await MenuCRUD(self.db).get_menus()
+        self.tasks.add_task(MenuCacheCRUD(self.cache).set_menus, result)
 
-        await MenuCacheCRUD(self.cache).set_menus(query_result=result)
+        # await MenuCacheCRUD(self.cache).set_menus(query_result=result)
 
         return result
 
@@ -41,8 +42,8 @@ class MenuService(AppService):
             return target_menu
 
         result = await MenuCRUD(self.db).get_menu(menu_id=menu_id)
-
-        await MenuCacheCRUD(self.cache).set_menu(query_result=result)
+        self.tasks.add_task(MenuCacheCRUD(self.cache).set_menu, result)
+        # await MenuCacheCRUD(self.cache).set_menu(query_result=result)
 
         return result
 
@@ -53,10 +54,10 @@ class MenuService(AppService):
         """POST operation for creating menu."""
 
         result = await MenuCRUD(self.db).create_menu(menu_schema=menu_schema)
-
-        await MenuCacheCRUD(self.cache).set_menu(query_result=result)
-
-        await MenuCacheCRUD(self.cache).invalidate_menus()
+        self.tasks.add_task(MenuCacheCRUD(self.cache).set_menu, result)
+        self.tasks.add_task(MenuCacheCRUD(self.cache).invalidate_menus)
+        # await MenuCacheCRUD(self.cache).set_menu(query_result=result)
+        # await MenuCacheCRUD(self.cache).invalidate_menus()
 
         return result
 
@@ -71,10 +72,10 @@ class MenuService(AppService):
             menu_id=menu_id,
             menu_schema=menu_schema
         )
-
-        await MenuCacheCRUD(self.cache).set_menu(query_result=result)
-
-        await MenuCacheCRUD(self.cache).invalidate_menus()
+        self.tasks.add_task(MenuCacheCRUD(self.cache).set_menu, result)
+        self.tasks.add_task(MenuCacheCRUD(self.cache).invalidate_menus)
+        # await MenuCacheCRUD(self.cache).set_menu(query_result=result)
+        # await MenuCacheCRUD(self.cache).invalidate_menus()
 
         return result
 
@@ -85,9 +86,9 @@ class MenuService(AppService):
         """DELETE operation for specific menu."""
 
         await MenuCRUD(self.db).delete_menu(menu_id=menu_id)
-
-        await MenuCacheCRUD(self.cache).delete(menu_id=menu_id)
-
-        await MenuCacheCRUD(self.cache).invalidate_menus()
+        self.tasks.add_task(MenuCacheCRUD(self.cache).delete, menu_id)
+        self.tasks.add_task(MenuCacheCRUD(self.cache).invalidate_menus)
+        # await MenuCacheCRUD(self.cache).delete(menu_id=menu_id)
+        # await MenuCacheCRUD(self.cache).invalidate_menus()
 
         return JSONResponse(status_code=200, content='menu deleted')

@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException
 from fastapi.responses import JSONResponse
 from redis.asyncio import Redis
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -22,6 +22,7 @@ dish_router = APIRouter()
     summary='Get all dishes'
 )
 async def get_dishes(
+    tasks: BackgroundTasks,
     target_menu_id: str,
     target_submenu_id: str,
     db: AsyncSession = Depends(get_async_db),
@@ -29,7 +30,7 @@ async def get_dishes(
 ) -> list[Dish]:
     """GET operation for retrieving list of dishes related to a specific submenu."""
 
-    result = await DishService(db, cache).get_dishes(
+    result = await DishService(db, cache, tasks).get_dishes(
         submenu_id=target_submenu_id
     )
     return result
@@ -42,6 +43,7 @@ async def get_dishes(
     summary='Get specific dish'
 )
 async def get_dish(
+    tasks: BackgroundTasks,
     target_menu_id: str,
     target_submenu_id: str,
     target_dish_id: str,
@@ -50,7 +52,7 @@ async def get_dish(
 ) -> Dish | HTTPException:
     """GET operation for retrieving a specific dish of a specific submenu."""
 
-    result = await DishService(db, cache).get_dish(
+    result = await DishService(db, cache, tasks).get_dish(
         menu_id=target_menu_id,
         submenu_id=target_submenu_id,
         dish_id=target_dish_id
@@ -66,6 +68,7 @@ async def get_dish(
     summary='Create a dish'
 )
 async def create_dish(
+    tasks: BackgroundTasks,
     target_menu_id: str,
     target_submenu_id: str,
     dish_create_schema: DishCreateSchema,
@@ -74,7 +77,7 @@ async def create_dish(
 ) -> Dish:
     """POST operation for creating a new dish under a specific submenu."""
 
-    result = await DishService(db, cache).create_dish(
+    result = await DishService(db, cache, tasks).create_dish(
         menu_id=target_menu_id,
         submenu_id=target_submenu_id,
         dish_schema=dish_create_schema
@@ -89,6 +92,7 @@ async def create_dish(
     summary='Update specific dish'
 )
 async def update_dish(
+    tasks: BackgroundTasks,
     target_menu_id: str,
     target_submenu_id: str,
     target_dish_id: str,
@@ -98,7 +102,7 @@ async def update_dish(
 ) -> Dish | HTTPException:
     """PATCH operation for updating a specific dish of a specific submenu."""
 
-    result = await DishService(db, cache).update_dish(
+    result = await DishService(db, cache, tasks).update_dish(
         menu_id=target_menu_id,
         submenu_id=target_submenu_id,
         dish_id=target_dish_id,
@@ -115,6 +119,7 @@ async def update_dish(
     summary='Delete specific dish'
 )
 async def delete_dish(
+    tasks: BackgroundTasks,
     target_menu_id: str,
     target_submenu_id: str,
     target_dish_id: str,
@@ -123,7 +128,7 @@ async def delete_dish(
 ) -> JSONResponse:
     """DELETE operation for deleting a specific dish of a specific submenu."""
 
-    result = await DishService(db, cache).delete_dish(
+    result = await DishService(db, cache, tasks).delete_dish(
         menu_id=target_menu_id,
         submenu_id=target_submenu_id,
         dish_id=target_dish_id

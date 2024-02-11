@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException
 from fastapi.responses import JSONResponse
 from redis.asyncio import Redis
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -22,13 +22,14 @@ submenu_router = APIRouter()
     summary='Get all submenus'
 )
 async def get_submenus(
+    tasks: BackgroundTasks,
     target_menu_id: str,
     db: AsyncSession = Depends(get_async_db),
     cache: Redis = Depends(redis)
 ) -> list[SubMenu] | list[dict]:
     """GET operation for retrieving submenus related to a specific menu."""
 
-    result = await SubMenuService(db, cache).get_submenus(menu_id=target_menu_id)
+    result = await SubMenuService(db, cache, tasks).get_submenus(menu_id=target_menu_id)
     return result
 
 
@@ -39,6 +40,7 @@ async def get_submenus(
     summary='Get specific submenu'
 )
 async def get_submenu(
+    tasks: BackgroundTasks,
     target_menu_id: str,
     target_submenu_id: str,
     db: AsyncSession = Depends(get_async_db),
@@ -46,7 +48,7 @@ async def get_submenu(
 ) -> SubMenu | HTTPException:
     """GET operation for retrieving a specific submenu of a specific menu."""
 
-    result = await SubMenuService(db, cache).get_submenu(
+    result = await SubMenuService(db, cache, tasks).get_submenu(
         menu_id=target_menu_id,
         submenu_id=target_submenu_id
     )
@@ -62,6 +64,7 @@ async def get_submenu(
     summary='Create a submenu'
 )
 async def create_submenu(
+    tasks: BackgroundTasks,
     target_menu_id: str,
     submenu_create_schema: SubMenuCreateSchema,
     db: AsyncSession = Depends(get_async_db),
@@ -69,7 +72,7 @@ async def create_submenu(
 ) -> SubMenu | HTTPException:
     """POST operation for creating a new submenu for a specific menu."""
 
-    result = await SubMenuService(db, cache).create_submenu(
+    result = await SubMenuService(db, cache, tasks).create_submenu(
         menu_id=target_menu_id,
         submenu_schema=submenu_create_schema
     )
@@ -84,6 +87,7 @@ async def create_submenu(
     summary='Update specific submenu'
 )
 async def update_submenu(
+    tasks: BackgroundTasks,
     target_menu_id: str,
     target_submenu_id: str,
     submenu_update_schema: SubMenuUpdateSchema,
@@ -92,7 +96,7 @@ async def update_submenu(
 ) -> SubMenu | HTTPException:
     """PATCH operation for updating a specific submenu of a specific menu."""
 
-    result = await SubMenuService(db, cache).update_submenu(
+    result = await SubMenuService(db, cache, tasks).update_submenu(
         menu_id=target_menu_id,
         submenu_id=target_submenu_id,
         submenu_schema=submenu_update_schema,
@@ -108,6 +112,7 @@ async def update_submenu(
     summary='Delete specific submenu'
 )
 async def delete_submenu(
+    tasks: BackgroundTasks,
     target_menu_id: str,
     target_submenu_id: str,
     db: AsyncSession = Depends(get_async_db),
@@ -115,7 +120,7 @@ async def delete_submenu(
 ) -> JSONResponse:
     """DELETE operation for deleting a specific submenu of a specific menu."""
 
-    result = await SubMenuService(db, cache).delete_submenu(
+    result = await SubMenuService(db, cache, tasks).delete_submenu(
         menu_id=target_menu_id,
         submenu_id=target_submenu_id
     )

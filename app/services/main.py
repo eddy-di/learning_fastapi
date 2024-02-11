@@ -1,3 +1,4 @@
+from fastapi import BackgroundTasks
 from redis.asyncio import Redis
 from sqlalchemy.orm import Session
 
@@ -5,11 +6,12 @@ from sqlalchemy.orm import Session
 class ServiceSessionContext:
     """Context for database session and redis."""
 
-    def __init__(self, db: Session, cache: Redis) -> None:
+    def __init__(self, db: Session, cache: Redis, tasks: BackgroundTasks) -> None:
         """Initialization for session of connection to database and redis."""
 
         self.db = db
         self.cache = cache
+        self.tasks = tasks
 
 
 class AppService(ServiceSessionContext):

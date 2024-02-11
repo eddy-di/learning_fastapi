@@ -19,8 +19,8 @@ class SubMenuService(AppService):
             return all_submenus
 
         result = await SubMenuCRUD(self.db).get_submenus(menu_id=menu_id)
-
-        await SubMenuCacheCRUD(self.cache).set_submenus(query_result=result)
+        self.tasks.add_task(SubMenuCacheCRUD(self.cache).set_submenus, result)
+        # await SubMenuCacheCRUD(self.cache).set_submenus(query_result=result)
 
         return result
 
@@ -38,8 +38,8 @@ class SubMenuService(AppService):
             menu_id=menu_id,
             submenu_id=submenu_id
         )
-
-        await SubMenuCacheCRUD(self.cache).set_submenu(query_result=result)
+        self.tasks.add_task(SubMenuCacheCRUD(self.cache).set_submenu, result)
+        # await SubMenuCacheCRUD(self.cache).set_submenu(query_result=result)
 
         return result
 
@@ -54,9 +54,10 @@ class SubMenuService(AppService):
             menu_id=menu_id,
             submenu_schema=submenu_schema,
         )
-
-        await SubMenuCacheCRUD(self.cache).set_submenu(query_result=result)
-        await SubMenuCacheCRUD(self.cache).invalidate_submenus(menu_id=menu_id)
+        self.tasks.add_task(SubMenuCacheCRUD(self.cache).set_submenu, result)
+        self.tasks.add_task(SubMenuCacheCRUD(self.cache).invalidate_submenus, menu_id)
+        # await SubMenuCacheCRUD(self.cache).set_submenu(query_result=result)
+        # await SubMenuCacheCRUD(self.cache).invalidate_submenus(menu_id=menu_id)
 
         return result
 
@@ -73,9 +74,10 @@ class SubMenuService(AppService):
             submenu_id=submenu_id,
             menu_id=menu_id
         )
-
-        await SubMenuCacheCRUD(self.cache).set_submenu(query_result=result)
-        await SubMenuCacheCRUD(self.cache).invalidate_submenus(menu_id=menu_id)
+        self.tasks.add_task(SubMenuCacheCRUD(self.cache).set_submenu, result)
+        self.tasks.add_task(SubMenuCacheCRUD(self.cache).invalidate_submenus, menu_id)
+        # await SubMenuCacheCRUD(self.cache).set_submenu(query_result=result)
+        # await SubMenuCacheCRUD(self.cache).invalidate_submenus(menu_id=menu_id)
 
         return result
 
@@ -90,8 +92,9 @@ class SubMenuService(AppService):
             menu_id=menu_id,
             submenu_id=submenu_id
         )
-
-        await SubMenuCacheCRUD(self.cache).delete(submenu_id=submenu_id)
-        await SubMenuCacheCRUD(self.cache).invalidate_submenus(menu_id=menu_id)
+        self.tasks.add_task(SubMenuCacheCRUD(self.cache).delete, submenu_id)
+        self.tasks.add_task(SubMenuCacheCRUD(self.cache).invalidate_submenus, menu_id)
+        # await SubMenuCacheCRUD(self.cache).delete(submenu_id=submenu_id)
+        # await SubMenuCacheCRUD(self.cache).invalidate_submenus(menu_id=menu_id)
 
         return JSONResponse(status_code=200, content='submenu deleted')
