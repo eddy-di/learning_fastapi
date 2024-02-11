@@ -75,7 +75,7 @@ class DishCRUD(DatabaseCRUD):
             .filter(DishModel.submenu_id == submenu_id)
         )
 
-        return result.all()
+        return result.scalars().fetchall()
 
     async def create_dish(
         self,
