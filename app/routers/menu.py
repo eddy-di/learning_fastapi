@@ -28,7 +28,7 @@ async def get_menus_preview(
 ):
     """GET endpoint to show all objects that are stored in database."""
 
-    result = await MenuService(db, cache).get_all()
+    result = await MenuService(db, cache).get_preview()
     return result
 
 

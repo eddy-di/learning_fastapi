@@ -16,14 +16,14 @@ class MenuCacheCRUD(CacheCRUD):
     Avaiable methods: `get_menu`, `set_menu`, `delete`.
     """
 
-    async def get_all(self) -> list[Row[tuple[Menu, SubMenu, Dish]]] | None:
+    async def get_preview(self) -> list[Row[tuple[Menu, SubMenu, Dish]]] | None:
         """Checks if the `everything` key is present/existent in cache db."""
 
         if everything := self.cache.get('everything'):
             return pickle.loads(everything)
         return None
 
-    async def set_all(
+    async def set_preview(
         self,
         query_result: list[Row[tuple[Menu, SubMenu, Dish]]]
     ) -> None:
@@ -31,7 +31,7 @@ class MenuCacheCRUD(CacheCRUD):
 
         self.cache.set('everything', pickle.dumps(query_result))
 
-    async def invalidate_all(self):
+    async def invalidate_preview(self):
         """Executes flushdb command to delete all keys in database without completely killing database"""
 
         self.cache.flushdb()

@@ -18,7 +18,7 @@ def not_found_exception() -> HTTPException:
 class MenuCRUD(DatabaseCRUD):
     """Service for querying specific menu."""
 
-    async def get_all(self):
+    async def get_preview(self):
         """
         Returns result of a PostgreSQl query:
             SELECT

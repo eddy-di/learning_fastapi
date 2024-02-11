@@ -12,14 +12,14 @@ from app.services.main import AppService
 class MenuService(AppService):
     """Service for querying the menu data from database and cache."""
 
-    async def get_all(self) -> list[Menu]:
+    async def get_preview(self) -> list[Menu]:
 
-        if everything := await MenuCacheCRUD(self.cache).get_all():
-            return everything
+        # if everything := await MenuCacheCRUD(self.cache).get_preview():
+        # return everything
 
-        result = await MenuCRUD(self.db).get_all()
+        result = await MenuCRUD(self.db).get_preview()
 
-        await MenuCacheCRUD(self.cache).set_all(query_result=result)
+        # await MenuCacheCRUD(self.cache).set_preview(query_result=result)
 
         return result
 
