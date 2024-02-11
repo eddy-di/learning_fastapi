@@ -1,7 +1,7 @@
 from fastapi import Depends, FastAPI
 
-from app.config.database import get_async_db
-from app.routers import dish, menu, preview, submenu
+from app.config.database import get_async_db, init_db
+from app.routers import dish, menu, submenu
 
 description = """
 # Menu management applications API
@@ -24,10 +24,6 @@ app = FastAPI(
     dependencies=[Depends(get_async_db)],
     openapi_tags=[
         {
-            'name': 'Preview',
-            'description': 'GET opreation for getting all objects'
-        },
-        {
             'name': 'Menus',
             'description': 'Operations for menus'
         },
@@ -39,11 +35,14 @@ app = FastAPI(
             'name': 'Dishes',
             'description': 'Operations for dishes'
         }
-    ]
+    ],
 )
 
 
-app.include_router(preview.main_router)
+@app.on_event('startup')
+async def on_startup():
+    await init_db()
+
 app.include_router(menu.menu_router)
 app.include_router(submenu.submenu_router)
 app.include_router(dish.dish_router)

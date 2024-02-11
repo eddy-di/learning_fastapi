@@ -34,7 +34,7 @@ class SubMenu(Base):
     )
     menu: Mapped['Menu'] = relationship(
         back_populates='submenus',
-        # lazy='selectin'
+        lazy='selectin'
     )
 
     dishes: Mapped[list['Dish']] = relationship(

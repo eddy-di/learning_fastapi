@@ -64,20 +64,12 @@ class SubMenuCRUD(DatabaseCRUD):
             .where(SubMenuModel.menu_id == menu_id)
         )
 
-        all_submenus = all_submenus.all()
+        all_submenus = all_submenus.scalars().fetchall()
 
         if not all_submenus:
             return []
-        result = []
-        for i in all_submenus:
-            submenu, count = i
-            result.append({
-                'title': submenu.title,
-                'description': submenu.description,
-                'id': submenu.id,
-                'dishes_count': count
-            })
-        return result
+
+        return all_submenus
 
     async def create_submenu(
         self,

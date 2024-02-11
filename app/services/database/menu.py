@@ -18,6 +18,32 @@ def not_found_exception() -> HTTPException:
 class MenuCRUD(DatabaseCRUD):
     """Service for querying specific menu."""
 
+    async def get_all(self):
+        """
+        Returns result of a PostgreSQl query:
+            SELECT
+                menus.*,
+                submenus.*,
+                dishes.*
+            FROM
+                menus
+            LEFT JOIN
+                submenus ON menus.id = submenus.menu_id
+            LEFT JOIN
+                dishes ON submenus.id = dishes.submenu_id;
+        """
+
+        query = (
+            select(MenuModel)
+            .outerjoin(SubMenuModel, MenuModel.id == SubMenuModel.menu_id)
+            .outerjoin(DishModel, SubMenuModel.id == DishModel.submenu_id)
+        )
+        result = await self.db.execute(query)
+
+        all_data = result.scalars().fetchall()
+
+        return all_data
+
     async def get_menus(self) -> list[dict]:
         """Query to get list of all menus."""
 
@@ -34,20 +60,9 @@ class MenuCRUD(DatabaseCRUD):
             )
         )
 
-        menus = menus.all()
+        menus = menus.scalars().fetchall()
 
-        result = []
-        for i in menus:
-            menu, submenus_count, dishes_count = i
-            result.append({
-                'id': menu.id,
-                'title': menu.title,
-                'description': menu.description,
-                'submenus_count': submenus_count,
-                'dishes_count': dishes_count
-            })
-
-        return result
+        return menus
 
     async def create_menu(self, menu_schema: MenuCreate) -> MenuModel:
         """Create menu instance in database."""

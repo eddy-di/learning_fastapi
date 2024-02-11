@@ -1,18 +1,35 @@
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi.responses import JSONResponse
 from redis import Redis
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.config.base import MENU_LINK, MENUS_LINK
+from app.config.base import ALL_MENUS, MENU_LINK, MENUS_LINK
 from app.config.cache import create_redis as redis
 from app.config.database import get_async_db
 from app.models.menu import Menu
 from app.schemas.menu import Menu as MenuSchema
 from app.schemas.menu import MenuCreate as MenuCreateSchema
 from app.schemas.menu import MenuUpdate as MenuUpdateSchema
+from app.schemas.menu_with_children import MenuPreview
 from app.services.api.menu import MenuService
 
 menu_router = APIRouter()
+
+
+@menu_router.get(
+    ALL_MENUS,
+    response_model=list[MenuPreview],
+    tags=['Menus'],
+    summary='Get all objects without counters'
+)
+async def get_menus_preview(
+    db: AsyncSession = Depends(get_async_db),
+    cache: Redis = Depends(redis)
+):
+    """GET endpoint to show all objects that are stored in database."""
+
+    result = await MenuService(db, cache).get_all()
+    return result
 
 
 @menu_router.get(
@@ -22,7 +39,7 @@ menu_router = APIRouter()
     summary='Get all menus'
 )
 async def get_menus(
-    db: Session = Depends(get_async_db),
+    db: AsyncSession = Depends(get_async_db),
     cache: Redis = Depends(redis)
 ) -> list[Menu] | list[dict]:
     """GET endpoint for list of menus, and a count of related items in it."""
@@ -39,7 +56,7 @@ async def get_menus(
 )
 async def get_menu(
     target_menu_id: str,
-    db: Session = Depends(get_async_db),
+    db: AsyncSession = Depends(get_async_db),
     cache: Redis = Depends(redis)
 ) -> Menu | HTTPException:
     """GET operation for specific menu"""
@@ -57,7 +74,7 @@ async def get_menu(
 )
 async def create_menu(
     menu_create_schema: MenuCreateSchema,
-    db: Session = Depends(get_async_db),
+    db: AsyncSession = Depends(get_async_db),
     cache: Redis = Depends(redis)
 ) -> Menu:
     """POST operation for creating menu."""
@@ -75,7 +92,7 @@ async def create_menu(
 async def update_menu(
     target_menu_id: str,
     menu_update_schema: MenuUpdateSchema,
-    db: Session = Depends(get_async_db),
+    db: AsyncSession = Depends(get_async_db),
     cache: Redis = Depends(redis)
 ) -> Menu | HTTPException:
     """PATCH operation for specific menu."""
@@ -95,7 +112,7 @@ async def update_menu(
 )
 async def delete_menu(
     target_menu_id: str,
-    db: Session = Depends(get_async_db),
+    db: AsyncSession = Depends(get_async_db),
     cache: Redis = Depends(redis)
 ) -> JSONResponse:
     """DELETE operation for specific menu."""

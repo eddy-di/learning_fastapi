@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi.responses import JSONResponse
 from redis import Redis
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.config.base import DISH_LINK, DISHES_LINK
 from app.config.cache import create_redis as redis
@@ -24,7 +24,7 @@ dish_router = APIRouter()
 async def get_dishes(
     target_menu_id: str,
     target_submenu_id: str,
-    db: Session = Depends(get_async_db),
+    db: AsyncSession = Depends(get_async_db),
     cache: Redis = Depends(redis)
 ) -> list[Dish]:
     """GET operation for retrieving list of dishes related to a specific submenu."""
@@ -45,7 +45,7 @@ async def get_dish(
     target_menu_id: str,
     target_submenu_id: str,
     target_dish_id: str,
-    db: Session = Depends(get_async_db),
+    db: AsyncSession = Depends(get_async_db),
     cache: Redis = Depends(redis)
 ) -> Dish | HTTPException:
     """GET operation for retrieving a specific dish of a specific submenu."""
@@ -69,7 +69,7 @@ async def create_dish(
     target_menu_id: str,
     target_submenu_id: str,
     dish_create_schema: DishCreateSchema,
-    db: Session = Depends(get_async_db),
+    db: AsyncSession = Depends(get_async_db),
     cache: Redis = Depends(redis)
 ) -> Dish:
     """POST operation for creating a new dish under a specific submenu."""
@@ -93,7 +93,7 @@ async def update_dish(
     target_submenu_id: str,
     target_dish_id: str,
     dish_update_schema: DishUpdateSchema,
-    db: Session = Depends(get_async_db),
+    db: AsyncSession = Depends(get_async_db),
     cache: Redis = Depends(redis)
 ) -> Dish | HTTPException:
     """PATCH operation for updating a specific dish of a specific submenu."""
@@ -118,7 +118,7 @@ async def delete_dish(
     target_menu_id: str,
     target_submenu_id: str,
     target_dish_id: str,
-    db: Session = Depends(get_async_db),
+    db: AsyncSession = Depends(get_async_db),
     cache: Redis = Depends(redis)
 ) -> JSONResponse:
     """DELETE operation for deleting a specific dish of a specific submenu."""

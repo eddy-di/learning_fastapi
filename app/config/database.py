@@ -20,23 +20,8 @@ async def get_async_db():
     # """
     # Creates a database session and closes it after finishing,
     # """
-
-    # if AsyncSessionLocal is None:
-    # raise Exception(
-    # 'Database session manager `AsyncSessionLocal` is not initialized.'
-    # )
-
     async with AsyncSessionLocal() as session:
         yield session
-
-    # try:
-        # db = AsyncSessionLocal()
-        # yield db
-        # await db.commit()
-    # except Exception:
-        # await db.rollback()
-    # finally:
-        # await db.close()
 
 # for tests
 

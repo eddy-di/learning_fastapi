@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi.responses import JSONResponse
 from redis import Redis
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.config.base import SUBMENU_LINK, SUBMENUS_LINK
 from app.config.cache import create_redis as redis
@@ -23,7 +23,7 @@ submenu_router = APIRouter()
 )
 async def get_submenus(
     target_menu_id: str,
-    db: Session = Depends(get_async_db),
+    db: AsyncSession = Depends(get_async_db),
     cache: Redis = Depends(redis)
 ) -> list[SubMenu] | list[dict]:
     """GET operation for retrieving submenus related to a specific menu."""
@@ -41,7 +41,7 @@ async def get_submenus(
 async def get_submenu(
     target_menu_id: str,
     target_submenu_id: str,
-    db: Session = Depends(get_async_db),
+    db: AsyncSession = Depends(get_async_db),
     cache: Redis = Depends(redis)
 ) -> SubMenu | HTTPException:
     """GET operation for retrieving a specific submenu of a specific menu."""
@@ -64,7 +64,7 @@ async def get_submenu(
 async def create_submenu(
     target_menu_id: str,
     submenu_create_schema: SubMenuCreateSchema,
-    db: Session = Depends(get_async_db),
+    db: AsyncSession = Depends(get_async_db),
     cache: Redis = Depends(redis)
 ) -> SubMenu | HTTPException:
     """POST operation for creating a new submenu for a specific menu."""
@@ -87,7 +87,7 @@ async def update_submenu(
     target_menu_id: str,
     target_submenu_id: str,
     submenu_update_schema: SubMenuUpdateSchema,
-    db: Session = Depends(get_async_db),
+    db: AsyncSession = Depends(get_async_db),
     cache: Redis = Depends(redis)
 ) -> SubMenu | HTTPException:
     """PATCH operation for updating a specific submenu of a specific menu."""
@@ -110,7 +110,7 @@ async def update_submenu(
 async def delete_submenu(
     target_menu_id: str,
     target_submenu_id: str,
-    db: Session = Depends(get_async_db),
+    db: AsyncSession = Depends(get_async_db),
     cache: Redis = Depends(redis)
 ) -> JSONResponse:
     """DELETE operation for deleting a specific submenu of a specific menu."""
