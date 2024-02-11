@@ -1,41 +1,44 @@
-from sqlalchemy.ext.asyncio import (
-    AsyncConnection,
-    async_sessionmaker,
-    create_async_engine,
-)
-from sqlalchemy.orm import declarative_base
+from sqlalchemy.ext.asyncio import AsyncConnection, AsyncSession, create_async_engine
+from sqlalchemy.orm import declarative_base, sessionmaker
 
 from app.config.base import db_url
 
 async_engine = create_async_engine(db_url)
 
-AsyncSessionLocal = async_sessionmaker(autocommit=False, autoflush=False, expire_on_commit=False, bind=async_engine)
+AsyncSessionLocal = sessionmaker(autoflush=False, autocommit=False, class_=AsyncSession,
+                                 expire_on_commit=False, bind=async_engine)
 
 Base = declarative_base()
 
 
-async def get_async_db():
-    """
-    Creates a database session and closes it after finishing,
-    if exception comes out executes `rollback()` method and returns None.
-    """
-
+async def init_db():
     async with async_engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
 
-    if AsyncSessionLocal is None:
-        raise Exception(
-            'Database session manager `AsyncSessionLocal` is not initialized.'
-        )
 
-    try:
-        db = AsyncSessionLocal()
-        yield db
-        db.commit()
-    except Exception:
-        await db.rollback()
-    finally:
-        db.close()
+async def get_async_db():
+    # """
+    # Creates a database session and closes it after finishing,
+    # """
+
+    # if AsyncSessionLocal is None:
+    # raise Exception(
+    # 'Database session manager `AsyncSessionLocal` is not initialized.'
+    # )
+
+    async with AsyncSessionLocal() as session:
+        yield session
+
+    # try:
+        # db = AsyncSessionLocal()
+        # yield db
+        # await db.commit()
+    # except Exception:
+        # await db.rollback()
+    # finally:
+        # await db.close()
+
+# for tests
 
 
 async def create_all(connection: AsyncConnection):
