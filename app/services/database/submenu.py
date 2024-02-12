@@ -93,7 +93,8 @@ class SubMenuCRUD(DatabaseCRUD):
             new_submenu = SubMenuModel(
                 id=submenu_schema.id,
                 title=submenu_schema.title,
-                description=submenu_schema.description
+                description=submenu_schema.description,
+                menu_id=menu_id
             )
         else:
             new_submenu = SubMenuModel(
