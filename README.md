@@ -1,4 +1,4 @@
-# Домашнее задание 3
+# Домашнее задание 4
 
 Этот git-репозиторий создан исключительно для выполнения требований для прохождения стажировки в компании Y-Lab. Более подробная информация предназначена для модераторов, которые собираются ее протестировать.
 
@@ -67,12 +67,12 @@ docker-compose -f docker-compose-tests.yaml up -d; docker logs --follow test_web
 6. Юнит тесты проверяющие CRUD эндпоинтов по блюдам доступны [тут](https://github.com/eddy-di/learning_fastapi/blob/main/tests/test_dish_crud.py).
 
 
-## 4. Путь к сложному ORM запросу
+## 4. Путь к сложному ORM запросу (устарело см. пункт 6 ДЗ 4)
 
 1. Можете увидеть выполнение SQLAlchemy ORM запроса по [этой ссылке](https://github.com/eddy-di/learning_fastapi/blob/469fca66b163d470eb87ff92a5537a41f532781f/app/services/database/menu.py#L24).
 2. В переменной `menus` хранится ORM запрос к базе данных. Начало 25 линия, конец 33.
 
-## 5. Пункты 3 Домашнего задания
+## 5. Пункты 3 Домашнего задания (устарело см. пункт 6 ДЗ 4)
 
 1. Вынести бизнес логику и запросы в отдельные слои приложения:
     - бизнес логика доступна по пути [`.app/services/api`](https://github.com/eddy-di/learning_fastapi/tree/main/app/services/api),
@@ -91,5 +91,12 @@ docker-compose -f docker-compose-tests.yaml up -d; docker logs --follow test_web
 
 6. Добавлена функция [`reverse()`](https://github.com/eddy-di/learning_fastapi/blob/895b422e3cf234199f8bfd745feceaba9bd34eeb/app/utils/pathfinder.py#L15), используется в тестах pytest, [пример](https://github.com/eddy-di/learning_fastapi/blob/5794d5241c145fe9e5a3152010c3814227e9a37a/tests/test_case4_counters.py#L26).
 
+## 6 Пункты 4 Домашнего задания
 
+1. Переход от синхронного к асинхронному при соединении к базе данных и кэшу, а также слой бизнес логики асинхронен.
+2. Добавление фоновых задач с проверками и перепроверками доступны [тут](app/celery/).
+3. Добавлен новый эндпоинт с выводом всех имеющихся объектов в базе данных [тут](https://github.com/eddy-di/learning_fastapi/blob/0500f4a186e400fc4ac3843a54defbabc97e24f3/app/routers/menu.py#L25).
+4. Реализация кеша через встроенный BackgroundTasks присутствует, и полностью используется по всему файлу по этому [пути](app/services/api/). Во всех файлах моделей можно увидеть, [пример](https://github.com/eddy-di/learning_fastapi/blob/0500f4a186e400fc4ac3843a54defbabc97e24f3/app/services/api/dish.py#L27).
+5. Обновление происходит не из GoogleSheets а из Menu.xlsx из папке [/app/admin/Menu.xlsx](app/admin/Menu.xlsx).
+6. Пока что не было времени протестровать, но есть момент отвечающий за то как парсинг с экселя [считывает скидку](https://github.com/eddy-di/learning_fastapi/blob/0500f4a186e400fc4ac3843a54defbabc97e24f3/app/celery/helpers/parser.py#L53), что в дальнейшем идет на валидацию со схем [тут](https://github.com/eddy-di/learning_fastapi/blob/0500f4a186e400fc4ac3843a54defbabc97e24f3/app/schemas/dish.py#L45).
 ---

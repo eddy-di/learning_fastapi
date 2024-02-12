@@ -88,12 +88,22 @@ class DishCRUD(DatabaseCRUD):
         await self.check_menu_id(menu_id=menu_id)
         await self.check_submenu_id(submenu_id=submenu_id)
 
-        new_dish = DishModel(
-            title=dish_schema.title,
-            description=dish_schema.description,
-            price=dish_schema.price,
-            submenu_id=submenu_id
-        )
+        if dish_schema.id:
+            new_dish = DishModel(
+                id=dish_schema.id,
+                title=dish_schema.title,
+                description=dish_schema.description,
+                price=dish_schema.price,
+                submenu_id=submenu_id
+            )
+        else:
+            new_dish = DishModel(
+                title=dish_schema.title,
+                description=dish_schema.description,
+                price=dish_schema.price,
+                submenu_id=submenu_id
+            )
+
         self.db.add(new_dish)
 
         await self.db.commit()
