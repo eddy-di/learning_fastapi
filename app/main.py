@@ -43,7 +43,7 @@ app = FastAPI(
 
 @app.on_event('startup')
 async def on_startup():
-    await init_db
+    await init_db()
 
     update_db_menu.delay()
 

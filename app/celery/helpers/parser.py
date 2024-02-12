@@ -23,16 +23,15 @@ class ExcelSheetParser:
         """
 
         menus: list[dict] = []
-        submenus: list[dict] = []
         for row in self.sheet.iter_rows(min_col=0, max_col=7, values_only=True):
 
             if row[0]:
-                menu_id, title, description, submenus = row[0], row[1], row[2], []
+                menu_id, title, description = row[0], row[1], row[2]
                 menu_dict = {
                     'id': menu_id,
                     'title': title,
                     'description': description,
-                    'submenus': submenus
+                    'submenus': []
                 }
                 menus.append(menu_dict)
                 self.menus.append(menu_dict)
@@ -46,7 +45,7 @@ class ExcelSheetParser:
                     'menu_id': sub_menu_id,
                     'dishes': []
                 }
-                submenus.append(sub_menu_dict)
+                menus[-1]['submenus'].append(sub_menu_dict)
                 self.submenus.append(sub_menu_dict)
 
             elif row[0] is None and row[1] is None and row[2]:
@@ -62,12 +61,7 @@ class ExcelSheetParser:
                     'discount': d_discount,
                     'submenu_id': sub_menu_dict['id']
                 }
-                submenus[-1]['dishes'].append(dish_dict)
+                menus[-1]['submenus'][-1]['dishes'].append(dish_dict)
                 self.dishes.append(dish_dict)
-
-        for i in range(len(menus)):
-            for j in range(len(submenus)):
-                if menus[i]['id'] == submenus[j]['menu_id']:
-                    menus[i]['submenus'].append(submenus[j])
 
         return menus

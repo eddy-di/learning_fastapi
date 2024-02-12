@@ -4,6 +4,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+SERVER_URL = 'http://web:8000'
 ALL_MENUS = '/api/v1/menus/preview'
 MENUS_LINK = '/api/v1/menus'
 MENU_LINK = '/api/v1/menus/{target_menu_id}'
