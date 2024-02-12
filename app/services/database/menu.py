@@ -77,11 +77,18 @@ class MenuCRUD(DatabaseCRUD):
 
     async def create_menu(self, menu_schema: MenuCreate) -> MenuModel:
         """Create menu instance in database."""
+        if menu_schema.id:
+            new_menu = MenuModel(
+                id=menu_schema.id,
+                title=menu_schema.title,
+                description=menu_schema.description
+            )
+        else:
+            new_menu = MenuModel(
+                title=menu_schema.title,
+                description=menu_schema.description
+            )
 
-        new_menu = MenuModel(
-            title=menu_schema.title,
-            description=menu_schema.description
-        )
         self.db.add(new_menu)
 
         await self.db.commit()

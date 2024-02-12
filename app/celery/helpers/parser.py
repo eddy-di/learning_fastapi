@@ -1,19 +1,21 @@
 from openpyxl import Workbook, load_workbook
 from openpyxl.worksheet.worksheet import Worksheet
 
-from app.config.base import FILE_PATH, SHEET_NAME
 
+class ExcelSheetParser:
+    menus: list[dict] = []
+    submenus: list[dict] = []
+    dishes: list[dict] = []
+    preview_results: list[dict] = []
 
-class ExcelSheetParse:
-    def __init__(self):
-        self.file: Workbook = load_workbook(filename=FILE_PATH)
-        self.sheet: Worksheet = self.file[SHEET_NAME]
-        self.preview_results: list[dict] = self.get_preview_result()
-        self.menus: list[dict] = []
-        self.submenus: list[dict] = []
-        self.dishes: list[dict] = []
+    file: Workbook = None
+    sheet: Worksheet = None
 
-    def get_preview_result(self):
+    def __init__(self, filename: str, sheet_name: str):
+        self.file: Workbook = load_workbook(filename=filename)
+        self.sheet: Worksheet = self.file[sheet_name]
+
+    def parse(self):
         """
         Parsing of the Menu.xlsx file to python list of dictionaries
         that fully represent the menu, submenu and dish structure.

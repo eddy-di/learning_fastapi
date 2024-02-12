@@ -1,13 +1,10 @@
 import requests
 
 from app.config.base import ALL_MENUS, MENU_LINK, MENUS_LINK
-from app.services.tasks.parse import ExcelSheetParse
-
-parsed_menus = ExcelSheetParse().menus
 
 
 class UpdateMenu:
-    def __init__(self, data: list[dict] = parsed_menus):
+    def __init__(self, data: list[dict]):
         self.data = data
 
     def get_menus_preview_db(self):
@@ -34,10 +31,10 @@ class UpdateMenu:
             }
             requests.post(url, json=new_menu_data)
 
-    def get_menu(self, menu_instance: dict):
-        url = MENU_LINK.format(target_menu_id=menu_instance['id'])
-        response = requests.get(url)
-        return response
+    # def get_menu(self, menu_instance: dict):
+        # url = MENU_LINK.format(target_menu_id=menu_instance['id'])
+        # response = requests.get(url)
+        # return response
 
     def patch_menu(self, menu_instance: dict):
         url = MENU_LINK.format(target_menu_id=menu_instance['id'])
@@ -47,8 +44,8 @@ class UpdateMenu:
         }
         requests.patch(url, json=data)
 
-    def check_all_menus(self, parsed_data: list[dict]):
-        excel_data = parsed_data
+    def check_all_menus(self):
+        excel_data = self.data
         db_data = self.get_menus_db()
         # if there are no menu objects in db
         if db_data == []:

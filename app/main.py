@@ -1,5 +1,6 @@
 from fastapi import Depends, FastAPI
 
+from app.celery.tasks import update_db_menu
 from app.config.database import get_async_db, init_db
 from app.routers import dish, menu, submenu
 
@@ -42,7 +43,10 @@ app = FastAPI(
 
 @app.on_event('startup')
 async def on_startup():
-    await init_db()
+    await init_db
+
+    update_db_menu.delay()
+
 
 app.include_router(menu.menu_router)
 app.include_router(submenu.submenu_router)
