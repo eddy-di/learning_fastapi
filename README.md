@@ -91,5 +91,9 @@ docker-compose -f docker-compose-tests.yaml up -d; docker logs --follow test_web
 
 6. Добавлена функция [`reverse()`](https://github.com/eddy-di/learning_fastapi/blob/895b422e3cf234199f8bfd745feceaba9bd34eeb/app/utils/pathfinder.py#L15), используется в тестах pytest, [пример](https://github.com/eddy-di/learning_fastapi/blob/5794d5241c145fe9e5a3152010c3814227e9a37a/tests/test_case4_counters.py#L26).
 
+## 6 Пункты ДЗ 4
 
+1. Переход от синхронного к асинхронному при соединении к базе данных и кэшу, а также слой бизнес логики асинхронен.
+2. Добавление фоновых задач с проверками и перепроверками доступны [тут](app/celery/).
+3. Добавлено новый эндпоинт с выводом всех имеющихся объектов в базе данных.
 ---

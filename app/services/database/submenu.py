@@ -89,11 +89,18 @@ class SubMenuCRUD(DatabaseCRUD):
 
         await self.check_menu_id(menu_id)
 
-        new_submenu = SubMenuModel(
-            title=submenu_schema.title,
-            description=submenu_schema.description,
-            menu_id=menu_id
-        )
+        if submenu_schema.id:
+            new_submenu = SubMenuModel(
+                id=submenu_schema.id,
+                title=submenu_schema.title,
+                description=submenu_schema.description
+            )
+        else:
+            new_submenu = SubMenuModel(
+                title=submenu_schema.title,
+                description=submenu_schema.description,
+                menu_id=menu_id
+            )
         self.db.add(new_submenu)
 
         await self.db.commit()

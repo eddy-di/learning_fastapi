@@ -23,7 +23,7 @@ class DishCreate(DishBase):
 
     """Dish create schema, iherits `DishBase`"""
 
-    pass
+    id: str | None
 
 
 class DishUpdate(DishBase):
