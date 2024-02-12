@@ -1,5 +1,5 @@
 from fastapi import HTTPException
-from sqlalchemy import distinct, func
+from sqlalchemy import distinct, func, select
 from sqlalchemy.orm import selectinload
 
 from app.models.dish import Dish as DishModel
@@ -18,23 +18,52 @@ def not_found_exception() -> HTTPException:
 class MenuCRUD(DatabaseCRUD):
     """Service for querying specific menu."""
 
-    def get_menus(self) -> list[dict]:
+    async def get_preview(self):
+        """
+        Returns result of a PostgreSQl query:
+            SELECT
+                menus.*,
+                submenus.*,
+                dishes.*
+            FROM
+                menus
+            LEFT JOIN
+                submenus ON menus.id = submenus.menu_id
+            LEFT JOIN
+                dishes ON submenus.id = dishes.submenu_id;
+        """
+
+        query = (
+            select(MenuModel)
+            .outerjoin(SubMenuModel, MenuModel.id == SubMenuModel.menu_id)
+            .outerjoin(DishModel, SubMenuModel.id == DishModel.submenu_id)
+        )
+        result = await self.db.execute(query)
+
+        all_data = result.scalars().fetchall()
+
+        return all_data
+
+    async def get_menus(self) -> list[dict]:
         """Query to get list of all menus."""
 
-        menus = (
-            self.db.query(
-                MenuModel,
-                func.count(distinct(SubMenuModel.id)).label('submenus_count'),
-                func.count(distinct(DishModel.id)).label('dishes_count'),
+        menus = await (
+            self.db.execute(
+                select(
+                    MenuModel,
+                    func.count(distinct(SubMenuModel.id)).label('submenus_count'),
+                    func.count(distinct(DishModel.id)).label('dishes_count'),
+                )
+                .join(SubMenuModel, MenuModel.id == SubMenuModel.menu_id, isouter=True)
+                .join(DishModel, SubMenuModel.id == DishModel.submenu_id, isouter=True)
+                .group_by(MenuModel.id, MenuModel.title, MenuModel.description)
             )
-            .join(SubMenuModel, MenuModel.id == SubMenuModel.menu_id, isouter=True)
-            .join(DishModel, SubMenuModel.id == DishModel.submenu_id, isouter=True)
-            .group_by(MenuModel.id, MenuModel.title, MenuModel.description)
-            .all()
         )
 
+        all_data = menus.all()
+
         result = []
-        for i in menus:
+        for i in all_data:
             menu, submenus_count, dishes_count = i
             result.append({
                 'title': menu.title,
@@ -46,80 +75,113 @@ class MenuCRUD(DatabaseCRUD):
 
         return result
 
-    def create_menu(self, menu_schema: MenuCreate) -> MenuModel:
+    async def create_menu(self, menu_schema: MenuCreate) -> MenuModel:
         """Create menu instance in database."""
+        if menu_schema.id:
+            new_menu = MenuModel(
+                id=menu_schema.id,
+                title=menu_schema.title,
+                description=menu_schema.description
+            )
+        else:
+            new_menu = MenuModel(
+                title=menu_schema.title,
+                description=menu_schema.description
+            )
 
-        new_menu = MenuModel(
-            title=menu_schema.title,
-            description=menu_schema.description
-        )
         self.db.add(new_menu)
-        self.db.commit()
-        self.db.refresh(new_menu)
+
+        await self.db.commit()
+        await self.db.refresh(new_menu)
         return new_menu
 
-    def get_menu(self, menu_id: str) -> MenuModel | HTTPException:
+    async def get_menu(self, menu_id: str) -> MenuModel | HTTPException:
         """Get specific menu from database."""
 
-        target_menu_from_db = (
-            self.db.query(MenuModel)
-            .filter(MenuModel.id == menu_id)
-            .options(
-                selectinload(MenuModel.submenus)
+        target_menu_query = await (
+            self.db.execute(
+                select(
+                    MenuModel
+                )
+                .where(MenuModel.id == menu_id)
                 .options(
-                    selectinload(SubMenuModel.dishes)
+                    selectinload(MenuModel.submenus)
+                    .options(
+                        selectinload(SubMenuModel.dishes)
+                    )
                 )
             )
-            .first()
         )
 
-        if not target_menu_from_db:
+        target_menu = target_menu_query.scalar()
+
+        if not target_menu:
             return not_found_exception()
 
-        target_menu_from_db.submenus_count = (
-            self.db.query(
-                func.count(SubMenuModel.id)
+        submenus_count_query = await (
+            self.db.execute(
+                select(
+                    func.count(SubMenuModel.id)
+                )
+                .where(SubMenuModel.menu_id == menu_id)
             )
-            .filter(SubMenuModel.menu_id == target_menu_from_db.id)
-            .scalar()
         )
 
-        target_menu_from_db.dishes_count = (
-            self.db.query(
-                func.count(DishModel.id)
+        dishes_count_query = await (
+            self.db.execute(
+                select(
+                    func.count(DishModel.id)
+                )
+                .join(SubMenuModel)
+                .where(SubMenuModel.menu_id == menu_id)
             )
-            .join(SubMenuModel)
-            .filter(SubMenuModel.menu_id == target_menu_from_db.id)
-            .scalar()
         )
 
-        return target_menu_from_db
+        target_menu.submenus_count = submenus_count_query.scalar()
+        target_menu.dishes_count = dishes_count_query.scalar()
 
-    def update_menu(
+        return target_menu
+
+    async def update_menu(
         self,
         menu_id: str,
         menu_schema: MenuUpdate
     ) -> MenuModel | HTTPException:
         """Update specific menu in database."""
 
-        target_menu_from_db = self.db.query(MenuModel).filter(MenuModel.id == menu_id).first()
+        target_menu_from_db = await self.db.execute(
+            select(
+                MenuModel
+            )
+            .where(MenuModel.id == menu_id)
+        )
+
+        target_menu_from_db = target_menu_from_db.scalar()
 
         if not target_menu_from_db:
             return not_found_exception()
+
         for key, value in menu_schema.model_dump(exclude_unset=True).items():
             setattr(target_menu_from_db, key, value)
-        self.db.commit()
-        self.db.refresh(target_menu_from_db)
+        await self.db.commit()
+        await self.db.refresh(target_menu_from_db)
         return target_menu_from_db
 
-    def delete_menu(self, menu_id: str) -> None | HTTPException:
+    async def delete_menu(self, menu_id: str) -> None | HTTPException:
         """Delete specific menu in database."""
 
-        target_menu_from_db = self.db.query(MenuModel).filter(MenuModel.id == menu_id).first()
+        target_menu_from_db = await self.db.execute(
+            select(
+                MenuModel
+            )
+            .where(MenuModel.id == menu_id)
+        )
+
+        target_menu_from_db = target_menu_from_db.scalar()
 
         if not target_menu_from_db:
             return not_found_exception()
 
-        self.db.delete(target_menu_from_db)
-        self.db.commit()
+        await self.db.delete(target_menu_from_db)
+        await self.db.commit()
         return None

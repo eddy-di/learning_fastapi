@@ -15,7 +15,7 @@ class MenuCreate(MenuBase):
 
     """Menu create schema, inherits `MenuBase`"""
 
-    pass
+    id: str | None
 
 
 class MenuUpdate(MenuBase):

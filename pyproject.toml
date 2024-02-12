@@ -8,19 +8,27 @@ packages = [{include = "y_lab_menu"}]
 
 [tool.poetry.dependencies]
 python = "^3.11"
-fastapi = {extras = ["all"], version = "^0.109.0"}
 uvicorn = {extras = ["standard"], version = "^0.26.0"}
-sqlalchemy = "^2.0.25"
 psycopg2-binary = "^2.9.9"
 python-dotenv = "^1.0.0"
 httpx = "^0.26.0"
 pytest = "^7.4.4"
 faker = "^22.5.1"
 pre-commit = "^3.6.0"
-redis = {extras = ["hiredis"], version = "^5.0.1"}
 types-redis = "^4.6.0.20240106"
 stubs = "^1.0.0"
 loguru = "^0.7.2"
+fastapi = {extras = ["all"], version = "^0.109.2"}
+sqlalchemy = {extras = ["asyncio"], version = "^2.0.25"}
+google-api-python-client = "^2.116.0"
+openpyxl = "^3.1.2"
+asyncpg = "^0.29.0"
+greenlet = "^3.0.3"
+redis = "^5.0.1"
+pytest-asyncio = "^0.23.5"
+celery = "^5.3.6"
+flower = "^2.0.1"
+rabbitmq = "^0.2.0"
 [tool.pytest.ini_options]
 testpaths = [
     "tests"

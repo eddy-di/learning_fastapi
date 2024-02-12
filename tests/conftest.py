@@ -1,115 +1,145 @@
+import asyncio
+from typing import Generator, Iterator
+
 import pytest
-from fastapi.testclient import TestClient
-from redis import Redis
-from sqlalchemy import create_engine
+import pytest_asyncio
+from httpx import AsyncClient
+from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import sessionmaker
 
-from app.config.base import db_url
-from app.config.cache import create_redis as redis
-from app.config.database import Base, get_db
+from app.config.database import Base, async_engine, get_async_db
 from app.main import app
 from app.models.dish import Dish
 from app.models.menu import Menu
 from app.models.submenu import SubMenu
 
-engine = create_engine(db_url)
+
+@pytest.fixture(scope='session')
+def event_loop(request) -> Generator:  # noqa: indirect usage
+    loop = asyncio.get_event_loop_policy().new_event_loop()
+    yield loop
+    loop.close()
+
+# unit tests
 
 
-@pytest.fixture
-def init_db():
-    Base.metadata.create_all(bind=engine)
+@pytest_asyncio.fixture(scope='function')
+async def async_session() -> AsyncSession:
+    session = sessionmaker(
+        async_engine, class_=AsyncSession, expire_on_commit=False
+    )
+
+    async with session() as s:
+        async with async_engine.begin() as conn:
+            await conn.run_sync(Base.metadata.create_all)
+
+        yield s
+
+    async with async_engine.begin() as conn:
+        await conn.run_sync(Base.metadata.drop_all)
+
+    await async_engine.dispose()
 
 
-@pytest.fixture
-def drop_db():
-    Base.metadata.drop_all(bind=engine)
+@pytest_asyncio.fixture
+async def async_client(async_session):
+    def override_get_db() -> Iterator[AsyncSession]:
+        """Utility function to wrap the database session in a generator.
+
+        Yields:
+            Iterator[AsyncSession]: An iterator containing one database session.
+        """
+        yield async_session
+
+    app.dependency_overrides[get_async_db] = override_get_db
+
+    async with AsyncClient(
+            app=app,
+            base_url='http://test'
+    ) as client:
+        yield client
+
+# scenario
 
 
-TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+@pytest_asyncio.fixture(scope='module')
+async def scenario_session() -> AsyncSession:
+    session = sessionmaker(
+        async_engine, class_=AsyncSession, expire_on_commit=False
+    )
 
-# Override the database dependency for testing
+    async with session() as s:
+        async with async_engine.begin() as conn:
+            await conn.run_sync(Base.metadata.create_all)
 
+        yield s
 
-def override_get_db():
-    db = TestingSessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
+    async with async_engine.begin() as conn:
+        await conn.run_sync(Base.metadata.drop_all)
 
-
-app.dependency_overrides[get_db] = override_get_db
-
-
-client = TestClient(app)
-
-
-@pytest.fixture
-def setup_test_db():
-    # creates db and drops it at the end
-    Base.metadata.create_all(bind=engine)
-    r = redis()
-    test_client = TestClient(app)
-    yield test_client
-    # drop test_db after tests
-    Base.metadata.drop_all(bind=engine)
-    r.flushdb()
+    await async_engine.dispose()
 
 
-@pytest.fixture
-def cache_connect() -> Redis:
-    return redis()
+@pytest_asyncio.fixture
+async def scenario_client(scenario_session):
+    def override_get_db() -> Iterator[AsyncSession]:
+        """Utility function to wrap the database session in a generator.
+
+        Yields:
+            Iterator[AsyncSession]: An iterator containing one database session.
+        """
+        yield scenario_session
+
+    app.dependency_overrides[get_async_db] = override_get_db
+
+    async with AsyncClient(
+            app=app,
+            base_url='http://test'
+    ) as client:
+        yield client
 
 
-@pytest.fixture
-def cache_flush():
-    return redis().flushdb()
-
-
-@pytest.fixture
-def create_menu():
-    session = TestingSessionLocal()
+@pytest_asyncio.fixture(scope='function')
+async def create_menu(async_session: AsyncSession):
     db_menu_item = Menu(
         title='testMenu1',
         description='testMenu1Description'
     )
-    session.add(db_menu_item)
-    session.commit()
-    session.refresh(db_menu_item)
-    session.close()
+    async_session.add(db_menu_item)
+    await async_session.commit()
+    await async_session.refresh(db_menu_item)
+    await async_session.close()
     return db_menu_item
 
 
-@pytest.fixture
-def create_submenu():
-    def make_menu(menu_id):
-        session = TestingSessionLocal()
+@pytest_asyncio.fixture(scope='function')
+async def create_submenu(async_session: AsyncSession):
+    async def make_menu(menu_id):
         db_submenu_item = SubMenu(
             title='testSubMenu1',
             description='testSubMenu1Description',
             menu_id=menu_id
         )
-        session.add(db_submenu_item)
-        session.commit()
-        session.refresh(db_submenu_item)
-        session.close()
+        async_session.add(db_submenu_item)
+        await async_session.commit()
+        await async_session.refresh(db_submenu_item)
+        await async_session.close()
         return db_submenu_item
     return make_menu
 
 
-@pytest.fixture
-def create_dish():
-    def make_dish(submenu_id):
-        session = TestingSessionLocal()
+@pytest_asyncio.fixture(scope='function')
+async def create_dish(async_session: AsyncSession):
+    async def make_dish(submenu_id):
         db_dish_item = Dish(
             title='testDishTitle1',
             description='testDishDescription1',
             price='11.10',
             submenu_id=submenu_id
         )
-        session.add(db_dish_item)
-        session.commit()
-        session.refresh(db_dish_item)
-        session.close()
+        async_session.add(db_dish_item)
+        await async_session.commit()
+        await async_session.refresh(db_dish_item)
+        await async_session.close()
         return db_dish_item
     return make_dish

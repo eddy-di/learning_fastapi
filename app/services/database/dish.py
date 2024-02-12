@@ -1,4 +1,5 @@
 from fastapi import HTTPException
+from sqlalchemy import select
 
 from app.models.dish import Dish as DishModel
 from app.models.menu import Menu as MenuModel
@@ -18,35 +19,65 @@ def not_found_exception() -> HTTPException:
 class DishCRUD(DatabaseCRUD):
     """Service for querying specific dish."""
 
-    def check_menu_id(self, menu_id: str) -> HTTPException | None:
+    async def check_menu_id(self, menu_id: str) -> HTTPException | None:
         """Check if menu id given in endpoint is correct and exists."""
 
-        res = self.db.query(MenuModel).filter(MenuModel.id == menu_id).first()
+        res = await self.db.execute(
+            select(
+                MenuModel
+            )
+            .where(MenuModel.id == menu_id)
+        )
+
+        res = res.scalar()
+
         if not res:
             return no_menu()
         return None
 
-    def check_submenu_id(self, submenu_id: str) -> HTTPException | None:
+    async def check_submenu_id(self, submenu_id: str) -> HTTPException | None:
         """Check if submenu id given in endpoint is correct and exists."""
 
-        res = self.db.query(SubMenuModel).filter(SubMenuModel.id == submenu_id).first()
+        res = await self.db.execute(
+            select(
+                SubMenuModel
+            )
+            .where(SubMenuModel.id == submenu_id)
+        )
+
+        res = res.scalar()
+
         if not res:
             return no_submenu()
         return None
 
-    def fetch_dish(self, dish_id: str) -> DishModel | None:
+    async def fetch_dish(self, dish_id: str) -> DishModel | None:
         """Fetching specific dish by its id for furter operations."""
 
-        return self.db.query(DishModel).filter(DishModel.id == dish_id).first()
+        query = await self.db.execute(
+            select(
+                DishModel
+            )
+            .where(DishModel.id == dish_id)
+        )
 
-    def get_dishes(self, submenu_id: str) -> list[DishModel]:
+        query = query.scalar()
+
+        return query
+
+    async def get_dishes(self, submenu_id: str) -> list[DishModel]:
         """Query to get list of all dishes."""
 
-        result = self.db.query(DishModel).filter(DishModel.submenu_id == submenu_id).all()
+        result = await self.db.execute(
+            select(
+                DishModel
+            )
+            .filter(DishModel.submenu_id == submenu_id)
+        )
 
-        return result
+        return result.scalars().fetchall()
 
-    def create_dish(
+    async def create_dish(
         self,
         menu_id: str,
         submenu_id: str,
@@ -54,9 +85,8 @@ class DishCRUD(DatabaseCRUD):
     ) -> DishModel:
         """Create dish instance in database."""
 
-        self.check_menu_id(menu_id=menu_id)
-
-        self.check_submenu_id(submenu_id=submenu_id)
+        await self.check_menu_id(menu_id=menu_id)
+        await self.check_submenu_id(submenu_id=submenu_id)
 
         new_dish = DishModel(
             title=dish_schema.title,
@@ -65,11 +95,12 @@ class DishCRUD(DatabaseCRUD):
             submenu_id=submenu_id
         )
         self.db.add(new_dish)
-        self.db.commit()
-        self.db.refresh(new_dish)
+
+        await self.db.commit()
+        await self.db.refresh(new_dish)
         return new_dish
 
-    def get_dish(
+    async def get_dish(
         self,
         menu_id: str,
         submenu_id: str,
@@ -77,17 +108,16 @@ class DishCRUD(DatabaseCRUD):
     ) -> DishModel | HTTPException:
         """Get specific dish from database."""
 
-        self.check_menu_id(menu_id=menu_id)
+        await self.check_menu_id(menu_id=menu_id)
+        await self.check_submenu_id(submenu_id=submenu_id)
 
-        self.check_submenu_id(submenu_id=submenu_id)
-
-        dish = self.fetch_dish(dish_id=dish_id)
+        dish = await self.fetch_dish(dish_id=dish_id)
 
         if not dish:
             return not_found_exception()
         return dish
 
-    def update_dish(
+    async def update_dish(
         self,
         menu_id: str,
         submenu_id: str,
@@ -96,22 +126,22 @@ class DishCRUD(DatabaseCRUD):
     ) -> DishModel | HTTPException:
         """Update specific dish in database."""
 
-        self.check_menu_id(menu_id=menu_id)
+        await self.check_menu_id(menu_id=menu_id)
+        await self.check_submenu_id(submenu_id=submenu_id)
 
-        self.check_submenu_id(submenu_id=submenu_id)
-
-        dish_to_update = self.fetch_dish(dish_id=dish_id)
+        dish_to_update = await self.fetch_dish(dish_id=dish_id)
 
         if not dish_to_update:
             return not_found_exception()
 
         for key, value in dish_schema.model_dump(exclude_unset=True).items():
             setattr(dish_to_update, key, value)
-        self.db.commit()
-        self.db.refresh(dish_to_update)
+
+        await self.db.commit()
+        await self.db.refresh(dish_to_update)
         return dish_to_update
 
-    def delete_dish(
+    async def delete_dish(
         self,
         menu_id: str,
         submenu_id: str,
@@ -119,14 +149,14 @@ class DishCRUD(DatabaseCRUD):
     ) -> None | HTTPException:
         """Delete specific dish in database."""
 
-        self.check_menu_id(menu_id=menu_id)
+        await self.check_menu_id(menu_id=menu_id)
+        await self.check_submenu_id(submenu_id=submenu_id)
 
-        self.check_submenu_id(submenu_id=submenu_id)
-
-        dish_to_delete = self.fetch_dish(dish_id=dish_id)
+        dish_to_delete = await self.fetch_dish(dish_id=dish_id)
 
         if not dish_to_delete:
             return not_found_exception()
-        self.db.delete(dish_to_delete)
-        self.db.commit()
+
+        await self.db.delete(dish_to_delete)
+        await self.db.commit()
         return None

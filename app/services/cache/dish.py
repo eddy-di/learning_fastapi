@@ -12,47 +12,48 @@ class DishCacheCRUD(CacheCRUD):
     Avaiable methods: `get_dish`, `set_dish`, `delete`.
     """
 
-    def get_dishes(self) -> list[Dish] | None:
+    async def get_dishes(self) -> list[Dish] | None:
         """Returns cached list of all dishes if available in cache."""
 
-        if all_dishes := self.cache.get('all_dishes'):
+        if all_dishes := await self.cache.get('all_dishes'):
             return pickle.loads(all_dishes)
         return None
 
-    def set_dishes(self, query_result: list[Dish]) -> None:
+    async def set_dishes(self, query_result: list[Dish]) -> None:
         """Sets into cache memory SQLAlchemy query result for getting list of all dishes."""
 
-        self.cache.set('all_dishes', pickle.dumps(query_result))
+        await self.cache.set('all_dishes', pickle.dumps(query_result))
 
-    def invalidate_dishes(self, menu_id: str, submenu_id: str) -> None:
+    async def invalidate_dishes(self, menu_id: str, submenu_id: str) -> None:
         """
         Invalidation happens with deleting all related information in cache
         that was anyhow related to all dishes, submenus and menus as well as specific submenu and menu.
         Made to correctly store valid information at the time PostgreSQL database changes are made.
         """
 
-        self.cache.delete(
+        await self.cache.delete(
             f'menu_id_{menu_id}',
             f'submenu_id_{submenu_id}',
             'all_submenus',
             'all_menus',
-            'all_dishes'
+            'all_dishes',
+            'menus_preview'
         )
 
-    def get_dish(self, dish_id) -> Dish | None:
+    async def get_dish(self, dish_id) -> Dish | None:
         """Returns cached dish instance if available."""
 
-        if target_dish := self.cache.get(f'dish_id_{dish_id}'):
+        if target_dish := await self.cache.get(f'dish_id_{dish_id}'):
             return pickle.loads(target_dish)
         return None
 
-    def set_dish(self, query_result: Dish) -> None:
+    async def set_dish(self, query_result: Dish) -> None:
         """Sets into cache memory SQLAlchemy query result for getting, creating or updating dish instance."""
 
         serialized_dish = DishSchema.model_validate(query_result)
-        self.cache.set(f'dish_id_{query_result.id}', pickle.dumps(serialized_dish))
+        await self.cache.set(f'dish_id_{query_result.id}', pickle.dumps(serialized_dish))
 
-    def delete(self, dish_id: str) -> None:
+    async def delete(self, dish_id: str) -> None:
         """Deletes from cache specific dish instance by its key."""
 
-        self.cache.delete(f'dish_id_{dish_id}')
+        await self.cache.delete(f'dish_id_{dish_id}')
