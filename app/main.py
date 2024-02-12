@@ -17,6 +17,7 @@ You can `GET` list of submenus in a menu, `POST` a submenu in a menu, `GET`, `PA
 You can `GET` list of dishes in submenu, `POST` a dish in submenu, `GET`, `PATCH` or `DELETE` specific dish in submenu.
 """
 
+
 app = FastAPI(
     title='Y-lab intensive course API',
     description=description,

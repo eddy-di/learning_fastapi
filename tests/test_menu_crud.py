@@ -39,8 +39,8 @@ async def test_menu_get_list_with_submenu_and_dishes(async_client: AsyncClient, 
     assert response.json()[0]['id'] == menu.id
     assert response.json()[0]['title'] == 'testMenu1'
     assert response.json()[0]['description'] == 'testMenu1Description'
-    # assert response.json()[0]['submenus_count'] == 2
-    # assert response.json()[0]['dishes_count'] == 3
+    assert response.json()[0]['submenus_count'] == 2
+    assert response.json()[0]['dishes_count'] == 3
 
 
 @pytest.mark.asyncio

@@ -43,6 +43,35 @@ services:
       timeout: 3s
       retries: 5
 
+  celery:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    env_file:
+      - .env_compose
+    container_name: celery
+    restart: always
+    command: ["celery", "--app=app.config.tasks:celery", "worker", "-l", "INFO"]
+    depends_on:
+      - web
+
+  rabbitmq:
+    image: rabbitmq:latest
+    hostname: rabbitmq
+    restart: always
+    container_name: rabbitmq
+    volumes:
+      - rabbit_data:/var/lib/rabbitmq
+    env_file:
+      - .env_compose
+    ports:
+      - 5672:5672
+    healthcheck:
+      test: rabbitmq-diagnostics -q ping
+      interval: 10s
+      timeout: 30s
+      retries: 5
+
 volumes:
   postgres_data:
   redis_data:

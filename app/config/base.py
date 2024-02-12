@@ -22,6 +22,15 @@ POSTGRES_DB = os.getenv('POSTGRES_DB')
 REDIS_HOST = os.getenv('REDIS_HOST')
 REDIS_PORT = os.getenv('REDIS_PORT')
 
+RABBITMQ_HOST = os.getenv('RABBITMQ_HOST')
+RABBITMQ_PASSWORD = os.getenv('RABBITMQ_PASSWORD')
+RABBITMQ_PORT = os.getenv('RABBITMQ_PORT')
+RABBITMQ_USER = os.getenv('RABBITMQ_USER')
+
+CELERY_STATUS = os.getenv('CELERY_STATUS')
+
+FILE_PATH = '/code/app/admin/Menu.xlsx'
+SHEET_NAME = 'Лист1'
 
 db_url = (
     f'postgresql+asyncpg://{POSTGRES_USER}:{POSTGRES_PASSWORD}'

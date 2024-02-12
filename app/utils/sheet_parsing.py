@@ -1,6 +1,6 @@
 from openpyxl import Workbook, load_workbook
 
-wb = load_workbook(filename='/app/admin/Menu.xlsx')  # need to double check if everything is good
+wb = load_workbook(filename='/code/app/admin/Menu.xlsx')  # need to double check if everything is good
 
 sheet = wb['Лист1']
 
@@ -14,6 +14,7 @@ def update_from_excel(sheet: Workbook) -> list[dict]:
 
     menus: list[dict] = []
     submenus: list[dict] = []
+    dishes: list[dict] = []
     for row in sheet.iter_rows(min_col=0, max_col=7, values_only=True):
 
         if row[0]:
@@ -49,6 +50,7 @@ def update_from_excel(sheet: Workbook) -> list[dict]:
                 'submenu_id': sub_menu_dict['id']
             }
             submenus[-1]['dishes'].append(dish_dict)
+            dishes.append(dish_dict)
 
     for i in range(len(menus)):
         for j in range(len(submenus)):
