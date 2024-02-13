@@ -27,7 +27,7 @@ class MenuCacheCRUD(CacheCRUD):
         self,
         query_result: list[Row[tuple[Menu, SubMenu, Dish]]]
     ) -> None:
-        """Sets the key `evertyhing` in cache db."""
+        """Sets the key `menus_preview` in cache db."""
 
         await self.cache.set('menus_preview', pickle.dumps(query_result))
 

@@ -24,8 +24,8 @@ class DishService(AppService):
         result = await DishCRUD(self.db).get_dishes(
             submenu_id=submenu_id
         )
+
         self.tasks.add_task(DishCacheCRUD(self.cache).set_dishes, result)
-        # await DishCacheCRUD(self.cache).set_dishes(query_result=result)
 
         return result
 
@@ -45,9 +45,8 @@ class DishService(AppService):
             submenu_id=submenu_id,
             dish_id=dish_id
         )
-        self.tasks.add_task(DishCacheCRUD(self.cache).set_dish, result)
 
-        # await DishCacheCRUD(self.cache).set_dish(query_result=result)
+        self.tasks.add_task(DishCacheCRUD(self.cache).set_dish, result)
 
         return result
 
@@ -64,10 +63,9 @@ class DishService(AppService):
             submenu_id=submenu_id,
             dish_schema=dish_schema
         )
+
         self.tasks.add_task(DishCacheCRUD(self.cache).set_dish, result)
         self.tasks.add_task(DishCacheCRUD(self.cache).invalidate_dishes, menu_id, submenu_id)
-        # await DishCacheCRUD(self.cache).set_dish(query_result=result)
-        # await DishCacheCRUD(self.cache).invalidate_dishes(menu_id=menu_id, submenu_id=submenu_id)
 
         return result
 
@@ -86,10 +84,9 @@ class DishService(AppService):
             dish_id=dish_id,
             dish_schema=dish_schema
         )
+
         self.tasks.add_task(DishCacheCRUD(self.cache).set_dish, result)
         self.tasks.add_task(DishCacheCRUD(self.cache).invalidate_dishes, menu_id, submenu_id)
-        # await DishCacheCRUD(self.cache).set_dish(query_result=result)
-        # await DishCacheCRUD(self.cache).invalidate_dishes(menu_id=menu_id, submenu_id=submenu_id)
 
         return result
 
@@ -109,7 +106,5 @@ class DishService(AppService):
         )
         self.tasks.add_task(DishCacheCRUD(self.cache).delete, dish_id)
         self.tasks.add_task(DishCacheCRUD(self.cache).invalidate_dishes, menu_id, submenu_id)
-        # await DishCacheCRUD(self.cache).delete(dish_id=dish_id)
-        # await DishCacheCRUD(self.cache).invalidate_dishes(menu_id=menu_id, submenu_id=submenu_id)
 
         return JSONResponse(status_code=200, content='dish deleted')

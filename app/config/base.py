@@ -4,7 +4,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-SERVER_URL = 'http://web:8000'
+SERVER_URL = os.getenv('SERVER_URL')
 ALL_MENUS = '/api/v1/menus/preview'
 MENUS_LINK = '/api/v1/menus'
 MENU_LINK = '/api/v1/menus/{target_menu_id}'
@@ -27,8 +27,6 @@ RABBITMQ_HOST = os.getenv('RABBITMQ_HOST')
 RABBITMQ_DEFAULT_PASS = os.getenv('RABBITMQ_DEFAULT_PASS')
 RABBITMQ_DEFAULT_PORT = os.getenv('RABBITMQ_DEFAULT_PORT')
 RABBITMQ_DEFAULT_USER = os.getenv('RABBITMQ_DEFAULT_USER')
-
-CELERY_STATUS = os.getenv('CELERY_STATUS')
 
 FILE_PATH = 'app/admin/Menu.xlsx'
 SHEET_NAME = 'Лист1'

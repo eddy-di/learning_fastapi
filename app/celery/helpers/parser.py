@@ -3,10 +3,9 @@ from openpyxl.worksheet.worksheet import Worksheet
 
 
 class ExcelSheetParser:
-    menus: list[dict] = []
-    submenus: list[dict] = []
-    dishes: list[dict] = []
-    preview_results: list[dict] = []
+    menus: dict = {}
+    submenus: dict = {}
+    dishes: dict = {}
 
     file: Workbook = None
     sheet: Worksheet = None
@@ -14,39 +13,42 @@ class ExcelSheetParser:
     def __init__(self, filename: str, sheet_name: str):
         self.file: Workbook = load_workbook(filename=filename)
         self.sheet: Worksheet = self.file[sheet_name]
+        self.menus: dict = {}
+        self.submenus: dict = {}
+        self.dishes: dict = {}
 
-    def parse(self):
+    def parse(self) -> None:
         """
         Parsing of the Menu.xlsx file to python list of dictionaries
         that fully represent the menu, submenu and dish structure.
         Necessary for further convergence to json and comparison with the pydantic schema models.
         """
 
-        menus: list[dict] = []
-        for row in self.sheet.iter_rows(min_col=0, max_col=7, values_only=True):
+        menus: dict = {}
+        submenus: dict = {}
+        dishes: dict = {}
+        menu_global_id = None
+        submenu_global_id = None
+        for row in self.sheet.iter_rows(min_col=0, max_col=8, values_only=True):
 
             if row[0]:
-                menu_id, title, description = row[0], row[1], row[2]
+                menu_global_id, title, description = row[0], row[1], row[2]
                 menu_dict = {
-                    'id': menu_id,
+                    'id': menu_global_id,
                     'title': title,
                     'description': description,
-                    'submenus': []
                 }
-                menus.append(menu_dict)
-                self.menus.append(menu_dict)
+                menus[menu_global_id] = menu_dict
 
             elif row[0] is None and row[1]:
-                sub_id, sub_title, sub_description, sub_menu_id = row[1], row[2], row[3], menu_dict['id']
+                submenu_global_id, sub_title, sub_description = row[1], row[2], row[3]
                 sub_menu_dict = {
-                    'id': sub_id,
+                    'id': submenu_global_id,
                     'title': sub_title,
                     'description': sub_description,
-                    'menu_id': sub_menu_id,
-                    'dishes': []
+                    'menu_id': menu_global_id,
                 }
-                menus[-1]['submenus'].append(sub_menu_dict)
-                self.submenus.append(sub_menu_dict)
+                submenus[submenu_global_id] = sub_menu_dict
 
             elif row[0] is None and row[1] is None and row[2]:
                 d_id, d_title, d_description, d_price = row[2], row[3], row[4], row[5]
@@ -59,9 +61,57 @@ class ExcelSheetParser:
                     'description': d_description,
                     'price': d_price,
                     'discount': d_discount,
-                    'submenu_id': sub_menu_dict['id']
+                    'submenu_id': submenu_global_id,
+                    'menu_id': menu_global_id
                 }
-                menus[-1]['submenus'][-1]['dishes'].append(dish_dict)
-                self.dishes.append(dish_dict)
+                dishes[d_id] = dish_dict
 
-        return menus
+        self.menus = menus
+        self.submenus = submenus
+        self.dishes = dishes
+
+
+class JsonParser:
+    menus: dict = {}
+    submenus: dict = {}
+    dishes: dict = {}
+    data: dict = {}
+
+    def __init__(self, json_data: dict):
+        self.data = json_data
+        self.menus: dict = {}
+        self.submenus: dict = {}
+        self.dishes: dict = {}
+
+    def parse(self):
+        for menu in self.data:
+            if menu['id'] not in self.menus:
+                menu_data = {
+                    'id': menu['id'],
+                    'title': menu['title'],
+                    'description': menu['description']
+                }
+                self.menus[menu['id']] = menu_data
+
+            for submenu in menu['submenus']:
+                if submenu['id'] not in self.submenus:
+                    subemnu_data = {
+                        'id': submenu['id'],
+                        'title': submenu['title'],
+                        'description': submenu['description'],
+                        'menu_id': menu['id']
+                    }
+                    self.submenus[submenu['id']] = subemnu_data
+
+                for dish in submenu['dishes']:
+                    if dish['id'] not in self.dishes:
+                        dish_data = {
+                            'id': dish['id'],
+                            'title': dish['title'],
+                            'description': dish['description'],
+                            'price': dish['price'],
+                            'discount': dish['discount'],
+                            'submenu_id': submenu['id'],
+                            'menu_id': menu['id']
+                        }
+                        self.dishes[dish['id']] = dish_data

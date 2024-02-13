@@ -35,8 +35,16 @@ class MenuCRUD(DatabaseCRUD):
 
         query = (
             select(MenuModel)
-            .outerjoin(SubMenuModel, MenuModel.id == SubMenuModel.menu_id)
-            .outerjoin(DishModel, SubMenuModel.id == DishModel.submenu_id)
+            .options(
+                selectinload(
+                    MenuModel.submenus
+                )
+                .options(
+                    selectinload(
+                        SubMenuModel.dishes
+                    )
+                )
+            )
         )
         result = await self.db.execute(query)
 
@@ -70,7 +78,7 @@ class MenuCRUD(DatabaseCRUD):
                 'description': menu.description,
                 'id': menu.id,
                 'submenus_count': submenus_count,
-                'dishes_count': dishes_count
+                'dishes_count': dishes_count,
             })
 
         return result
