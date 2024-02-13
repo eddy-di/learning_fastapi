@@ -13,6 +13,9 @@ class ExcelSheetParser:
     def __init__(self, filename: str, sheet_name: str):
         self.file: Workbook = load_workbook(filename=filename)
         self.sheet: Worksheet = self.file[sheet_name]
+        self.menus: dict = {}
+        self.submenus: dict = {}
+        self.dishes: dict = {}
 
     def parse(self) -> None:
         """
@@ -76,6 +79,9 @@ class JsonParser:
 
     def __init__(self, json_data: dict):
         self.data = json_data
+        self.menus: dict = {}
+        self.submenus: dict = {}
+        self.dishes: dict = {}
 
     def parse(self):
         for menu in self.data:
