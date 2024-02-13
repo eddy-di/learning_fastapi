@@ -20,8 +20,16 @@ class DishBase(BaseModel):
 
 
 class DishCreate(DishBase):
-
-    """Dish create schema, iherits `DishBase`"""
+    """
+    Dish update schema, inherits `DishBase`\n
+    Attributes:
+        title: str | None = None
+        description: str | None = None
+        price: Decimal | None = None
+        discount: int | 0 = 0
+        ---adding to the model---
+        id: str | None
+    """
 
     id: str | None
 
@@ -39,18 +47,19 @@ class DishUpdate(DishBase):
     title: str | None = None
     description: str | None = None
     price: Decimal | None = None
-    discount: int = 0
+    discount: int = Field(default=0, ge=0, lt=100)
 
 
 class Dish(DishBase):
     """
     Dish schema, iherits `DishBase`\n
     Attributes:
-        id: str
         title: str | None
         description: str | None
         price: Decimal | None
         discount: int | 0
+        ---adding to the model---
+        id: str | None
     """
 
     id: str

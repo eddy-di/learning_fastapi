@@ -18,7 +18,15 @@ class MenuPreviewBase(BaseModel):
 
 
 class SubmenuPreview(SubmenuPreviewBase):
-    """SubmenuPreview schema, inherits `SubmenuPreviewBase`"""
+    """
+    SubmenuPreview schema, inherits `SubmenuPreviewBase`\n
+    Attributes:
+        title: str | None
+        description: str | None
+        ---completing model with---
+        id: str
+        dishes: list[Dish] = []
+    """
 
     id: str
     dishes: list[Dish] = []
@@ -28,7 +36,16 @@ class SubmenuPreview(SubmenuPreviewBase):
 
 
 class MenuPreview(MenuPreviewBase):
-    """MenuPreview schema, inherits `MenuPreviewBase`"""
+    """
+    MenuPreview schema, inherits `MenuPreviewBase`\n
+    Attributes:
+        title: str | None
+        description: str | None
+        ---completing model with---
+        id: str
+        submenus: list[SubmenuPreview] = []
+    """
+
     id: str
     submenus: list[SubmenuPreview] = []
 

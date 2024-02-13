@@ -4,7 +4,6 @@ from .dish import Dish
 
 
 class SubMenuBase(BaseModel):
-
     """SubMenu base schema, inherits `BaseModel` from `pydantic`"""
 
     title: str | None
@@ -12,23 +11,41 @@ class SubMenuBase(BaseModel):
 
 
 class SubMenuCreate(SubMenuBase):
-
-    """SubMenu create schema, inherits `SubMenuBase`"""
+    """
+    SubMenu create schema, inherits `SubMenuBase`\n
+    Attributes:
+        title: str | None
+        description: str | None
+        ---adding to the model---
+        id: str | None
+    """
 
     id: str | None
 
 
 class SubMenuUpdate(SubMenuBase):
-
-    """SubMenu update schema, inherits `SubMenuBase`"""
+    """
+    SubMenu update schema, inherits `SubMenuBase`\n
+    Attributes:
+        title: str | None
+        description: str | None
+    """
 
     title: str | None = None
     description: str | None = None
 
 
 class SubMenu(SubMenuBase):
-
-    """SubMenu schema, inherits `SubMenuBase`"""
+    """
+    SubMenu schema, inherits `SubMenuBase`\n
+    Attributes:
+        title: str | None
+        description: str | None
+        ---adding to the model---
+        id: str | None
+        dishes: list[Dish] = []
+        dishes_count: int = 0
+    """
 
     id: str
     dishes: list[Dish] = []
