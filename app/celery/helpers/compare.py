@@ -1,6 +1,14 @@
 import requests
 
-from app.config.base import DISH_LINK, MENU_LINK, SERVER_URL, SUBMENU_LINK
+from app.config.base import (
+    DISH_LINK,
+    DISHES_LINK,
+    MENU_LINK,
+    MENUS_LINK,
+    SERVER_URL,
+    SUBMENU_LINK,
+    SUBMENUS_LINK,
+)
 
 
 def get_correct_link(model_name: str, menu_id: str, submenu_id: str | None = None, dish_id: str | None = None):
@@ -30,10 +38,7 @@ def crud_menus(excel_data: dict, db_data: dict):
     ids_to_create, ids_to_update, ids_to_delete = compare_models_data(excel_data, db_data)
 
     for id in ids_to_create:
-        url = get_correct_link(
-            model_name='menu',
-            menu_id=id,
-        )
+        url = SERVER_URL + MENUS_LINK
         requests.post(url, json=excel_data[id])
 
     for id in ids_to_update:
@@ -55,11 +60,7 @@ def crud_submenus(excel_data: dict, db_data: dict):
     ids_to_create, ids_to_update, ids_to_delete = compare_models_data(excel_data, db_data)
 
     for id in ids_to_create:
-        url = get_correct_link(
-            model_name='submenu',
-            menu_id=excel_data[id]['menu_id'],
-            submenu_id=id
-        )
+        url = SERVER_URL + SUBMENUS_LINK.format(target_menu_id=excel_data[id]['menu_id'])
         requests.post(url, json=excel_data[id])
 
     for id in ids_to_update:
@@ -83,11 +84,9 @@ def crud_dishes(excel_data: dict, db_data: dict):
     ids_to_create, ids_to_update, ids_to_delete = compare_models_data(excel_data, db_data)
 
     for id in ids_to_create:
-        url = get_correct_link(
-            model_name='dish',
-            menu_id=excel_data[id]['menu_id'],
-            submenu_id=excel_data[id]['submenu_id'],
-            dish_id=id
+        url = SERVER_URL + DISHES_LINK.format(
+            target_menu_id=excel_data[id]['menu_id'],
+            target_submenu_id=excel_data[id]['submenu_id']
         )
         requests.post(url, json=excel_data[id])
 
