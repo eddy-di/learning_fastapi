@@ -4,7 +4,7 @@ import logging
 import requests
 from celery import Celery
 
-from app.celery.helpers.compare import crud_dishes, crud_menus, crud_submenus
+from app.celery.helpers.crud import crud_dishes, crud_menus, crud_submenus
 from app.celery.helpers.parser import ExcelSheetParser, JsonParser
 from app.config.base import (
     ALL_MENUS,
