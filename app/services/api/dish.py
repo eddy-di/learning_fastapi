@@ -1,4 +1,4 @@
-from decimal import ROUND_HALF_UP, Decimal
+# from decimal import ROUND_HALF_UP, Decimal
 
 from fastapi import HTTPException
 from fastapi.responses import JSONResponse
@@ -26,12 +26,12 @@ class DishService(AppService):
         result = await DishCRUD(self.db).get_dishes(
             submenu_id=submenu_id
         )
-        for dish in result:
-            if dish.discount:
-                discounted_price = Decimal(
-                    dish.price * (1 - Decimal(round(dish.discount / 100, 2)))
-                ).quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)
-                dish.price = discounted_price
+        # for dish in result:
+        # if dish.discount:
+        # discounted_price = Decimal(
+        # dish.price * (1 - Decimal(round(dish.discount / 100, 2)))
+        # ).quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)
+        # dish.price = discounted_price
 
         self.tasks.add_task(DishCacheCRUD(self.cache).set_dishes, result)
 
@@ -71,11 +71,11 @@ class DishService(AppService):
             submenu_id=submenu_id,
             dish_schema=dish_schema
         )
-        if result.discount:
-            discounted_price = Decimal(
-                result.price * (1 - Decimal(round(result.discount / 100, 2)))
-            ).quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)
-            result.price = discounted_price
+        # if result.discount:
+        # discounted_price = Decimal(
+        # result.price * (1 - Decimal(round(result.discount / 100, 2)))
+        # ).quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)
+        # result.price = discounted_price
 
         self.tasks.add_task(DishCacheCRUD(self.cache).set_dish, result)
         self.tasks.add_task(DishCacheCRUD(self.cache).invalidate_dishes, menu_id, submenu_id)
@@ -97,11 +97,11 @@ class DishService(AppService):
             dish_id=dish_id,
             dish_schema=dish_schema
         )
-        if result.discount:
-            discounted_price = Decimal(
-                result.price * (1 - Decimal(round(result.discount / 100, 2)))
-            ).quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)
-            result.price = discounted_price
+        # if result.discount:
+        # discounted_price = Decimal(
+        # result.price * (1 - Decimal(round(result.discount / 100, 2)))
+        # ).quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)
+        # result.price = discounted_price
 
         self.tasks.add_task(DishCacheCRUD(self.cache).set_dish, result)
         self.tasks.add_task(DishCacheCRUD(self.cache).invalidate_dishes, menu_id, submenu_id)

@@ -1,4 +1,4 @@
-from decimal import ROUND_HALF_UP, Decimal
+# from decimal import ROUND_HALF_UP, Decimal
 
 from fastapi import HTTPException
 from fastapi.responses import JSONResponse
@@ -21,14 +21,14 @@ class MenuService(AppService):
 
         result = await MenuCRUD(self.db).get_preview()
 
-        for menu in result:
-            for submenu in menu.submenus:
-                for dish in submenu.dishes:
-                    if dish.discount:
-                        discounted_price = Decimal(
-                            dish.price * (1 - Decimal(round(dish.discount / 100, 2)))
-                        ).quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)
-                        dish.price = discounted_price
+        # for menu in result:
+        # for submenu in menu.submenus:
+        # for dish in submenu.dishes:
+        # if dish.discount:
+        # discounted_price = Decimal(
+        # dish.price * (1 - Decimal(round(dish.discount / 100, 2)))
+        # ).quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)
+        # dish.price = discounted_price
 
         self.tasks.add_task(MenuCacheCRUD(self.cache).set_preview, result)
 

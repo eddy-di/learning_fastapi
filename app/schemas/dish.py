@@ -1,6 +1,6 @@
-from decimal import Decimal
+from decimal import ROUND_HALF_UP, Decimal
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, ValidationInfo, field_validator
 
 
 class DishBase(BaseModel):
@@ -63,6 +63,17 @@ class Dish(DishBase):
     """
 
     id: str
+
+    @field_validator('price')
+    @classmethod
+    def discounted_price(cls, value: Decimal, info: ValidationInfo):
+        discount = info.data['discount']
+        if 0 < discount <= 100:
+            discounted_price = Decimal(
+                value * (1 - Decimal(round(discount / 100, 2)))
+            ).quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)
+            value = discounted_price
+        return value
 
     class Config:
         from_attributes = True
