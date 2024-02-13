@@ -32,8 +32,8 @@ def update_db_menu():
     try:
         parser = ExcelSheetParser(FILE_PATH, SHEET_NAME)
         preview_results = parser.parse()
-        menus_results = parser.menus
-        # submenus_results = parser.submenus
+        menus_results_excel = parser.menus
+        # submenus_results_excel = parser.submenus
         # dishes_results = parser.dishes
 
         # PREVIEW_URL = SERVER_URL + ALL_MENUS
@@ -94,7 +94,7 @@ def update_db_menu():
                         }
                         requests.post(SERVER_URL + DISHES_URL, json=new_dish_data)
 
-        for menu in menus_results:
+        for menu in menus_results_excel:
             for submenu in menu['submenus']:
                 for dish in submenu['dishes']:
                     if dish['discount'] > 0:

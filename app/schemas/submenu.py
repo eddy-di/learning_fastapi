@@ -1,7 +1,5 @@
 from pydantic import BaseModel
 
-from .dish import Dish
-
 
 class SubMenuBase(BaseModel):
     """SubMenu base schema, inherits `BaseModel` from `pydantic`"""
@@ -43,12 +41,10 @@ class SubMenu(SubMenuBase):
         description: str | None
         ---adding to the model---
         id: str | None
-        dishes: list[Dish] = []
         dishes_count: int = 0
     """
 
     id: str
-    dishes: list[Dish] = []
     dishes_count: int = 0
 
     class Config:
