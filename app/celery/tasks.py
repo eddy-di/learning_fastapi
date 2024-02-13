@@ -4,21 +4,17 @@ import logging
 import requests
 from celery import Celery
 
-from app.celery.helpers.parser import ExcelSheetParser
-from app.config.base import (  # ALL_MENUS,
-    DISH_LINK,
-    DISHES_LINK,
+from app.celery.helpers.compare import crud_dishes, crud_menus, crud_submenus
+from app.celery.helpers.parser import ExcelSheetParser, JsonParser
+from app.config.base import (
+    ALL_MENUS,
     FILE_PATH,
-    MENU_LINK,
-    MENUS_LINK,
     RABBITMQ_DEFAULT_PASS,
     RABBITMQ_DEFAULT_PORT,
     RABBITMQ_DEFAULT_USER,
     RABBITMQ_HOST,
     SERVER_URL,
     SHEET_NAME,
-    SUBMENU_LINK,
-    SUBMENUS_LINK,
 )
 
 app = Celery(
@@ -30,83 +26,22 @@ app = Celery(
 @app.task(max_retries=None, default_retry_delay=15)
 def update_db_menu():
     try:
-        parser = ExcelSheetParser(FILE_PATH, SHEET_NAME)
-        preview_results = parser.parse()
-        menus_results_excel = parser.menus
-        # submenus_results_excel = parser.submenus
-        # dishes_results = parser.dishes
+        # parse excel file from admin folder
+        excel_parser = ExcelSheetParser(FILE_PATH, SHEET_NAME)
+        excel_parser.parse()
 
-        # PREVIEW_URL = SERVER_URL + ALL_MENUS
-        # menu_preview_json = requests.get(PREVIEW_URL).json()
-        # menu_preview = json.loads(menu_preview_json)
+        # get json format of db data
+        PREVIEW_URL = SERVER_URL + ALL_MENUS
+        menu_preview_json = requests.get(PREVIEW_URL).json()
 
-        # print(preview_results)
-        # if preview_results == menu_preview:
-        # print("IF PASSED")
-        for menu in preview_results:
-            MENU_URL = MENU_LINK.format(
-                target_menu_id=menu['id'],
-            )
-            response = requests.get(SERVER_URL + MENU_URL)
-            if response.status_code == 404:
-                new_menu_data = {
-                    'id': menu['id'],
-                    'title': menu['title'],
-                    'description': menu['description']
-                }
-                requests.post(SERVER_URL + MENUS_LINK, json=new_menu_data)
+        # parse db data for comparison
+        db_parser = JsonParser(menu_preview_json)
+        db_parser.parse()
 
-            for submenu in menu['submenus']:
-                SUBMENU_URL = SUBMENU_LINK.format(
-                    target_menu_id=menu['id'],
-                    target_submenu_id=submenu['id'],
-                )
-                response = requests.get(SERVER_URL + SUBMENU_URL)
-                if response.status_code == 404:
-                    SUBMENUS_URL = SUBMENUS_LINK.format(
-                        target_menu_id=menu['id'],
-                    )
-                    new_submenu_data = {
-                        'id': submenu['id'],
-                        'title': submenu['title'],
-                        'description': submenu['description']
-                    }
-                    requests.post(SERVER_URL + SUBMENUS_URL, json=new_submenu_data)
-
-                for dish in submenu['dishes']:
-                    DISH_URL = DISH_LINK.format(
-                        target_menu_id=menu['id'],
-                        target_submenu_id=submenu['id'],
-                        target_dish_id=dish['id'],
-                    )
-                    response = requests.get(SERVER_URL + DISH_URL)
-                    if response.status_code == 404:
-                        DISHES_URL = DISHES_LINK.format(
-                            target_menu_id=menu['id'],
-                            target_submenu_id=submenu['id'],
-                        )
-                        new_dish_data = {
-                            'id': dish['id'],
-                            'title': dish['title'],
-                            'description': dish['description'],
-                            'price': dish['price'],
-                            'discount': dish['discount'],
-                        }
-                        requests.post(SERVER_URL + DISHES_URL, json=new_dish_data)
-
-        for menu in menus_results_excel:
-            for submenu in menu['submenus']:
-                for dish in submenu['dishes']:
-                    if dish['discount'] > 0:
-                        DISH_PATCH_URL = SERVER_URL + DISH_LINK.format(
-                            target_menu_id=menu['id'],
-                            target_submenu_id=submenu['id'],
-                            target_dish_id=dish['id']
-                        )
-                        dish_patch_data = {
-                            'discount': dish['discount']
-                        }
-                        requests.patch(DISH_PATCH_URL, json=dish_patch_data)
+        # crud data in db from excel
+        crud_menus(excel_data=excel_parser.menus, db_data=db_parser.menus,)
+        crud_submenus(excel_data=excel_parser.submenus, db_data=db_parser.submenus,)
+        crud_dishes(excel_data=excel_parser.dishes, db_data=db_parser.dishes,)
 
     except Exception as error:
         logging.error(error)
