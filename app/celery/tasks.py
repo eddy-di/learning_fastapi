@@ -1,10 +1,11 @@
+# import json
 import logging
 
 import requests
 from celery import Celery
 
 from app.celery.helpers.parser import ExcelSheetParser
-from app.config.base import (
+from app.config.base import (  # ALL_MENUS,
     DISH_LINK,
     DISHES_LINK,
     FILE_PATH,
@@ -31,7 +32,17 @@ def update_db_menu():
     try:
         parser = ExcelSheetParser(FILE_PATH, SHEET_NAME)
         preview_results = parser.parse()
+        menus_results = parser.menus
+        # submenus_results = parser.submenus
+        # dishes_results = parser.dishes
 
+        # PREVIEW_URL = SERVER_URL + ALL_MENUS
+        # menu_preview_json = requests.get(PREVIEW_URL).json()
+        # menu_preview = json.loads(menu_preview_json)
+
+        # print(preview_results)
+        # if preview_results == menu_preview:
+        # print("IF PASSED")
         for menu in preview_results:
             MENU_URL = MENU_LINK.format(
                 target_menu_id=menu['id'],
@@ -68,14 +79,12 @@ def update_db_menu():
                         target_submenu_id=submenu['id'],
                         target_dish_id=dish['id'],
                     )
-
                     response = requests.get(SERVER_URL + DISH_URL)
                     if response.status_code == 404:
                         DISHES_URL = DISHES_LINK.format(
                             target_menu_id=menu['id'],
                             target_submenu_id=submenu['id'],
                         )
-
                         new_dish_data = {
                             'id': dish['id'],
                             'title': dish['title'],
@@ -84,6 +93,20 @@ def update_db_menu():
                             'discount': dish['discount'],
                         }
                         requests.post(SERVER_URL + DISHES_URL, json=new_dish_data)
+
+        for menu in menus_results:
+            for submenu in menu['submenus']:
+                for dish in submenu['dishes']:
+                    if dish['discount'] > 0:
+                        DISH_PATCH_URL = SERVER_URL + DISH_LINK.format(
+                            target_menu_id=menu['id'],
+                            target_submenu_id=submenu['id'],
+                            target_dish_id=dish['id']
+                        )
+                        dish_patch_data = {
+                            'discount': dish['discount']
+                        }
+                        requests.patch(DISH_PATCH_URL, json=dish_patch_data)
 
     except Exception as error:
         logging.error(error)

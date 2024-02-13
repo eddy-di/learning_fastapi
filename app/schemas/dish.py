@@ -41,12 +41,6 @@ class DishUpdate(DishBase):
     price: Decimal | None = None
     discount: int = 0
 
-    @property
-    def modified_price(self):
-        if 0 < self.discount <= 100:
-            return self.price * (1 - Decimal(self.discount) / 100)
-        return self.price
-
 
 class Dish(DishBase):
     """
@@ -60,12 +54,6 @@ class Dish(DishBase):
     """
 
     id: str
-
-    @property
-    def modified_price(self):
-        if 0 < self.discount <= 100:
-            return self.price * (1 - Decimal(self.discount) / 100)
-        return self.price
 
     class Config:
         from_attributes = True

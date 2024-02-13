@@ -19,7 +19,6 @@ class MenuService(AppService):
 
         result = await MenuCRUD(self.db).get_preview()
         self.tasks.add_task(MenuCacheCRUD(self.cache).set_preview, result)
-        # await MenuCacheCRUD(self.cache).set_preview(query_result=result)
 
         return result
 
@@ -32,8 +31,6 @@ class MenuService(AppService):
         result = await MenuCRUD(self.db).get_menus()
         self.tasks.add_task(MenuCacheCRUD(self.cache).set_menus, result)
 
-        # await MenuCacheCRUD(self.cache).set_menus(query_result=result)
-
         return result
 
     async def get_menu(self, menu_id: str) -> Menu:
@@ -43,7 +40,6 @@ class MenuService(AppService):
 
         result = await MenuCRUD(self.db).get_menu(menu_id=menu_id)
         self.tasks.add_task(MenuCacheCRUD(self.cache).set_menu, result)
-        # await MenuCacheCRUD(self.cache).set_menu(query_result=result)
 
         return result
 
@@ -56,8 +52,6 @@ class MenuService(AppService):
         result = await MenuCRUD(self.db).create_menu(menu_schema=menu_schema)
         self.tasks.add_task(MenuCacheCRUD(self.cache).set_menu, result)
         self.tasks.add_task(MenuCacheCRUD(self.cache).invalidate_menus)
-        # await MenuCacheCRUD(self.cache).set_menu(query_result=result)
-        # await MenuCacheCRUD(self.cache).invalidate_menus()
 
         return result
 
@@ -74,8 +68,6 @@ class MenuService(AppService):
         )
         self.tasks.add_task(MenuCacheCRUD(self.cache).set_menu, result)
         self.tasks.add_task(MenuCacheCRUD(self.cache).invalidate_menus)
-        # await MenuCacheCRUD(self.cache).set_menu(query_result=result)
-        # await MenuCacheCRUD(self.cache).invalidate_menus()
 
         return result
 
@@ -88,7 +80,5 @@ class MenuService(AppService):
         await MenuCRUD(self.db).delete_menu(menu_id=menu_id)
         self.tasks.add_task(MenuCacheCRUD(self.cache).delete, menu_id)
         self.tasks.add_task(MenuCacheCRUD(self.cache).invalidate_menus)
-        # await MenuCacheCRUD(self.cache).delete(menu_id=menu_id)
-        # await MenuCacheCRUD(self.cache).invalidate_menus()
 
         return JSONResponse(status_code=200, content='menu deleted')

@@ -15,7 +15,7 @@ class ExcelSheetParser:
         self.file: Workbook = load_workbook(filename=filename)
         self.sheet: Worksheet = self.file[sheet_name]
 
-    def parse(self):
+    def parse(self) -> list[dict]:
         """
         Parsing of the Menu.xlsx file to python list of dictionaries
         that fully represent the menu, submenu and dish structure.
@@ -23,7 +23,7 @@ class ExcelSheetParser:
         """
 
         menus: list[dict] = []
-        for row in self.sheet.iter_rows(min_col=0, max_col=7, values_only=True):
+        for row in self.sheet.iter_rows(min_col=0, max_col=8, values_only=True):
 
             if row[0]:
                 menu_id, title, description = row[0], row[1], row[2]

@@ -22,8 +22,7 @@ async def init_db():
 
 
 async def get_async_db():
-    # """
-    # Creates a database session and closes it after finishing.
-    # """
+    """Creates async database session."""
+
     async with AsyncSessionLocal() as session:
         yield session
