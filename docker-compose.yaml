@@ -3,6 +3,8 @@ version: '3'
 services:
   web:
     build: .
+    networks:
+      - ylab_menu_web_network
     volumes:
       - .:/app
     ports:
@@ -19,6 +21,8 @@ services:
 
   db:
     image: postgres:15.1-alpine
+    networks:
+      - ylab_menu_web_network
     volumes:
       - postgres_data:/var/lib/postgresql/data/
     expose:
@@ -35,6 +39,8 @@ services:
     image: redis:latest
     container_name: redis
     restart: always
+    networks:
+      - ylab_menu_web_network
     volumes:
       - redis_data:/data
     expose:
@@ -62,6 +68,8 @@ services:
     hostname: rabbitmq
     restart: always
     container_name: rabbitmq
+    networks:
+      - ylab_menu_web_network
     volumes:
       - rabbit_data:/var/lib/rabbitmq
     env_file:
@@ -74,7 +82,13 @@ services:
       timeout: 30s
       retries: 5
 
+networks:
+  ylab_menu_web_network:
+    name: ylab_menu_web_network
 volumes:
   postgres_data:
+    name: postgres_data
   redis_data:
+    name: redis_data
   rabbit_data:
+    name: rabbit_data

@@ -8,9 +8,8 @@ description = """
 # Menu management applications API
 This API is created solely to fulfill the requirements for completing an intensive course at Y-Lab to get internship.
 It consists of Preview part that gives list of evertyhing in database, main Menu that can have Submenus, which in its own accord has Dishes with prices.\n
-## Preview
-Gives an access to all available objects in database through `GET` method.
 ## Menus
+Path `api/v1/menus/preview` gives an access to all available objects in database through `GET` method.
 You can `GET` list of menus, `POST` a menu, `GET`, `PATCH` or `DELETE` specific menu.
 ## Submenus
 You can `GET` list of submenus in a menu, `POST` a submenu in a menu, `GET`, `PATCH` or `DELETE` specific submenu in a menu.
