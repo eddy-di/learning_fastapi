@@ -44,7 +44,7 @@ class SubMenu(SubMenuBase):
         dishes_count: int = 0
     """
 
-    id: str | None = None
+    id: str
     dishes_count: int = 0
 
     class Config:

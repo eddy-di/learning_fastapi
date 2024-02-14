@@ -18,7 +18,7 @@ class MenuCreate(MenuBase):
         id: str | None
     """
 
-    id: str | None
+    id: str | None = None
 
 
 class MenuUpdate(MenuBase):
@@ -45,7 +45,7 @@ class Menu(MenuBase):
         dishes_count: int = 0
     """
 
-    id: str | None = None
+    id: str
     submenus_count: int = 0
     dishes_count: int = 0
 

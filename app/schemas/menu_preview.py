@@ -28,7 +28,7 @@ class SubmenuPreview(SubmenuPreviewBase):
         dishes: list[Dish] = []
     """
 
-    id: str | None = None
+    id: str
     dishes: list[Dish] = []
 
     class Config:
@@ -46,7 +46,7 @@ class MenuPreview(MenuPreviewBase):
         submenus: list[SubmenuPreview] = []
     """
 
-    id: str | None = None
+    id: str
     submenus: list[SubmenuPreview] = []
 
     class Config:
