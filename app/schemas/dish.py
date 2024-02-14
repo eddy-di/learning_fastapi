@@ -32,7 +32,7 @@ class DishCreate(DishBase):
         id: str | None
     """
 
-    id: str | None
+    id: str | None = None
 
 
 class DishUpdate(DishBase):
@@ -64,7 +64,7 @@ class Dish(DishBase):
         price field validated and shown with dicount
     """
 
-    id: str
+    id: str | None = None
 
     @model_validator(mode='before')
     @classmethod

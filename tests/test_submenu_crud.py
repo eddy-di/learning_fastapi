@@ -8,6 +8,7 @@ from app.routers.submenu import (
     get_submenus,
     update_submenu,
 )
+from app.utils.generators import generate_uuid
 from app.utils.pathfinder import reverse
 
 
@@ -48,6 +49,7 @@ async def test_submenu_post(async_client: AsyncClient, create_menu):
     url = reverse(create_submenu, target_menu_id=menu.id)
     # when: executing CRUD operation post
     post_data = {
+        'id': generate_uuid(),
         'title': 'subMenuTitle1',
         'description': 'subMenuDescription1'
     }

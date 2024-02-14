@@ -45,7 +45,7 @@ class Menu(MenuBase):
         dishes_count: int = 0
     """
 
-    id: str
+    id: str | None = None
     submenus_count: int = 0
     dishes_count: int = 0
 

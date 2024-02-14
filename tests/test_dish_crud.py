@@ -2,6 +2,7 @@ import pytest
 from httpx import AsyncClient
 
 from app.routers.dish import create_dish, delete_dish, get_dish, get_dishes, update_dish
+from app.utils.generators import generate_uuid
 from app.utils.pathfinder import reverse
 
 
@@ -41,6 +42,7 @@ async def test_dish_post(async_client: AsyncClient, create_menu, create_submenu)
     url = reverse(create_dish, target_menu_id=menu.id, target_submenu_id=submenu.id)
     # when: executing CRUD operation post
     post_data = {
+        'id': generate_uuid(),
         'title': 'testDishTitle1',
         'description': 'testDishDescription1',
         'price': '12.12'

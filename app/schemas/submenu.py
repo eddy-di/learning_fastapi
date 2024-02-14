@@ -18,7 +18,7 @@ class SubMenuCreate(SubMenuBase):
         id: str | None
     """
 
-    id: str | None
+    id: str | None = None
 
 
 class SubMenuUpdate(SubMenuBase):
@@ -44,7 +44,7 @@ class SubMenu(SubMenuBase):
         dishes_count: int = 0
     """
 
-    id: str
+    id: str | None = None
     dishes_count: int = 0
 
     class Config:
