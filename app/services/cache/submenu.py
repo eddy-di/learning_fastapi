@@ -6,7 +6,6 @@ from app.services.main import CacheCRUD
 
 
 class SubMenuCacheCRUD(CacheCRUD):
-
     """
     Service for caching endpoints' CRUD operations.\n
     Avaiable methods: `get_submenu`, `set_submenu`, `delete`.

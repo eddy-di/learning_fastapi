@@ -42,7 +42,9 @@ app = FastAPI(
 
 
 @app.on_event('startup')
-async def on_startup():
+async def on_startup() -> None:
+    """Function that is being run on startup to access database and start celery background tasks."""
+
     await init_db()
 
     update_db_menu.delay()

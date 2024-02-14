@@ -13,7 +13,9 @@ from app.config.base import (
 )
 
 
-def compare_models_data(excel_data: dict, db_data: dict):
+def compare_models_data(excel_data: dict, db_data: dict) -> tuple[set, set, set]:
+    """Comparing keys from parsed dict objects to know where to make changes like update, create or delete."""
+
     excel_keys = excel_data.keys()
     db_keys = db_data.keys()
 
@@ -23,7 +25,12 @@ def compare_models_data(excel_data: dict, db_data: dict):
     return (ids_to_create, ids_to_update, ids_to_delete)
 
 
-def crud_menus(excel_data: dict, db_data: dict):
+def crud_menus(excel_data: dict, db_data: dict) -> None:
+    """
+    Takes result of `compare_models_data` function and performs necessary tasks for menu model and its instances.
+    Prioritizing the excel as the main source for CREATE, UPDATE and DELETE operations.
+    """
+
     logging.info('Compare and update menus.')
     ids_to_create, ids_to_update, ids_to_delete = compare_models_data(excel_data, db_data)
 
@@ -43,7 +50,12 @@ def crud_menus(excel_data: dict, db_data: dict):
         requests.delete(url)
 
 
-def crud_submenus(excel_data: dict, db_data: dict):
+def crud_submenus(excel_data: dict, db_data: dict) -> None:
+    """
+    Takes result of `compare_models_data` function and performs necessary tasks for submenu model and its instances.
+    Prioritizing the excel as the main source for CREATE, UPDATE and DELETE operations.
+    """
+
     logging.info('Compare and update submenus.')
     ids_to_create, ids_to_update, ids_to_delete = compare_models_data(excel_data, db_data)
 
@@ -69,7 +81,12 @@ def crud_submenus(excel_data: dict, db_data: dict):
         requests.delete(url)
 
 
-def crud_dishes(excel_data: dict, db_data: dict):
+def crud_dishes(excel_data: dict, db_data: dict) -> None:
+    """
+    Takes result of `compare_models_data` function and performs necessary tasks for dish model and its instances.
+    Prioritizing the excel as the main source for CREATE, UPDATE and DELETE operations.
+    """
+
     logging.info('Compare and update dishes.')
     ids_to_create, ids_to_update, ids_to_delete = compare_models_data(excel_data, db_data)
 

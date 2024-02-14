@@ -6,7 +6,6 @@ from app.services.main import CacheCRUD
 
 
 class DishCacheCRUD(CacheCRUD):
-
     """
     Service for caching endpoints' CRUD operations.\n
     Avaiable methods: `get_dish`, `set_dish`, `delete`.

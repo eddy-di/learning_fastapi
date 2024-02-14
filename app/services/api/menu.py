@@ -13,6 +13,7 @@ class MenuService(AppService):
     """Service for querying the menu data from database and cache."""
 
     async def get_preview(self) -> list[Menu]:
+        """Query to get menus preview with all instances of database."""
 
         if everything := await MenuCacheCRUD(self.cache).get_preview():
             return everything

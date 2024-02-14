@@ -18,7 +18,7 @@ def not_found_exception() -> HTTPException:
 class MenuCRUD(DatabaseCRUD):
     """Service for querying specific menu."""
 
-    async def get_preview(self):
+    async def get_preview(self) -> list[MenuModel]:
         """
         Returns result of a PostgreSQl query:
             SELECT
@@ -85,6 +85,7 @@ class MenuCRUD(DatabaseCRUD):
 
     async def create_menu(self, menu_schema: MenuCreate) -> MenuModel:
         """Create menu instance in database."""
+
         if menu_schema.id:
             new_menu = MenuModel(
                 id=menu_schema.id,

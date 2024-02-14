@@ -1,4 +1,3 @@
-# import json
 import logging
 
 import requests
@@ -24,7 +23,12 @@ app = Celery(
 
 
 @app.task(max_retries=None, default_retry_delay=15)
-def update_db_menu():
+def update_db_menu() -> None:
+    """
+    Celery task that utilizes the results of parsed excel sheet and the database condition
+    from `get_menus_preview` endpoint performing all necessary checks and CRUD operations.
+    """
+
     try:
         # parse excel file from admin folder
         excel_parser = ExcelSheetParser(FILE_PATH, SHEET_NAME)
@@ -39,9 +43,18 @@ def update_db_menu():
         db_parser.parse()
 
         # crud data in db from excel
-        crud_menus(excel_data=excel_parser.menus, db_data=db_parser.menus,)
-        crud_submenus(excel_data=excel_parser.submenus, db_data=db_parser.submenus,)
-        crud_dishes(excel_data=excel_parser.dishes, db_data=db_parser.dishes,)
+        crud_menus(
+            excel_data=excel_parser.menus,
+            db_data=db_parser.menus
+        )
+        crud_submenus(
+            excel_data=excel_parser.submenus,
+            db_data=db_parser.submenus
+        )
+        crud_dishes(
+            excel_data=excel_parser.dishes,
+            db_data=db_parser.dishes
+        )
 
     except Exception as error:
         logging.error(error)

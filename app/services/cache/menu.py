@@ -10,7 +10,6 @@ from app.services.main import CacheCRUD
 
 
 class MenuCacheCRUD(CacheCRUD):
-
     """
     Service for caching endpoints' CRUD operations.\n
     Avaiable methods: `get_menu`, `set_menu`, `delete`.

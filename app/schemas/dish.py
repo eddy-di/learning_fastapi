@@ -1,4 +1,5 @@
 from decimal import ROUND_HALF_UP, Decimal
+from typing import Any
 
 from pydantic import BaseModel, Field, model_validator
 
@@ -60,13 +61,16 @@ class Dish(DishBase):
         discount: int | 0
         ---adding to the model---
         id: str | None
+        price field validated and shown with dicount
     """
 
     id: str
 
     @model_validator(mode='before')
     @classmethod
-    def validate_atts(cls, data):
+    def validate_atts(cls, data: Any) -> Any:
+        """Validates if the discount is in range from 0 to 100 and sets price according to the discount."""
+
         if 0 < data.discount <= 100:
             discounted_price = Decimal(
                 data.price * (1 - Decimal(round(data.discount / 100, 2)))

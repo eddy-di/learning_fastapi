@@ -3,6 +3,11 @@ from openpyxl.worksheet.worksheet import Worksheet
 
 
 class ExcelSheetParser:
+    """
+    Excel parser class, parses from Excel sheet returns dictionaries
+    of all menu, submenu and dish instances with their IDs as their keys.
+    """
+
     menus: dict = {}
     submenus: dict = {}
     dishes: dict = {}
@@ -10,7 +15,7 @@ class ExcelSheetParser:
     file: Workbook = None
     sheet: Worksheet = None
 
-    def __init__(self, filename: str, sheet_name: str):
+    def __init__(self, filename: str, sheet_name: str) -> None:
         self.file: Workbook = load_workbook(filename=filename)
         self.sheet: Worksheet = self.file[sheet_name]
         self.menus: dict = {}
@@ -19,9 +24,9 @@ class ExcelSheetParser:
 
     def parse(self) -> None:
         """
-        Parsing of the Menu.xlsx file to python list of dictionaries
+        Parsing of the Menu.xlsx file to python dict of dictionaries
         that fully represent the menu, submenu and dish structure.
-        Necessary for further convergence to json and comparison with the pydantic schema models.
+        Necessary for further comparison with the pydantic schema models.
         """
 
         menus: dict = {}
@@ -72,18 +77,29 @@ class ExcelSheetParser:
 
 
 class JsonParser:
+    """
+    Json parser class, parses from the result of `menu_preview` endpoint and returns dictionaries
+    of all menu, submenu and dish instances with their IDs as their keys.
+    """
+
     menus: dict = {}
     submenus: dict = {}
     dishes: dict = {}
     data: dict = {}
 
-    def __init__(self, json_data: dict):
+    def __init__(self, json_data: dict) -> None:
         self.data = json_data
         self.menus: dict = {}
         self.submenus: dict = {}
         self.dishes: dict = {}
 
-    def parse(self):
+    def parse(self) -> None:
+        """
+        Parsing of the result of `get_menus_preview` endpoint to python dict of dictionaries
+        that fully represent the menu, submenu and dish structure.
+        Necessary for further comparison with the excel parser to compare and do further tasks.
+        """
+
         for menu in self.data:
             if menu['id'] not in self.menus:
                 menu_data = {
