@@ -66,36 +66,17 @@ docker-compose -f docker-compose-tests.yaml up -d; docker logs --follow test_web
 6. Юнит тесты проверяющие CRUD эндпоинтов по блюдам доступны [тут](https://github.com/eddy-di/learning_fastapi/blob/main/tests/test_dish_crud.py).
 
 
-## 4. Путь к сложному ORM запросу (устарело см. пункт 6 ДЗ 4)
+## 4. Путь к сложному ORM запросу
 
-1. Можете увидеть выполнение SQLAlchemy ORM запроса по [этой ссылке](https://github.com/eddy-di/learning_fastapi/blob/469fca66b163d470eb87ff92a5537a41f532781f/app/services/database/menu.py#L24).
-2. В переменной `menus` хранится ORM запрос к базе данных. Начало 25 линия, конец 33.
+1. Можете увидеть выполнение SQLAlchemy ORM запроса по [этой ссылке](https://github.com/eddy-di/learning_fastapi/blob/187a08fcb6f9e9467308e404529dfbdca5d40eae/app/services/database/menu.py#L58).
+2. В переменной `menus` хранится ORM запрос к базе данных. Начало 58 линия, конец 69.
 
-## 5. Пункты 3 Домашнего задания (устарело см. пункт 6 ДЗ 4)
-
-1. Вынести бизнес логику и запросы в отдельные слои приложения:
-    - бизнес логика доступна по пути [`.app/services/api`](https://github.com/eddy-di/learning_fastapi/tree/main/app/services/api),
-    - запросы в redis кэш доступны по пути [`.app/services/cache`](https://github.com/eddy-di/learning_fastapi/tree/main/app/services/cache),
-    - запросы в базу данных доступны по пути [`.app/services/database`](https://github.com/eddy-di/learning_fastapi/tree/main/app/services/database).
-
-2. Кеширование запросов API происходит по пути `.app/services/cache` с разделением на файлы для каждой модели отдельно. Инвалидация кэша происходит в методах с названием `invalidate_<model_name>s`, например [тут](https://github.com/eddy-di/learning_fastapi/blob/469fca66b163d470eb87ff92a5537a41f532781f/app/services/cache/dish.py#L27), расположенных в классах `<ModelName>CacheCRUD`, например [тут](https://github.com/eddy-di/learning_fastapi/blob/469fca66b163d470eb87ff92a5537a41f532781f/app/services/cache/dish.py#L8).
-
-3. pre-commit хуки в проект добавлены, изменения были в двух местах:
-    - [строка 8](https://github.com/eddy-di/learning_fastapi/blob/895b422e3cf234199f8bfd745feceaba9bd34eeb/.pre-commit-config.yaml#L8): `id: check-toml` так как используется poetry,
-    - [строка 52](https://github.com/eddy-di/learning_fastapi/blob/895b422e3cf234199f8bfd745feceaba9bd34eeb/.pre-commit-config.yaml#L52): `additional_dependencies: [types-redis, types-requests]` ругался в работе с редис
-
-4. Везде добавлены typehints кроме функции [`create_redis`](https://github.com/eddy-di/learning_fastapi/blob/895b422e3cf234199f8bfd745feceaba9bd34eeb/app/config/cache.py#L6) отвечающей за подключение к базе Redis из `.app/config/cache.py`, не получается даже с предыдущим 2 подпунктом pre-commit хука.
-
-5. В роутерах присутствуют `response_model=`, [пример](https://github.com/eddy-di/learning_fastapi/blob/469fca66b163d470eb87ff92a5537a41f532781f/app/routers/dish.py#L20), у всех API эндпоинтов. А также добавлены метаданные для более точного описания эндпоинтов и за что они ответственны. Добавлены теги для каждой модели в роутерах, а также метаданные (имя и описание) в [`main.py`](https://github.com/eddy-di/learning_fastapi/blob/main/app/main.py) в [`openapi_tags=`](https://github.com/eddy-di/learning_fastapi/blob/895b422e3cf234199f8bfd745feceaba9bd34eeb/app/main.py#L30) части.
-
-6. Добавлена функция [`reverse()`](https://github.com/eddy-di/learning_fastapi/blob/895b422e3cf234199f8bfd745feceaba9bd34eeb/app/utils/pathfinder.py#L15), используется в тестах pytest, [пример](https://github.com/eddy-di/learning_fastapi/blob/5794d5241c145fe9e5a3152010c3814227e9a37a/tests/test_case4_counters.py#L26).
-
-## 6 Пункты 4 Домашнего задания
+## 5. Пункты 4 Домашнего задания
 
 1. Переход от синхронного к асинхронному при соединении к базе данных и кэшу, а также слой бизнес логики асинхронен.
-2. Добавление фоновых задач с проверками и перепроверками доступны [тут](app/celery/).
-3. Добавлен новый эндпоинт с выводом всех имеющихся объектов в базе данных [тут](https://github.com/eddy-di/learning_fastapi/blob/0500f4a186e400fc4ac3843a54defbabc97e24f3/app/routers/menu.py#L25).
-4. Реализация кеша через встроенный BackgroundTasks присутствует, и полностью используется по всему файлу по этому [пути](app/services/api/). Во всех файлах моделей можно увидеть, [пример](https://github.com/eddy-di/learning_fastapi/blob/0500f4a186e400fc4ac3843a54defbabc97e24f3/app/services/api/dish.py#L27).
-5. Обновление происходит не из GoogleSheets а из Menu.xlsx из папке [/app/admin/Menu.xlsx](app/admin/Menu.xlsx).
-6. Пока что не было времени протестровать, но есть момент отвечающий за то как парсинг с экселя [считывает скидку](https://github.com/eddy-di/learning_fastapi/blob/0500f4a186e400fc4ac3843a54defbabc97e24f3/app/celery/helpers/parser.py#L53), что в дальнейшем идет на валидацию со схем [тут](https://github.com/eddy-di/learning_fastapi/blob/0500f4a186e400fc4ac3843a54defbabc97e24f3/app/schemas/dish.py#L45).
+2. Добавление фоновых задач с проверками и перепроверками доступны [тут](app/celery/tasks.py).
+3. Добавлен новый эндпоинт с выводом всех имеющихся объектов в базе данных [тут](https://github.com/eddy-di/learning_fastapi/blob/187a08fcb6f9e9467308e404529dfbdca5d40eae/app/routers/menu.py#L25).
+4. Реализация кеша через встроенный BackgroundTasks присутствует, и полностью используется по всему файлу по этому [пути](app/services/api/). Во всех файлах моделей можно увидеть, [пример](https://github.com/eddy-di/learning_fastapi/blob/187a08fcb6f9e9467308e404529dfbdca5d40eae/app/services/api/dish.py#L28).
+5. Обновление происходит не из GoogleSheets а из Menu.xlsx из папки [/app/admin/Menu.xlsx](app/admin/Menu.xlsx).
+6. Размер скидки просчитывается во врмея парсинга с экзеля [тут](https://github.com/eddy-di/learning_fastapi/blob/187a08fcb6f9e9467308e404529dfbdca5d40eae/app/celery/helpers/parser.py#L60), с 60 по 62 строку, что в дальнейшем идет на валидацию в pydantic схемах [тут](https://github.com/eddy-di/learning_fastapi/blob/187a08fcb6f9e9467308e404529dfbdca5d40eae/app/schemas/dish.py#L71), и в случае если была прописана скидка в G колонне в эксель файле то автоматически программа покажет цену со скидкой.
 ---
