@@ -4,7 +4,6 @@ import pytest
 from httpx import AsyncClient
 
 from app.routers.menu import create_menu, delete_menu, get_menu, get_menus, update_menu
-from app.utils.generators import generate_uuid
 from app.utils.pathfinder import reverse
 
 
@@ -61,7 +60,6 @@ async def test_menu_post(async_client: AsyncClient):
     url = reverse(create_menu)
     # when: executing CRUD operation post on list with post_data
     post_data = {
-        'id': generate_uuid(),
         'title': 'Menu 1',
         'description': 'Menu 1 description'
     }
