@@ -1,8 +1,6 @@
 import uuid
 
 import pytest
-
-# from .conftest import async_client
 from httpx import AsyncClient
 
 from app.routers.dish import create_dish, get_dishes
@@ -210,10 +208,3 @@ async def test_get_menus_list(scenario_client: AsyncClient,):
     # then: expecting to get status code 200 and empty menus
     assert response.status_code == 200
     assert response.json() == []
-
-# @pytest.mark.asyncio
-# async def test_end(
-    # cache_flush
-# ):
-    # ###necessary to cleanup db
-    # cache_flush
