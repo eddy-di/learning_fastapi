@@ -66,17 +66,12 @@ docker-compose -f docker-compose-tests.yaml up -d; docker logs --follow test_web
 6. Юнит тесты проверяющие CRUD эндпоинтов по блюдам доступны [тут](https://github.com/eddy-di/learning_fastapi/blob/main/tests/test_dish_crud.py).
 
 
-## 4. Путь к сложному ORM запросу
-
-1. Можете увидеть выполнение SQLAlchemy ORM запроса по [этой ссылке](https://github.com/eddy-di/learning_fastapi/blob/187a08fcb6f9e9467308e404529dfbdca5d40eae/app/services/database/menu.py#L58).
-2. В переменной `menus` хранится ORM запрос к базе данных. Начало 58 линия, конец 69.
-
-## 5. Пункты 4 Домашнего задания
+## 4. Пункты 4 Домашнего задания
 
 1. Переход от синхронного к асинхронному при соединении к базе данных и кэшу, а также слой бизнес логики асинхронен.
 2. Добавление фоновых задач с проверками и перепроверками доступны [тут](app/celery/tasks.py).
 3. Добавлен новый эндпоинт с выводом всех имеющихся объектов в базе данных [тут](https://github.com/eddy-di/learning_fastapi/blob/187a08fcb6f9e9467308e404529dfbdca5d40eae/app/routers/menu.py#L25).
 4. Реализация кеша через встроенный BackgroundTasks присутствует, и полностью используется по всему файлу по этому [пути](app/services/api/). Во всех файлах моделей можно увидеть, [пример](https://github.com/eddy-di/learning_fastapi/blob/187a08fcb6f9e9467308e404529dfbdca5d40eae/app/services/api/dish.py#L28).
 5. Обновление происходит не из GoogleSheets а из Menu.xlsx из папки [/app/admin/Menu.xlsx](app/admin/Menu.xlsx).
-6. Размер скидки просчитывается во врмея парсинга с экзеля [тут](https://github.com/eddy-di/learning_fastapi/blob/187a08fcb6f9e9467308e404529dfbdca5d40eae/app/celery/helpers/parser.py#L60), с 60 по 62 строку, что в дальнейшем идет на валидацию в pydantic схемах [тут](https://github.com/eddy-di/learning_fastapi/blob/187a08fcb6f9e9467308e404529dfbdca5d40eae/app/schemas/dish.py#L71), и в случае если была прописана скидка в G колонне в эксель файле то автоматически программа покажет цену со скидкой.
+6. Размер скидки просчитывается во время парсинга с экзеля [тут](https://github.com/eddy-di/learning_fastapi/blob/187a08fcb6f9e9467308e404529dfbdca5d40eae/app/celery/helpers/parser.py#L60), с 60 по 62 строку, что в дальнейшем идет на валидацию в pydantic схемах [тут](https://github.com/eddy-di/learning_fastapi/blob/187a08fcb6f9e9467308e404529dfbdca5d40eae/app/schemas/dish.py#L71), и в случае если была прописана скидка в G колонне в эксель файле то автоматически программа покажет цену со скидкой.
 ---
