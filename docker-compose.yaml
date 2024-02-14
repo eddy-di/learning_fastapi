@@ -55,6 +55,8 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+    networks:
+      - ylab_menu_web_network
     env_file:
       - .env_compose
     container_name: celery
