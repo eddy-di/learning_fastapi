@@ -36,7 +36,7 @@ http://localhost:8000/docs
 
 Вы должны будете увидеть такую страницу с реализованными эндпоинтами: ![image](./readme_images/schemas_menu.png "Пример эндпоинтов")
 
-5. Проверить можно с запросами на эндпоинты. Через первый и второй видно будет что Celery таски отработали и создали в базе данных всё так как указано в `Menu.xlsx`.
+5. Проверить можно с запросами на эндпоинты. Через первый и второй видно будет что Celery таски отработали и создали в базе данных всё так как указано в `Menu.xlsx`, в случае если сразу не начнется то переотправьте запрос подождав несколько секунд.
 6. Для того чтобы отключить поднятый сервер в docker'e находясь в корневой директории проекта введите:
 
 ```
@@ -69,9 +69,9 @@ docker-compose -f docker-compose-tests.yaml up -d; docker logs --follow test_web
 ## 4. Пункты 4 Домашнего задания
 
 1. Переход от синхронного к асинхронному при соединении к базе данных и кэшу, а также слой бизнес логики асинхронен.
-2. Добавление фоновых задач с проверками и перепроверками доступны [тут](app/celery/tasks.py).
+2. Добавление фоновых Celery задач с проверками и перепроверками доступны [тут](app/celery/tasks.py).
 3. Добавлен новый эндпоинт с выводом всех имеющихся объектов в базе данных [тут](https://github.com/eddy-di/learning_fastapi/blob/187a08fcb6f9e9467308e404529dfbdca5d40eae/app/routers/menu.py#L25).
-4. Реализация кеша через встроенный BackgroundTasks присутствует, и полностью используется по всему файлу по этому [пути](app/services/api/). Во всех файлах моделей можно увидеть, [пример](https://github.com/eddy-di/learning_fastapi/blob/187a08fcb6f9e9467308e404529dfbdca5d40eae/app/services/api/dish.py#L28).
-5. Обновление происходит не из GoogleSheets а из Menu.xlsx из папки [/app/admin/Menu.xlsx](app/admin/Menu.xlsx).
+4. Реализация кеша через встроенный BackgroundTasks присутствует, и полностью используется по всему файлу по этому [пути](app/services/api/). Во всех файлах моделей можно увидеть, [пример тут](https://github.com/eddy-di/learning_fastapi/blob/0e5a0c414a9c2ea8b7659cea0c1dbea061f462f7/app/services/api/dish.py#L28) из слоя бизнес логики.
+5. Обновление происходит не из GoogleSheets а из Menu.xlsx из папки [/app/admin/Menu.xlsx](app/admin/Menu.xlsx) посредством класса [ExcelSheetParser](https://github.com/eddy-di/learning_fastapi/blob/0e5a0c414a9c2ea8b7659cea0c1dbea061f462f7/app/celery/helpers/parser.py#L5) и метода [parse](https://github.com/eddy-di/learning_fastapi/blob/0e5a0c414a9c2ea8b7659cea0c1dbea061f462f7/app/celery/helpers/parser.py#L25).
 6. Размер скидки просчитывается во время парсинга с экзеля [тут](https://github.com/eddy-di/learning_fastapi/blob/187a08fcb6f9e9467308e404529dfbdca5d40eae/app/celery/helpers/parser.py#L60), с 60 по 62 строку, что в дальнейшем идет на валидацию в pydantic схемах [тут](https://github.com/eddy-di/learning_fastapi/blob/187a08fcb6f9e9467308e404529dfbdca5d40eae/app/schemas/dish.py#L71), и в случае если была прописана скидка в G колонне в эксель файле то автоматически программа покажет цену со скидкой.
 ---
